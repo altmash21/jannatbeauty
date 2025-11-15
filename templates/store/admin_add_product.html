@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin: Add Product{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:720px;">
+    <div class="card">
+        <h3 style="margin:0 0 0.5rem 0;">Add Product (Admin)</h3>
+        <form method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:0.6rem;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div style="margin-top:0.5rem;"><button type="submit" class="btn">Add Product</button></div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Registration - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <div class="card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <i class="fas fa-store" style="font-size: 3rem; color: #e67e22; margin-bottom: 1rem;"></i>
+            <h2>Seller Registration</h2>
+            <p style="color: #aaa;">Join our marketplace and start selling your products</p>
+        </div>
+        
+        <form method="post" id="registerForm" novalidate>
+            {% csrf_token %}
+
+            {# Show non-field errors #}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {# Render each form field so validation errors and previously submitted values are preserved #}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Seller Benefits:</strong>
+                <ul style="margin: 0.5rem 0 0 1rem;">
+                    <li>Create and manage your products</li>
+                    <li>Track orders and sales</li>
+                    <li>Access analytics dashboard</li>
+                    <li>Manage your store profile</li>
+                </ul>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; margin-bottom: 1rem;">
+                <i class="fas fa-store"></i> Create Seller Account
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <p style="color: #aaa;">Just want to shop?</p>
+            <a href="{% url 'accounts:register_customer' %}" class="btn btn-secondary">
+                <i class="fas fa-shopping-bag"></i> Register as Customer
+            </a>
+        </div>
+        
+        <div style="text-align: center; margin-top: 1rem;">
+            <p style="color: #aaa;">Already have an account?</p>
+            <a href="{% url 'accounts:login' %}">Sign in here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

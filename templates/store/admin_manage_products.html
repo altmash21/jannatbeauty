@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Products (Admin){% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h3 style="margin:0 0 1rem 0;">Manage Products (Admin)</h3>
+        <div class="grid grid-3">
+            {% for product in products %}
+            <div class="card">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" style="width:100%; height:150px; object-fit:cover; border-radius:6px; margin-bottom:0.5rem;">
+                {% endif %}
+                <h4 style="margin:0 0 0.3rem 0;">{{ product.name }}</h4>
+                <p style="margin:0 0 0.5rem 0; font-size:0.95rem;">{{ product.description|truncatechars:100 }}</p>
+                <div style="display:flex; gap:0.4rem;">
+                    <a href="{% url 'store:edit_product' product.id %}" class="btn">Edit</a>
+                    <a href="{% url 'store:delete_product' product.id %}" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>No products found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

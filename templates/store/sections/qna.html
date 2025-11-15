@@ -1,0 +1,64 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/sections/qna.css' %}">
+<div class="qna-section home-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="qna-container">
+            <div class="qna-item">
+                <div class="qna-question" onclick="toggleQnA(this)">
+                    <h3>What is Jannat Beauty?</h3>
+                    <span class="qna-icon">+</span>
+                </div>
+                <div class="qna-answer"><p>Jannat Beauty is your one-stop shop for curated Quran collections, inspiring books, prayer essentials, and gifts for every journey of faith and knowledge.</p></div>
+            </div>
+            <div class="qna-item">
+                <div class="qna-question" onclick="toggleQnA(this)">
+                    <h3>How can I place an order?</h3>
+                    <span class="qna-icon">+</span>
+                </div>
+                <div class="qna-answer"><p>Simply browse our store, add items to your cart, and proceed to checkout. You can pay securely using our integrated payment gateway.</p></div>
+            </div>
+            <div class="qna-item">
+                <div class="qna-question" onclick="toggleQnA(this)">
+                    <h3>Do you offer international shipping?</h3>
+                    <span class="qna-icon">+</span>
+                </div>
+                <div class="qna-answer"><p>Yes, we ship to many countries worldwide through our shipping partners. Shipping rates and delivery times vary based on your location.</p></div>
+            </div>
+            <div class="qna-item">
+                <div class="qna-question" onclick="toggleQnA(this)">
+                    <h3>What payment methods do you accept?</h3>
+                    <span class="qna-icon">+</span>
+                </div>
+                <div class="qna-answer"><p>We accept all major credit/debit cards, UPI, net banking, and wallet payments through our secure Razorpay payment gateway.</p></div>
+            </div>
+            <div class="qna-item">
+                <div class="qna-question" onclick="toggleQnA(this)">
+                    <h3>Can I return or exchange products?</h3>
+                    <span class="qna-icon">+</span>
+                </div>
+                <div class="qna-answer"><p>Yes, we have a hassle-free return and exchange policy. Please contact our customer support within 7 days of receiving your order.</p></div>
+            </div>
+            <div class="qna-item">
+                <div class="qna-question" onclick="toggleQnA(this)">
+                    <h3>How can I track my order?</h3>
+                    <span class="qna-icon">+</span>
+                </div>
+                <div class="qna-answer"><p>Once your order is shipped, you'll receive a tracking number via email. You can also check your order status in the "My Orders" section of your account.</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QnA styles moved to static/css/sections/qna.css -->
+
+<script>
+function toggleQnA(element) {
+    const qnaItem = element.parentElement;
+    const allItems = document.querySelectorAll('.qna-item');
+    allItems.forEach(item => { if (item !== qnaItem) item.classList.remove('active'); });
+    qnaItem.classList.toggle('active');
+}
+</script>

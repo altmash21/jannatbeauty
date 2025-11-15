@@ -1,0 +1,77 @@
+{% comment %} Reusable account sidebar (desktop + mobile) {% endcomment %}
+<style>
+/* Sidebar shared styles */
+.profile-container { display: grid; grid-template-columns: 250px 1fr; gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+.profile-sidebar { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: fit-content; position: sticky; top: 80px; }
+.sidebar-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; cursor: pointer; border-left: 4px solid transparent; transition: all 0.3s ease; color: #333; text-decoration: none; }
+.sidebar-item:hover { background: #f5f5f5; color: var(--color-primary); }
+.sidebar-item.active { background: var(--color-primary-bg); border-left-color: var(--color-primary); color: var(--color-primary); font-weight: 600; }
+.sidebar-item i { width: 20px; text-align: center; font-size: 1.1rem; }
+
+/* Mobile menu list (used on small screens) */
+.mobile-menu-list { display: none; }
+.mobile-menu-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; text-decoration: none; color: #333; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; }
+.mobile-menu-item:last-child { border-bottom: none; }
+.mobile-menu-item:hover { background: #f9f9f9; }
+.mobile-menu-item.active { background: var(--color-primary-bg); color: var(--color-primary); }
+.menu-icon { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+
+@media (max-width: 768px) {
+    .profile-container { grid-template-columns: 1fr; gap: 0; padding: 0; }
+    .profile-sidebar { display: none; }
+    .mobile-menu-list { display: block; background: #fff; border-radius: 12px; margin: 1rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+}
+</style>
+
+<!-- Desktop Sidebar -->
+<aside class="profile-sidebar" id="profileSidebar">
+    <a href="{% url 'accounts:customer_profile' %}" class="sidebar-item {% if request.path == '/accounts/customer/profile/' %}active{% endif %}"><i class="fas fa-user"></i><span>Profile Details</span></a>
+    <a href="{% url 'accounts:customer_order_history' %}" class="sidebar-item {% if request.path == '/accounts/customer/orders/' %}active{% endif %}"><i class="fas fa-shopping-bag"></i><span>My Orders</span></a>
+    <a href="#" class="sidebar-item"><i class="fas fa-map-marker-alt"></i><span>My Address</span></a>
+    <a href="{% url 'accounts:customer_notifications' %}" class="sidebar-item {% if request.path == '/accounts/customer/notifications/' %}active{% endif %}"><i class="fas fa-bell"></i><span>Notifications</span></a>
+    <a href="#" class="sidebar-item"><i class="fas fa-file-alt"></i><span>Policies</span></a>
+    <a href="#" class="sidebar-item"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+    <a href="#" class="sidebar-item"><i class="fas fa-info-circle"></i><span>About Us</span></a>
+</aside>
+
+<!-- Mobile menu list -->
+<div class="mobile-menu-list">
+    <a href="{% url 'accounts:customer_profile' %}" class="mobile-menu-item {% if request.path == '/accounts/customer/profile/' %}active{% endif %}">
+        <div class="menu-icon"><i class="fas fa-user"></i></div>
+        <span>Profile Details</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    <a href="{% url 'accounts:customer_order_history' %}" class="mobile-menu-item {% if request.path == '/accounts/customer/orders/' %}active{% endif %}">
+        <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
+        <span>My Orders</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    <a href="#" class="mobile-menu-item">
+        <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <span>My Address</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    <a href="#" class="mobile-menu-item">
+        <div class="menu-icon"><i class="fas fa-credit-card"></i></div>
+        <span>Saved Payment Options</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    <a href="{% url 'accounts:customer_notifications' %}" class="mobile-menu-item {% if request.path == '/accounts/customer/notifications/' %}active{% endif %}">
+        <div class="menu-icon"><i class="fas fa-bell"></i></div>
+        <span>Notifications</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</div>
+
+<script>
+// Close mobile sidebar on outside click (keeps behavior consistent)
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('profileSidebar');
+    if (!sidebar) return;
+    if (!sidebar.contains(event.target)) {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('mobile-open');
+        }
+    }
+});
+</script>

@@ -1,0 +1,156 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-5">Checkout</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'cart:cart_detail' %}">Cart</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <!-- Billing Details -->
+                <div class="billing-details">
+                    <h4 class="mb-4 text-uppercase">Billing Details</h4>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="firstName" name="first_name" value="{{ initial_data.first_name|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="lastName" name="last_name" value="{{ initial_data.last_name|default:'' }}" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="company" class="form-label">Company Name (optional)</label>
+                                <input type="text" class="form-control" id="company" name="company">
+                            </div>
+                           
+                            <div class="col-12">
+                                <label for="address" class="form-label">Street Address *</label>
+                                <input type="text" class="form-control mb-2" id="address" name="address" value="{{ initial_data.address|default:'' }}" placeholder="House number and street name" required>
+                                <input type="text" class="form-control" name="address2" placeholder="Apartment, suite, unit, etc. (optional)">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">Town / City *</label>
+                                <input type="text" class="form-control" id="city" name="city" value="{{ initial_data.city|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="state" class="form-label">State / Province *</label>
+                                <input type="text" class="form-control" id="state" name="state" value="{{ initial_data.state|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="zip" class="form-label">ZIP Code *</label>
+                                <input type="text" class="form-control" id="zip" name="zipcode" value="{{ initial_data.zipcode|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ initial_data.email|default:'' }}" required>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="createAccount" name="create_account">
+                                    <label class="form-check-label" for="createAccount">
+                                        Create an account?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
+                    </form>
+                </div>
+                <!-- Shipping Details, Order Notes, etc. can be added here as needed -->
+            </div>
+            <div class="col-lg-5">
+                <div class="order-summary bg-light p-4">
+                    <h4 class="text-uppercase mb-4">Your Order</h4>
+                    <div class="order-items">
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <strong>Product</strong>
+                            <strong>Subtotal</strong>
+                        </div>
+                        {% for item in cart %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                            <span>${{ item.total_price|floatformat:2 }}</span>
+                        </div>
+                        {% endfor %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>${{ subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span>Shipping</span>
+                            <span>Free Shipping</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <strong class="text-uppercase">Total</strong>
+                            <strong class="text-primary fs-5">${{ cart_total|floatformat:2 }}</strong>
+                        </div>
+                    </div>
+                    <!-- Payment Methods -->
+                    <div class="payment-methods">
+                        <h5 class="text-uppercase mb-3">Payment Method</h5>
+                        <div class="form-check mb-3 p-3 border">
+                            <input class="form-check-input" type="radio" name="payment" id="bankTransfer" checked>
+                            <label class="form-check-label w-100" for="bankTransfer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>Direct Bank Transfer</strong>
+                                </div>
+                                <p class="text-muted small mt-2 mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference.</p>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3 p-3 border">
+                            <input class="form-check-input" type="radio" name="payment" id="checkPayment">
+                            <label class="form-check-label w-100" for="checkPayment">
+                                <strong>Check Payments</strong>
+                                <p class="text-muted small mt-2 mb-0">Please send a check to our store address.</p>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3 p-3 border">
+                            <input class="form-check-input" type="radio" name="payment" id="cashOnDelivery">
+                            <label class="form-check-label w-100" for="cashOnDelivery">
+                                <strong>Cash on Delivery</strong>
+                                <p class="text-muted small mt-2 mb-0">Pay with cash upon delivery.</p>
+                            </label>
+                        </div>
+                        <div class="form-check mb-4 p-3 border">
+                            <input class="form-check-input" type="radio" name="payment" id="paypal">
+                            <label class="form-check-label w-100" for="paypal">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>PayPal</strong>
+                                    <img src="{% static 'images/paypal-card.png' %}" alt="PayPal" height="25">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I have read and agree to the website <a href="#">terms and conditions</a> *
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

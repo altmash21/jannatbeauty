@@ -1,0 +1,65 @@
+{% extends 'seller_base.html' %}
+{% load static %}
+
+{% block title %}Analytics - Seller Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <h1><i class="fas fa-chart-line"></i> Sales Analytics</h1>
+    <p style="color: #7f8c8d; margin-bottom: 2rem;">Track your performance and insights</p>
+    
+    <!-- Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Total Revenue -->
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+            <i class="fas fa-dollar-sign" style="font-size: 2.5rem; color: #27ae60; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">${{ analytics.total_revenue|floatformat:2 }}</h3>
+            <p style="color: #888; margin: 0;">Total Revenue</p>
+        </div>
+        
+        <!-- Total Orders -->
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+            <i class="fas fa-shopping-cart" style="font-size: 2.5rem; color: #3498db; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">{{ analytics.total_orders }}</h3>
+            <p style="color: #888; margin: 0;">Total Orders</p>
+        </div>
+        
+        <!-- Items Sold -->
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+            <i class="fas fa-box" style="font-size: 2.5rem; color: #e67e22; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">{{ analytics.total_sales }}</h3>
+            <p style="color: #888; margin: 0;">Items Sold</p>
+        </div>
+        
+        <!-- Average Order Value -->
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+            <i class="fas fa-chart-bar" style="font-size: 2.5rem; color: #9b59b6; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">${{ analytics.average_order_value|floatformat:2 }}</h3>
+            <p style="color: #888; margin: 0;">Avg Order Value</p>
+        </div>
+    </div>
+
+    <!-- Top Product -->
+    <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h2 style="margin-bottom: 1rem;"><i class="fas fa-star"></i> Top Product</h2>
+        <div style="text-align: center; padding: 1rem;">
+            <h3 style="margin: 0.5rem 0;">{{ analytics.top_product|default:"No products sold yet" }}</h3>
+        </div>
+    </div>
+
+    <!-- Order Status Breakdown -->
+    <div class="card" style="padding: 1.5rem;">
+        <h2 style="margin-bottom: 1rem;"><i class="fas fa-tasks"></i> Order Status</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+            <div style="padding: 1rem; background: #fff3cd; border-radius: 8px; text-align: center;">
+                <h3 style="margin: 0; color: #856404;">{{ analytics.pending_orders|default:0 }}</h3>
+                <p style="margin: 0.5rem 0 0 0; color: #856404;">Pending</p>
+            </div>
+            <div style="padding: 1rem; background: #d4edda; border-radius: 8px; text-align: center;">
+                <h3 style="margin: 0; color: #155724;">{{ analytics.completed_orders|default:0 }}</h3>
+                <p style="margin: 0.5rem 0 0 0; color: #155724;">Completed</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

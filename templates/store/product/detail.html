@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ product.name }} - Product Details{% endblock %}
+
+{% block content %}
+    <!-- Product Detail Section -->
+        <section class="py-5">
+                <div class="container">
+                     
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Shop</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+                </ol>
+            </nav>
+
+            <div class="row g-5 mt-2">
+                <div class="col-lg-6">
+                    <div class="product-gallery">
+                        <div class="swiper product-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                                    {% else %}
+                                        <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="img-fluid rounded">
+                                    {% endif %}
+                                </div>
+                                {# If you have a ProductImage model, you can loop here for more images #}
+                                {% if product.images.all %}
+                                    {% for img in product.images.all %}
+                                        <div class="swiper-slide">
+                                            <img src="{{ img.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <h1 class="mb-3">{{ product.name }}</h1>
+
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rating text-warning me-2">
+                                <svg width="18" height="18">
+                                    <use xlink:href="#star-solid"></use>
+                                </svg>
+                                <svg width="18" height="18">
+                                    <use xlink:href="#star-solid"></use>
+                                </svg>
+                                <svg width="18" height="18">
+                                    <use xlink:href="#star-solid"></use>
+                                </svg>
+                                <svg width="18" height="18">
+                                    <use xlink:href="#star-solid"></use>
+                                </svg>
+                                <svg width="18" height="18">
+                                    <use xlink:href="#star-outline"></use>
+                                </svg>
+                            </div>
+                            <span class="text-muted">(24 Reviews)</span>
+                        </div>
+
+                        <div class="product-price mb-4">
+                            <h3 class="text-primary">${{ product.price }}</h3>
+                            {% if product.compare_price %}
+                                <span class="text-decoration-line-through text-muted">${{ product.compare_price }}</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="mb-4">Premium quality soft leather jacket with exceptional comfort and style. Perfect
+                            for daily worship, gifting, and bringing barakah to your home.</p>
+                        <p class="mb-4">{{ product.description }}</p>
+
+
+                        <div class="mb-4">
+                            <h5 class="text-uppercase mb-3">Quantity</h5>
+                            <div class="input-group" style="max-width: 150px;">
+                                <button class="btn btn-outline-dark" type="button">
+                                    <svg width="20" height="20">
+                                        <use xlink:href="#minus"></use>
+                                    </svg>
+                                </button>
+                                <input type="number" class="form-control text-center" value="1" min="1">
+                                <button class="btn btn-outline-dark" type="button">
+                                    <svg width="20" height="20">
+                                        <use xlink:href="#plus"></use>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mb-4">
+                            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="d-inline w-100">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1" id="cart-quantity-input">
+                                <button type="submit" class="btn btn-primary btn-lg flex-grow-1 w-100">
+                                    <svg width="20" height="20" class="me-2">
+                                        <use xlink:href="#cart"></use>
+                                    </svg>
+                                    Add to Cart
+                                </button>
+                            </form>
+                            <button class="btn btn-outline-dark btn-lg">
+                                <svg width="20" height="20">
+                                    <use xlink:href="#heart"></use>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="product-meta border-top pt-4">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <strong>SKU:</strong> <span class="text-muted">{{ product.id }}</span>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <strong>Category:</strong> <a href="{% url 'store:product_list_by_category' product.category.slug %}" class="text-muted">{{ product.category.name }}</a>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <strong>Tags:</strong> <span class="text-muted">{% if product.tags %}{{ product.tags }}{% else %}Islamic, Essentials{% endif %}</span>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <strong>Availability:</strong> <span class="{% if product.available %}text-success{% else %}text-danger{% endif %}">{% if product.available %}In Stock{% else %}Out of Stock{% endif %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details Tabs -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <ul class="nav nav-tabs border-bottom" id="productTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active text-uppercase" id="description-tab" data-bs-toggle="tab"
+                                data-bs-target="#description" type="button" role="tab">Description</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-uppercase" id="info-tab" data-bs-toggle="tab"
+                                data-bs-target="#info" type="button" role="tab">Additional Information</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-uppercase" id="reviews-tab" data-bs-toggle="tab"
+                                data-bs-target="#reviews" type="button" role="tab">Reviews (24)</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content py-4" id="productTabContent">
+                        <div class="tab-pane fade show active" id="description" role="tabpanel">
+                            <p>{{ product.description }}</p>
+                        </div>
+                        <div class="tab-pane fade" id="info" role="tabpanel">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Material</strong></td>
+                                        <td>100% Genuine Leather</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Lining</strong></td>
+                                        <td>Cotton Blend</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Care Instructions</strong></td>
+                                        <td>Professional Dry Clean Only</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Origin</strong></td>
+                                        <td>Made in Italy</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fit</strong></td>
+                                        <td>Regular Fit</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="reviews" role="tabpanel">
+                            <div class="reviews-section">
+                                <h4 class="mb-4">Customer Reviews</h4>
+                                <div class="review-item border-bottom pb-4 mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>
+                                            <strong>Sarah Johnson</strong>
+                                            <div class="rating text-warning">
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <span class="text-muted">2 days ago</span>
+                                    </div>
+                                    <p>Absolutely love this jacket! The quality is outstanding and it fits perfectly.
+                                        Highly recommended!</p>
+                                </div>
+                                <div class="review-item border-bottom pb-4 mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>
+                                            <strong>Michael Chen</strong>
+                                            <div class="rating text-warning">
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                                <svg width="16" height="16">
+                                                    <use xlink:href="#star-outline"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <span class="text-muted">1 week ago</span>
+                                    </div>
+                                    <p>Great jacket, very comfortable. The only reason I didn't give 5 stars is that it
+                                        took a bit longer to arrive than expected.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reviews Section -->
+            {% include 'reviews/review_section.html' %}
+
+            <!-- Related Products -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h2 class="section-title text-center mb-5">Related Products</h2>
+                </div>
+                {% for related in related_products %}
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="product-card">
+                        <div class="image-holder">
+                            <a href="{{ related.get_absolute_url }}">
+                                {% if related.image %}
+                                    <img src="{{ related.image.url }}" alt="{{ related.name }}" class="img-fluid">
+                                {% else %}
+                                    <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ related.name }}" class="img-fluid">
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="product-detail text-center mt-3">
+                            <h5 class="text-uppercase mb-2"><a href="{{ related.get_absolute_url }}"
+                                    class="text-decoration-none text-dark">{{ related.name }}</a></h5>
+                            <span class="text-primary fw-bold">${{ related.price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center text-muted">No related products found in this category.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

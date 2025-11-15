@@ -1,0 +1,56 @@
+{% extends 'base_plain.html' %}
+
+{% block title %}Login - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 420px; margin: 1.25rem auto;">
+        <div class="card" style="padding: 1.25rem; text-align: center;">
+            <div style="margin-bottom: 0.75rem;">
+                <i class="fas fa-sign-in-alt" style="font-size: 1.6rem; color: #2563eb; display:inline-block; padding:0.45rem; border-radius:8px; background:#eff6ff;"></i>
+            </div>
+            <h2 style="font-size:1.25rem; margin-bottom:0.25rem; color:#111827;">Welcome back</h2>
+            <p style="color:#6b7280; font-size:0.95rem; margin-bottom:1rem;">Sign in to your account</p>
+
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+
+                {% if messages %}
+                <div class="messages" style="margin-bottom:0.75rem; text-align:left;">
+                    {% for message in messages %}
+                        <div style="padding:0.6rem; border-radius:6px; margin-bottom:0.5rem; background: #fff3cd; color:#664d03;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="id_username"><i class="fas fa-user" style="color:#9ca3af;"></i> Username</label>
+                    <input type="text" class="form-control" id="id_username" name="username" placeholder="your.username" required style="padding:0.6rem; border-radius:6px; border:1px solid #e6eef8; background:#fff; color:#0f172a;">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password"><i class="fas fa-lock" style="color:#9ca3af;"></i> Password</label>
+                    <input type="password" class="form-control" id="id_password" name="password" placeholder="••••••••" required style="padding:0.6rem; border-radius:6px; border:1px solid #e6eef8; background:#fff; color:#0f172a;">
+                </div>
+
+                <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;">
+                    <i class="fas fa-sign-in-alt" style="font-size:0.95rem;"></i> Sign in
+                </button>
+            </form>
+
+            <div style="margin-top:0.9rem; font-size:0.95rem; color:#6b7280;">
+                <span>Don't have an account?</span>
+                <a href="{% url 'accounts:register_customer' %}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-weight:600; margin-left:0.6rem;">
+                    <i class="fas fa-user-plus"></i> Create
+                </a>
+            </div>
+            <div style="margin-top:0.9rem; font-size:0.95rem; color:#6b7280;">
+                <span>Want to become seller?</span>
+                <a href="{% url 'accounts:register_seller' %}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-weight:600; margin-left:0.6rem;">
+                    <i class="fas fa-user-plus"></i> Create
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

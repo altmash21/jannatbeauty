@@ -1,0 +1,28 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/sections/hero.css' %}">
+<section class="banner-container" role="region" aria-label="Homepage hero">
+    <div class="inner-container">
+        <div class="hero-single">
+            <div class="hero-content">
+                <a href="#" aria-hidden="true" tabindex="-1">
+                    <video src="{% static 'videos/bg1.mp4' %}" muted loop autoplay playsinline></video>
+                </a>
+                <div class="hero-overlay" id="heroOverlay" role="group" aria-labelledby="heroTitle">
+                    <h1 id="heroTitle" class="hero-heading">Embrace Knowledge & Faith</h1>
+                    <p class="hero-subheading">Discover curated Qur'an collections, inspiring books, and essentials for every journey.</p>
+                    <a href="/store/" class="hero-cta" aria-label="Shop now, open store">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- hero styles moved to static/css/sections/hero.css -->
+
+    <script>
+    // Local hero overlay animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const hero = document.querySelector('.hero-single');
+        if (hero) setTimeout(() => hero.classList.add('loaded'), 50);
+    });
+    </script>
+</section>

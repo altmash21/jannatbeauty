@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h2 class="mb-4">Order Confirmed!</h2>
+            <p class="lead">Thank you for your purchase. Your order has been placed successfully.</p>
+            <p>We have sent a confirmation email to you. You can track your order from your dashboard.</p>
+            <a href="{% url 'store:home' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

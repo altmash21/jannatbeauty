@@ -1,0 +1,81 @@
+{% extends 'seller_base.html' %}
+{% load static %}
+
+{% block title %}Orders - Seller Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1><i class="fas fa-clipboard-list"></i> Customer Orders</h1>
+    <p style="color: #7f8c8d;">Track and manage your orders</p>
+</div>
+
+    {% if order_items %}
+    <div class="card" style="padding: 1.5rem;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee;">
+                        <th style="padding: 1rem; text-align: left;">Order ID</th>
+                        <th style="padding: 1rem; text-align: left;">Date</th>
+                        <th style="padding: 1rem; text-align: left;">Product</th>
+                        <th style="padding: 1rem; text-align: left;">Quantity</th>
+                        <th style="padding: 1rem; text-align: left;">Price</th>
+                        <th style="padding: 1rem; text-align: left;">Total</th>
+                        <th style="padding: 1rem; text-align: left;">Status</th>
+                        <th style="padding: 1rem; text-align: left;">Shipping</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 1rem;">#{{ item.order.id }}</td>
+                        <td style="padding: 1rem;">{{ item.order.created|date:"M d, Y" }}</td>
+                        <td style="padding: 1rem;">{{ item.product.name }}</td>
+                        <td style="padding: 1rem;">{{ item.quantity }}</td>
+                        <td style="padding: 1rem;">${{ item.price }}</td>
+                        <td style="padding: 1rem;">${{ item.get_cost }}</td>
+                        <td style="padding: 1rem;">
+                            <form method="post" action="{% url 'orders:update_order_status' item.order.id item.id %}">
+                                {% csrf_token %}
+                                <select name="status" style="padding:0.25rem 0.5rem; border-radius:6px;">
+                                    <option value="pending" {% if item.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="processing" {% if item.status == 'processing' %}selected{% endif %}>Processing</option>
+                                    <option value="shipped" {% if item.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                    <option value="delivered" {% if item.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="cancelled" {% if item.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" style="margin-left:0.5rem; padding:0.25rem 0.6rem; border-radius:6px; background:#6c5ce7; color:#fff; border:none; cursor:pointer;">Update</button>
+                            </form>
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if item.order.shiprocket_order_id %}
+                                <div style="font-size:0.85rem; color:#28a745;">
+                                    ✓ Shiprocket Order: {{ item.order.shiprocket_order_id }}
+                                    {% if item.order.awb_code %}
+                                    <br>AWB: {{ item.order.awb_code }}
+                                    <br><a href="{% url 'orders:track_shipment' item.order.id %}" style="color:#007bff;">Track</a>
+                                    {% endif %}
+                                </div>
+                            {% elif item.order.paid %}
+                                <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" 
+                                   style="padding:0.4rem 0.8rem; background:#28a745; color:#fff; text-decoration:none; border-radius:6px; font-size:0.85rem;">
+                                    Create Shipment
+                                </a>
+                            {% else %}
+                                <span style="color:#999; font-size:0.85rem;">Payment Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <i class="fas fa-inbox" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+        <h3>No Orders Yet</h3>
+        <p style="color: #888;">Orders will appear here when customers buy your products</p>
+    </div>
+    {% endif %}
+{% endblock %}

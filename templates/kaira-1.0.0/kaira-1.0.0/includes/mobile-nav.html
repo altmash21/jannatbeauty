@@ -1,0 +1,77 @@
+<!-- Mobile Bottom Navigation Component -->
+<!-- Include this component in all pages -->
+<div class="mobile-bottom-nav">
+    <div class="mobile-nav-items">
+        <a href="index.html" class="mobile-nav-item" id="nav-home">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+            <span>Home</span>
+        </a>
+
+        <a href="shop.html" class="mobile-nav-item" id="nav-shop">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                    d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            </svg>
+            <span>Shop</span>
+        </a>
+
+        <a href="cart.html" class="mobile-nav-item" id="nav-cart">
+            <div style="position: relative;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                </svg>
+                <span class="mobile-nav-badge">3</span>
+            </div>
+            <span>Cart</span>
+        </a>
+
+        <a href="about.html" class="mobile-nav-item" id="nav-about">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            <span>About</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    // Mobile bottom navigation active state management
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get current page filename
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+        // Remove active class from all nav items
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // Add active class to current page nav item
+        if (currentPage === 'index.html' || currentPage === '') {
+            document.getElementById('nav-home').classList.add('active');
+        } else if (currentPage === 'shop.html') {
+            document.getElementById('nav-shop').classList.add('active');
+        } else if (currentPage === 'cart.html') {
+            document.getElementById('nav-cart').classList.add('active');
+        } else if (currentPage === 'about.html') {
+            document.getElementById('nav-about').classList.add('active');
+        }
+
+        // Update cart badge count (you can connect this to your cart system)
+        function updateCartCount() {
+            // This would typically get the count from your cart system
+            // For demo purposes, we'll use a static count
+            const cartCount = 3; // Replace with actual cart count logic
+            const badge = document.querySelector('.mobile-nav-badge');
+            if (badge) {
+                badge.textContent = cartCount;
+                badge.style.display = cartCount > 0 ? 'block' : 'none';
+            }
+        }
+
+        updateCartCount();
+    });
+</script>

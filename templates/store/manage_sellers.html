@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Sellers{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:940px;">
+    <div class="card">
+        <h3 style="margin:0 0 0.5rem 0;">Manage Sellers</h3>
+        <div style="overflow:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.95rem;">
+                <thead>
+                    <tr style="text-align:left; color:#6b7280; font-weight:600;"><th style="padding:0.6rem 0.5rem;">Name</th><th style="padding:0.6rem 0.5rem;">Email</th><th style="padding:0.6rem 0.5rem;">Status</th></tr>
+                </thead>
+                <tbody>
+                {% for seller in sellers %}
+                    <tr style="border-top:1px solid #f1f5f9;"><td style="padding:0.6rem 0.5rem;">{{ seller.name }}</td><td style="padding:0.6rem 0.5rem;">{{ seller.email }}</td><td style="padding:0.6rem 0.5rem;">{{ seller.status }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="3" style="padding:0.6rem 0.5rem;">No sellers found.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

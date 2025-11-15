@@ -1,0 +1,1178 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}My Profile - Jannat{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-breadcrumb {
+        padding: 1rem 0;
+        font-size: 0.9rem;
+        color: #666;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    .profile-breadcrumb a {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .profile-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .profile-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* Mobile header - hidden on desktop */
+    .mobile-header {
+        display: none;
+    }
+
+    /* Mobile greeting card - hidden on desktop */
+    .mobile-greeting-card {
+        display: none;
+    }
+
+    /* Mobile quick actions - hidden on desktop */
+    .mobile-quick-actions {
+        display: none;
+    }
+
+    /* Mobile accordion wrapper - hidden on desktop */
+    .mobile-accordion-wrapper {
+        display: none;
+    }
+
+    .profile-sidebar {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 80px;
+    }
+
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+        color: #333;
+        text-decoration: none;
+    }
+    .sidebar-item:hover {
+        background: #f5f5f5;
+        color: var(--color-primary);
+    }
+    .sidebar-item.active {
+        background: var(--color-primary-bg);
+        border-left-color: var(--color-primary);
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+    .sidebar-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .profile-content {
+        background: #fff;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Profile Header - Same across all sections */
+    .profile-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-primary-bg);
+        font-size: 2.5rem;
+        color: var(--color-primary);
+    }
+
+    .profile-user-info h2 {
+        margin: 0 0 0.5rem;
+        font-size: 1.5rem;
+        color: #111;
+    }
+    .profile-user-info p {
+        margin: 0 0 0.25rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Content Sections - Hide all by default, show active */
+    .content-section {
+        display: none;
+    }
+    .content-section.active {
+        display: block;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    .form-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        color: #111;
+        font-weight: 600;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-size: 0.9rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-family: inherit;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(6, 64, 43, 0.1);
+    }
+
+    .gender-options {
+        display: flex;
+        gap: 1rem;
+    }
+    .gender-option {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    .gender-option:hover {
+        border-color: var(--color-primary);
+    }
+    .gender-option input[type="radio"] {
+        display: none;
+    }
+    .gender-option input[type="radio"]:checked + span {
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #ddd;
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .action-btn:hover {
+        border-color: #999;
+        background: #f5f5f5;
+    }
+
+    .save-button {
+        grid-column: 1 / -1;
+        background: var(--color-primary);
+        color: white;
+        border: none;
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .save-button:hover {
+        background: var(--color-primary-dark);
+    }
+
+    /* Orders Table Styles */
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
+    .orders-table thead th {
+        text-align: left;
+        color: #6b7280;
+        font-weight: 600;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .orders-table tbody td {
+        padding: 0.75rem 0.5rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    .orders-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    /* Notifications Styles */
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .notification-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .notification-card.unread {
+        background: #f8f9fa;
+        border-left: 4px solid var(--color-primary);
+    }
+    
+    .notification-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .notification-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .notification-icon-box.order {
+        background: #e3f2fd;
+        color: #2196f3;
+    }
+    
+    .notification-icon-box.product {
+        background: #f3e5f5;
+        color: #9c27b0;
+    }
+    
+    .notification-icon-box.promotion {
+        background: #fff3e0;
+        color: #ff9800;
+    }
+    
+    .notification-icon-box.system {
+        background: #e0f2f1;
+        color: #009688;
+    }
+    
+    .notification-icon-box.account {
+        background: #e8f5e9;
+        color: #4caf50;
+    }
+    
+    .notification-content-box {
+        flex: 1;
+    }
+    
+    .notification-title {
+        font-weight: 600;
+        font-size: 1.05rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .notification-message {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
+    }
+    
+    .notification-time {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #ddd;
+    }
+
+    /* Bottom Navigation - Hidden on desktop */
+    .bottom-nav {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .profile-breadcrumb {
+            display: none;
+        }
+
+        .profile-container {
+            grid-template-columns: 1fr;
+            gap: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            flex: 1;
+        }
+
+        /* Mobile Greeting Card */
+        .mobile-greeting-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fff;
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .greeting-avatar {
+            width: 80px;
+            height: 80px;
+            min-width: 80px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            font-size: 2rem;
+            color: #666;
+        }
+
+        .greeting-content h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .greeting-content p {
+            margin: 0.25rem 0 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .edit-link {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .edit-link i {
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Quick Actions */
+        .mobile-quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding: 0 1rem 1rem;
+        }
+
+        .quick-action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem 1rem;
+            background: #fff;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quick-action-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-card i {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f0f0f0;
+        }
+
+        .quick-action-card.vital-cash i {
+            background: #fef3cd;
+            color: #ff9800;
+        }
+
+        .quick-action-card.my-orders i {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .quick-action-card span {
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Mobile Accordion Sections */
+        .mobile-accordion-wrapper {
+            display: block;
+            margin: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-accordion-section {
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .mobile-accordion-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .mobile-accordion-header:hover {
+            background: #f9f9f9;
+        }
+
+        .accordion-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .accordion-title-text {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .accordion-chevron {
+            transition: transform 0.3s;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .mobile-accordion-section.active .accordion-chevron {
+            transform: rotate(90deg);
+        }
+
+        .mobile-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .mobile-accordion-section.active .mobile-accordion-content {
+            max-height: 3000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .mobile-accordion-body {
+            padding: 1.5rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* Hide desktop elements on mobile */
+        .profile-sidebar {
+            display: none;
+        }
+
+        #profileContent {
+            display: none;
+        }
+
+        .mobile-accordion-wrapper {
+            display: block !important;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #eee;
+            padding: 0.5rem 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.75rem;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .bottom-nav-item:hover {
+            color: var(--color-primary);
+        }
+
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+        }
+
+        .bottom-nav-item.active i {
+            transform: scale(1.1);
+        }
+
+        .mobile-accordion-wrapper {
+            padding-bottom: 5rem; /* Space for bottom nav */
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Desktop breadcrumb - hidden on mobile -->
+<div class="profile-breadcrumb">
+    <a href="{% url 'store:home' %}">Home</a> / 
+    <a href="#">My Profile</a> / 
+    <span id="breadcrumb-current">Profile Details</span>
+</div>
+
+<div class="profile-container">
+    <!-- Mobile header -->
+    {% comment %} <div class="mobile-header">
+        <button class="back-button" onclick="window.history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <h1 id="mobile-page-title">My Profile</h1>
+    </div> {% endcomment %}
+
+    <!-- Mobile greeting card -->
+    <div class="mobile-greeting-card">
+        <div class="greeting-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="greeting-content">
+            <h3>Hello</h3>
+            <p>{{ user.get_full_name|default:user.username }}</p>
+        </div>
+        <a href="#" class="edit-link" onclick="event.preventDefault(); showSection('profile'); scrollToTop();">
+            <i class="fas fa-pen"></i>
+        </a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="profile-sidebar" id="profileSidebar">
+        <a href="#" class="sidebar-item active" data-section="profile" onclick="event.preventDefault(); showSection('profile');">
+            <i class="fas fa-user"></i><span>Profile Details</span>
+        </a>
+        <a href="#" class="sidebar-item" data-section="orders" onclick="event.preventDefault(); showSection('orders');">
+            <i class="fas fa-shopping-bag"></i><span>My Orders</span>
+        </a>
+        <a href="#" class="sidebar-item" data-section="address" onclick="event.preventDefault(); showSection('address');">
+            <i class="fas fa-map-marker-alt"></i><span>My Address</span>
+        </a>
+        <a href="#" class="sidebar-item" data-section="notifications" onclick="event.preventDefault(); showSection('notifications');">
+            <i class="fas fa-bell"></i><span>Notifications</span>
+        </a>
+        <a href="#" class="sidebar-item" data-section="policies" onclick="event.preventDefault(); showSection('policies');">
+            <i class="fas fa-file-alt"></i><span>Policies</span>
+        </a>
+        <a href="#" class="sidebar-item">
+            <i class="fas fa-headset"></i><span>Contact Us</span>
+        </a>
+        <a href="#" class="sidebar-item">
+            <i class="fas fa-info-circle"></i><span>About Us</span>
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="sidebar-item" style="color: #dc3545; border-top: 1px solid #eee; margin-top: 0.5rem;">
+            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+    </aside>
+
+    <!-- Main Content (Desktop only) -->
+    <main class="profile-content" id="profileContent">
+        <!-- Profile Header - Same across all sections -->
+        <div class="profile-header">
+            <div class="profile-avatar"><i class="fas fa-user"></i></div>
+            <div class="profile-user-info">
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+            </div>
+        </div>
+
+        <!-- Profile Details Section -->
+        <div class="content-section active" id="section-profile">
+            <form method="POST" class="profile-form">
+                {% csrf_token %}
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="id_first_name">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_last_name">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" value="{{ user.username }}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_email">Email Id</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="id_phone">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <div class="gender-options">
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="male" {% if form.instance.gender == 'male' %}checked{% endif %}>
+                                    <span>Male ♂</span>
+                                </label>
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="female" {% if form.instance.gender == 'female' %}checked{% endif %}>
+                                    <span>Female ♀</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="id_date_of_birth">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="form-group">
+                            <!-- Empty for grid layout -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="action-btn">Delete Profile</button>
+                    <button type="button" class="action-btn">Deactivate Profile</button>
+                </div>
+
+                <button type="submit" class="save-button">SAVE</button>
+            </form>
+        </div>
+
+        <!-- My Orders Section -->
+        <div class="content-section" id="section-orders">
+            <h3 style="margin:0 0 1.5rem 0;">Order History</h3>
+            <div style="overflow:auto;">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.created|date:"M d, Y" }}</td>
+                            <td>{{ order.get_order_status_display }}</td>
+                            <td>${{ order.total_amount }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" style="text-align: center; padding: 2rem; color: #999;">No orders found.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- My Address Section -->
+        <div class="content-section" id="section-address">
+            <h3 style="margin:0 0 1.5rem 0;">My Address</h3>
+            {% if user.profile.address %}
+            <div style="line-height: 1.8; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+                <strong>{{ user.get_full_name|default:user.username }}</strong><br>
+                {{ user.profile.address }}<br>
+                {{ user.profile.city }}, {{ user.profile.state }} {{ user.profile.zipcode }}<br>
+                {{ user.profile.country }}<br>
+                Phone: {{ user.profile.phone }}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-map-marked-alt"></i>
+                <p>No address saved. Please update your profile.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Notifications Section -->
+        <div class="content-section" id="section-notifications">
+            <h3 style="margin:0 0 1.5rem 0;">My Notifications</h3>
+            {% if notifications %}
+            <div class="notifications-list">
+                {% for notification in notifications|slice:":10" %}
+                <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
+                    <div class="notification-icon-box {{ notification.notification_type }}">
+                        <i class="{{ notification.icon }}"></i>
+                    </div>
+                    <div class="notification-content-box">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-message">{{ notification.message }}</div>
+                        <div class="notification-time">
+                            <i class="far fa-clock"></i> {{ notification.created|timesince }} ago
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="far fa-bell-slash"></i>
+                <h3>No Notifications</h3>
+                <p>You don't have any notifications yet.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Policies Section -->
+        <div class="content-section" id="section-policies">
+            <h3 style="margin:0 0 1.5rem 0;">Policies</h3>
+            <div class="empty-state">
+                <i class="fas fa-file-contract"></i>
+                <h3>Policies</h3>
+                <p>Policy information will be displayed here.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Accordion Sections (Mobile only) -->
+    <div class="mobile-accordion-wrapper">
+        
+        <!-- Profile Details Section -->
+        <div class="mobile-accordion-section active" id="mobile-profile-section">
+            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-profile')">
+                <div class="accordion-icon-wrapper">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="accordion-title-text">Profile Details</div>
+                <i class="fas fa-chevron-right accordion-chevron"></i>
+            </div>
+            <div class="mobile-accordion-content">
+                <div class="mobile-accordion-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Username</label>
+                            <input type="text" value="{{ user.username }}" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; background: #f5f5f5; color: #999;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Email Id</label>
+                            {{ form.email }}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Gender</label>
+                            <div class="gender-options">
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="male" {% if form.instance.gender == 'male' %}checked{% endif %}>
+                                    <span>Male ♂</span>
+                                </label>
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="female" {% if form.instance.gender == 'female' %}checked{% endif %}>
+                                    <span>Female ♀</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <button type="submit" class="save-button">SAVE</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Orders Section -->
+        <div class="mobile-accordion-section" id="mobile-orders-section">
+            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-orders')">
+                <div class="accordion-icon-wrapper">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="accordion-title-text">My Orders</div>
+                <i class="fas fa-chevron-right accordion-chevron"></i>
+            </div>
+            <div class="mobile-accordion-content">
+                <div class="mobile-accordion-body">
+                    {% if orders %}
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        {% for order in orders %}
+                        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <div style="font-weight: 600; font-size: 0.9rem;">Order #{{ order.id|truncatechars:10 }}</div>
+                                <span style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; background: #d4edda; color: #155724;">{{ order.get_order_status_display }}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">{{ order.created|date:"M d, Y" }}</div>
+                            <div style="font-weight: 600; margin-top: 0.5rem;">Total: ${{ order.total_amount }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>No orders yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- My Address Section -->
+        <div class="mobile-accordion-section" id="mobile-address-section">
+            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-address')">
+                <div class="accordion-icon-wrapper">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="accordion-title-text">My Address</div>
+                <i class="fas fa-chevron-right accordion-chevron"></i>
+            </div>
+            <div class="mobile-accordion-content">
+                <div class="mobile-accordion-body">
+                    {% if user.profile.address %}
+                    <div style="line-height: 1.8;">
+                        <strong>{{ user.get_full_name|default:user.username }}</strong><br>
+                        {{ user.profile.address }}<br>
+                        {{ user.profile.city }}, {{ user.profile.state }} {{ user.profile.zipcode }}<br>
+                        {{ user.profile.country }}<br>
+                        Phone: {{ user.profile.phone }}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <p>No address saved. Please update your profile.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Payment Options Section -->
+        <div class="mobile-accordion-section" id="mobile-payment-section">
+            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-payment')">
+                <div class="accordion-icon-wrapper">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="accordion-title-text">Saved Payment Options</div>
+                <i class="fas fa-chevron-right accordion-chevron"></i>
+            </div>
+            <div class="mobile-accordion-content">
+                <div class="mobile-accordion-body">
+                    <div class="empty-state">
+                        <i class="fas fa-wallet"></i>
+                        <p>No saved payment methods</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div class="mobile-accordion-section" id="mobile-notifications-section">
+            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-notifications')">
+                <div class="accordion-icon-wrapper">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="accordion-title-text">Notifications</div>
+                <i class="fas fa-chevron-right accordion-chevron"></i>
+            </div>
+            <div class="mobile-accordion-content">
+                <div class="mobile-accordion-body">
+                    {% if notifications %}
+                        {% for notification in notifications|slice:":5" %}
+                        <div style="padding: 1rem; border-bottom: 1px solid #f0f0f0; display: flex; gap: 1rem; {% if not notification.is_read %}background: #f8f9fa;{% endif %}">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #e3f2fd; color: #2196f3;">
+                                <i class="{{ notification.icon }}"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem;">{{ notification.title }}</div>
+                                <div style="font-size: 0.85rem; color: #666; line-height: 1.4;">{{ notification.message }}</div>
+                                <div style="font-size: 0.75rem; color: #999; margin-top: 0.25rem;">{{ notification.created|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div style="padding: 1rem; text-align: center;">
+                            <a href="{% url 'accounts:customer_notifications' %}" style="color: #4CAF50; text-decoration: none; font-weight: 500;">View All Notifications</a>
+                        </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="far fa-bell"></i>
+                        <p>No notifications</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout Section -->
+        <div class="mobile-accordion-section" id="mobile-logout-section">
+            <a href="{% url 'accounts:logout' %}" class="mobile-accordion-header" style="color: #dc3545; border-top: 2px solid #f0f0f0;">
+                <div class="accordion-icon-wrapper" style="background: #ffe6e6; color: #dc3545;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="accordion-title-text" style="color: #dc3545; font-weight: 600;">Logout</div>
+                <i class="fas fa-chevron-right" style="color: #dc3545;"></i>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Bottom Navigation for Mobile -->
+<nav class="bottom-nav">
+    <div class="bottom-nav-container">
+        <a href="{% url 'store:home' %}" class="bottom-nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'store:product_list' %}?category=gifts" class="bottom-nav-item">
+            <i class="fas fa-gift"></i>
+            <span>Gifts</span>
+        </a>
+        <a href="{% url 'store:product_list' %}?category=kids" class="bottom-nav-item">
+            <i class="fas fa-child"></i>
+            <span>Kids</span>
+        </a>
+        <a href="#" class="bottom-nav-item active" onclick="event.preventDefault();">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+</nav>
+
+<script>
+function showSection(sectionName) {
+    // Hide all content sections
+    const allSections = document.querySelectorAll('.content-section');
+    allSections.forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Show the selected section
+    const selectedSection = document.getElementById('section-' + sectionName);
+    if (selectedSection) {
+        selectedSection.classList.add('active');
+    }
+    
+    // Update sidebar active state
+    const allSidebarItems = document.querySelectorAll('.sidebar-item');
+    allSidebarItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-section') === sectionName) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Update bottom nav active state
+    const allBottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    allBottomNavItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Update breadcrumb
+    const breadcrumbMap = {
+        'profile': 'Profile Details',
+        'orders': 'My Orders',
+        'address': 'My Address',
+        'notifications': 'Notifications',
+        'policies': 'Policies'
+    };
+    const breadcrumb = document.getElementById('breadcrumb-current');
+    if (breadcrumb && breadcrumbMap[sectionName]) {
+        breadcrumb.textContent = breadcrumbMap[sectionName];
+    }
+    
+    // Update mobile title
+    const mobileTitle = document.getElementById('mobile-page-title');
+    if (mobileTitle && breadcrumbMap[sectionName]) {
+        mobileTitle.textContent = breadcrumbMap[sectionName];
+    }
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Mobile accordion toggle function
+function toggleMobileAccordion(sectionName) {
+    const section = document.getElementById(sectionName + '-section');
+    if (!section) return;
+    
+    const allSections = document.querySelectorAll('.mobile-accordion-section');
+    
+    // Close all other sections
+    allSections.forEach(s => {
+        if (s !== section) {
+            s.classList.remove('active');
+        }
+    });
+    
+    // Toggle current section
+    section.classList.toggle('active');
+}
+</script>
+{% endblock %}

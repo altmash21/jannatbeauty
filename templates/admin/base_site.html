@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}Custom Admin Dashboard{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+    <script src="{% static 'admin/js/custom_admin.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="custom-dashboard">
+        <h1>Welcome to the Custom Admin Dashboard</h1>
+        <div class="dashboard-widgets">
+            <div class="widget">Widget 1</div>
+            <div class="widget">Widget 2</div>
+            <div class="widget">Widget 3</div>
+        </div>
+    </div>
+{% endblock %}

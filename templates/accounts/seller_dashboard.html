@@ -1,0 +1,136 @@
+{% extends 'seller_base.html' %}
+{% load static %}
+
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div>
+        <h1><i class="fas fa-store"></i> Welcome Back!</h1>
+        <p style="color: #7f8c8d;">{{ user.get_full_name|default:user.username }}</p>
+        {% if seller_profile %}
+            <p style="color: #7f8c8d;">Business: <strong>{{ seller_profile.business_name }}</strong></p>
+            <p style="color: {% if seller_profile.is_approved %}#27ae60{% else %}#e67e22{% endif %};">
+                Status: <strong>{{ seller_profile.get_approval_status_display }}</strong>
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="card" style="text-align: center; padding: 1.5rem;">
+            <i class="fas fa-box" style="font-size: 2.5rem; color: #3498db; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">{{ total_products }}</h3>
+            <p style="color: #888; margin: 0;">Products</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.5rem;">
+            <i class="fas fa-shopping-cart" style="font-size: 2.5rem; color: #27ae60; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">{{ total_orders }}</h3>
+            <p style="color: #888; margin: 0;">Total Orders</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.5rem;">
+            <i class="fas fa-clock" style="font-size: 2.5rem; color: #e67e22; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">{{ pending_orders }}</h3>
+            <p style="color: #888; margin: 0;">Pending Orders</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.5rem;">
+            <i class="fas fa-shipping-fast" style="font-size: 2.5rem; color: #f39c12; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">{{ pending_shipments }}</h3>
+            <p style="color: #888; margin: 0;">Pending Shipments</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.5rem;">
+            <i class="fas fa-dollar-sign" style="font-size: 2.5rem; color: #9b59b6; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">${{ total_revenue|floatformat:2 }}</h3>
+            <p style="color: #888; margin: 0;">Revenue</p>
+        </div>
+    </div>
+
+    <!-- Navigation Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <a href="{% url 'accounts:seller_products' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
+            <i class="fas fa-boxes" style="font-size: 3rem; color: #27ae60; margin-bottom: 1rem;"></i>
+            <h3 style="color: #2c3e50;">Products</h3>
+            <p style="color: #888;">Manage your inventory</p>
+        </a>
+
+        <a href="{% url 'accounts:seller_orders' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
+            <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e67e22; margin-bottom: 1rem;"></i>
+            <h3 style="color: #2c3e50;">Orders</h3>
+            <p style="color: #888;">Track customer orders</p>
+        </a>
+
+        <a href="{% url 'accounts:seller_analytics' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
+            <i class="fas fa-chart-line" style="font-size: 3rem; color: #3498db; margin-bottom: 1rem;"></i>
+            <h3 style="color: #2c3e50;">Analytics</h3>
+            <p style="color: #888;">View performance</p>
+        </a>
+
+        <a href="{% url 'accounts:seller_profile' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
+            <i class="fas fa-user-cog" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+            <h3 style="color: #2c3e50;">Profile</h3>
+            <p style="color: #888;">Update your info</p>
+        </a>
+    </div>
+
+    <!-- Recent Orders -->
+    {% if order_items %}
+    <div class="card" style="margin-top: 2rem; padding: 1.5rem;">
+        <h2 style="margin-bottom: 1rem;"><i class="fas fa-history"></i> Recent Orders</h2>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee;">
+                        <th style="padding: 1rem; text-align: left;">Order ID</th>
+                        <th style="padding: 1rem; text-align: left;">Product</th>
+                        <th style="padding: 1rem; text-align: left;">Quantity</th>
+                        <th style="padding: 1rem; text-align: left;">Price</th>
+                        <th style="padding: 1rem; text-align: left;">Status</th>
+                        <th style="padding: 1rem; text-align: left;">Shipment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 1rem;">#{{ item.order.id }}</td>
+                        <td style="padding: 1rem;">{{ item.product.name }}</td>
+                        <td style="padding: 1rem;">{{ item.quantity }}</td>
+                        <td style="padding: 1rem;">${{ item.price }}</td>
+                        <td style="padding: 1rem;">
+                            <span style="padding: 0.25rem 0.75rem; border-radius: 12px; background: #e8f4f8; color: #2980b9;">
+                                {{ item.order.order_status }}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if item.order.shiprocket_order_id %}
+                                <span style="color: #28a745; font-size: 0.85rem;">
+                                    <i class="fas fa-check-circle"></i> Created
+                                    {% if item.order.awb_code %}
+                                    <br><a href="{% url 'orders:track_shipment' item.order.id %}" style="color:#007bff; text-decoration:none;">Track</a>
+                                    {% endif %}
+                                </span>
+                            {% elif item.order.paid %}
+                                <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" 
+                                   style="padding:0.4rem 0.8rem; background:#28a745; color:#fff; text-decoration:none; border-radius:6px; font-size:0.85rem;">
+                                    <i class="fas fa-shipping-fast"></i> Create
+                                </a>
+                            {% else %}
+                                <span style="color:#999; font-size:0.85rem;">Awaiting Payment</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

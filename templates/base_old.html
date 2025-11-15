@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce Store{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+       :root {
+  /* 🌙 Primary Brand Colors */
+  --color-primary: #06402B;           /* Deep Islamic Green */
+  --color-primary-dark: #043322;      /* Darker shade for hover or headers */
+  --color-primary-light: #0B6B4A;     /* Softer green for highlights */
+  --color-primary-bg: #E6F2ED;        /* Very light tint for backgrounds */
+
+  /* 🖋️ Text Colors */
+  --color-text: #1A1A1A;              /* Primary body text (blackish) */
+  --color-text-secondary: #333333;    /* Subtext */
+  --color-text-tertiary: #555555;     /* Muted info text */
+  --color-text-muted: #777777;        /* Placeholder / Disabled text */
+  --color-text-on-primary: #FFFFFF;   /* For text on green backgrounds */
+
+  /* 🕋 Background Colors */
+  --color-bg-white: #FFFFFF;
+  --color-bg-light: #FAFAFA;
+  --color-bg-lighter: #F5F7F6;        /* Slight greenish tint for brand harmony */
+  --color-bg-gray: #EFEFEF;
+  --color-bg-off-white: #F2F5F3;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* 🕌 Border Colors */
+  --color-border: #D9E3DF;
+  --color-border-light: #E6ECE9;
+  --color-border-input: #A6BFB4;
+  --color-border-divider: #C9D8D2;
+
+  /* 🌟 Accent Colors */
+  --color-accent-green: #0B6B4A;      /* Matching accent green */
+  --color-accent-gold: #C5A200;       /* Elegant golden accent (Islamic theme) */
+  --color-accent-blue: #007A85;       /* Calm teal-blue contrast */
+  --color-accent-link: #0B6B4A;       /* Use green for links */
+
+  /* 💰 Price / Alert Colors */
+  --color-price-current: #06402B;
+  --color-price-original: rgba(6, 64, 43, 0.6);
+  --color-success: #0B6B4A;
+  --color-warning: #E4B200;
+  --color-error: #C0392B;
+
+  /* 🪶 Shadows & Effects */
+  --shadow-soft: 0 2px 8px rgba(6, 64, 43, 0.1);
+  --shadow-medium: 0 4px 12px rgba(6, 64, 43, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+body {
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--color-text-secondary);
+    font-weight: 400;
+    background: var(--color-bg-white);
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+button,
+.btn {
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+button:focus,
+.btn:focus,
+input:focus {
+    outline: none;
+}
+
+.btn-fill {
+    border-radius: 4px;
+    background: var(--color-accent-blue);
+    color: var(--color-bg-white);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* ==================== UTILITY CLASSES ==================== */
+.display-none {
+    display: none !important;
+}
+
+.hidden {
+    min-height: 0;
+    display: none;
+}
+
+
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+}
+.page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-width: 1025px;
+}
+
+@media screen and (min-width: 1024px) {
+    .page-container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+.inner-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 0px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* ========== HEADER ========== */
+    @media screen and (min-width:1024px) {
+    .page-container {
+        padding-left: 15px;
+        padding-right: 15px
+    }
+}
+
+.display-none {
+    display: none !important
+}
+
+input:focus {
+    outline: none
+}
+
+/* Header Top Section */
+.header .header-top {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    background-color: var(--color-primary);
+    display: flex;
+    align-items: center
+}
+
+.header .header-top .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%
+}
+
+.header .header-top .logo {
+    margin-right: 8px;
+    float: left;
+    width: 16%;
+    max-width: 185px;
+    padding: 12px 0
+}
+
+.header .header-top .logo a {
+    display: block;
+    position: relative;
+    height: 39px;
+    color: white;
+}
+
+.header .header-top .logo a svg * {
+    font-size: 20px !important;
+    max-width: 157.9px
+}
+
+.header .header-top .search {
+    width: auto;
+    flex-grow: 1;
+    float: left;
+    margin-left: 0;
+    max-width: 452px
+}
+
+.header .header-top .actions {
+    padding-left: 5px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.header .header-top .actions .action-item {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 40px
+}
+
+.header .header-top .actions .wallet {
+    position: relative;
+    padding-left: 40px;
+    cursor: pointer
+}
+
+.header .header-top .actions .login-btn {
+    font-family: Be Vietnam Pro, sans-serif;
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 20px;
+    letter-spacing: .17px;
+    color: var(--color-primary);
+    background-color: var(--color-bg-white);
+    padding: 9px 31px;
+    border-radius: 100px;
+    height: max-content;
+    text-transform: uppercase;
+    line-height: normal
+}
+
+.header .header-top .actions .cart-wrap {
+    position: relative
+}
+
+.header .header-top .actions .cart-wrap .cart-label {
+    display: block
+}
+
+.header .header-top .actions .cart-wrap .cart-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    position: relative;
+}
+
+.header .header-top .actions .cart-wrap .cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid white;
+    min-width: 24px;
+}
+
+.header .header-top .actions .user-group {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+/* Search Box */
+.search-outer .search-overlay .search-form {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 16px
+}
+
+@media screen and (min-width:1024px) {
+    .search-outer .search-overlay .search-form {
+        padding: 0
+    }
+}
+
+.search-outer .search-overlay .search-form .search-input {
+    font-family: Be Vietnam Pro, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+    letter-spacing: 0;
+    color: #212121;
+    border-radius: 100px;
+    border: .5px solid #828282;
+    padding: 14px 42px;
+    -webkit-appearance: none;
+    -ms-appearance: none;
+    flex-grow: 1;
+    box-shadow: none
+}
+
+.search-outer .search-overlay .search-form .search-icon {
+    position: absolute;
+    top: 11px;
+    left: 12px
+}
+
+.search-input:focus {
+    outline: none
+}
+
+/* Navigation Menu */
+.header .nav-menu {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    margin-top: 0;
+    transition: all .5s cubic-bezier(.55, 0, .1, 1);
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, .08);
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.header .nav-menu .nav-container {
+    margin: 0 auto
+}
+
+.header .nav-menu .nav-container .menu-wrapper {
+    position: relative;
+    width: 100%
+}
+
+.header .nav-menu .nav-container .menu.main {
+    display: flex;
+    align-items: center
+}
+
+.header .nav-menu .nav-container .menu>ul {
+    display: flex;
+    gap: 20px
+}
+
+.header .nav-menu .nav-container .menu>ul>li {
+    display: inline-block;
+    position: relative
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown-arrow {
+    margin-left: 5px;
+    display: flex;
+    transform: rotate(0);
+    transition: transform 0.3s ease;
+    color: white;
+
+}
+
+.header .nav-menu .nav-container .menu>ul>li.active .dropdown-arrow svg {
+    transform: rotate(180deg);
+    color: white;
+    
+}
+
+.header .nav-menu .nav-container .menu>ul>li .menu-link {
+    font-family: Be Vietnam Pro, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0;
+    color: white;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: initial
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown {
+    border-radius: 0 0 4px 4px;
+    left: 0;
+    position: fixed;
+    background: #fff;
+    z-index: 999;
+    transition: all .5s ease-in-out;
+    height: auto;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 35px 0
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, .15);
+    background-color: transparent
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+    background-color: transparent
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown::-webkit-scrollbar-thumb {
+    background-color: hsla(0, 0%, 44%, .8)
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .dropdown-grid {
+    display: flex;
+    gap: 40px
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown ul.dropdown-grid li.col {
+    display: inline-block
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown ul.dropdown-grid li.col .list-wrap ul {
+    overflow: hidden;
+    gap: 20px;
+    display: flex;
+    flex-direction: column
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section.single {
+    padding: 20px 20px 15px
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section.four-col {
+    display: flex;
+    gap: 40px
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section .section-title {
+    font-family: Be Vietnam Pro, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 15px;
+    letter-spacing: 0;
+    color: #2b2b2b;
+    margin-bottom: 32px;
+    white-space: nowrap
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul {
+    display: inline-block;
+    vertical-align: top
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul li {
+    display: block
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul li.with-icon {
+    margin-bottom: 16px
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul li.with-icon:last-child {
+    margin-bottom: 0
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul li a {
+    font-family: Be Vietnam Pro, sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: normal;
+    letter-spacing: 0;
+    color: #2b2b2b;
+    display: flex;
+    align-items: center;
+    white-space: nowrap
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul li a img {
+    width: 16px;
+    height: 16px;
+    margin-right: 9px
+}
+
+.header .nav-menu .nav-container .menu>ul>li .dropdown .menu-section ul li a:hover {
+    color: #212121
+}
+
+/* Hamburger - Hidden on Desktop */
+.header .header-top .hamburger {
+    display: none;
+}
+
+/* Mobile Sidebar Styles */
+.mobile-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 85%;
+    max-width: 400px;
+    height: 100%;
+    background: #fff;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-sidebar.active {
+    left: 0;
+}
+
+.mobile-sidebar-header {
+    padding: 24px 20px;
+    background: var(--color-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-user-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.mobile-user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-user-avatar svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--color-text-on-primary);
+}
+
+.mobile-user-info {
+    flex: 1;
+}
+
+.mobile-user-greeting {
+    font-size: 16px;
+    color: var(--color-text-on-primary);
+    margin-bottom: 8px;
+}
+
+.mobile-login-btn {
+    font-family: Be Vietnam Pro, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-primary);
+    background-color: var(--color-text-on-primary);
+    padding: 10px 24px;
+    border-radius: 100px;
+    border: none;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.mobile-brand-banner {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-brand-banner img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.mobile-brand-info h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-on-primary);
+    margin-bottom: 4px;
+}
+
+.mobile-brand-info p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mobile-sidebar-menu {
+    padding: 12px 0;
+}
+
+.mobile-menu-item {
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.mobile-menu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.mobile-menu-link:hover {
+    background: var(--color-primary-bg);
+}
+
+.mobile-menu-link-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mobile-menu-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-menu-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--color-primary);
+}
+
+.mobile-menu-arrow {
+    transition: transform 0.3s ease;
+}
+
+.mobile-menu-arrow svg {
+    stroke: var(--color-primary);
+}
+
+.mobile-menu-item.active .mobile-menu-arrow {
+    transform: rotate(180deg);
+}
+
+.mobile-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: var(--color-primary-bg);
+}
+
+.mobile-menu-item.active .mobile-submenu {
+    max-height: 500px;
+}
+
+.mobile-submenu-content {
+    padding: 12px 20px 12px 60px;
+}
+
+.mobile-submenu-item {
+    padding: 10px 0;
+}
+
+.mobile-submenu-item a {
+    color: var(--color-primary-dark);
+    font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s ease;
+}
+
+.mobile-submenu-item a:hover {
+    color: var(--color-primary-light);
+}
+
+/* Mobile Only Styles */
+@media (max-width: 900px) {
+    .page-container {
+        min-width: 0;
+    }
+
+    .header .header-top {
+        background: var(--color-primary);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header .header-top .header-inner {
+        flex-wrap: wrap;
+        padding: 12px 16px;
+    }
+
+    .header .header-top .hamburger {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 8px;
+        order: 1;
+    }
+
+    .header .header-top .hamburger svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--color-text-on-primary);
+    }
+
+    .header .header-top .logo {
+        width: auto;
+        max-width: 140px;
+        margin-right: 0;
+        padding: 0;
+        order: 2;
+    }
+
+    .header .header-top .logo a {
+        height: 28px;
+        color: var(--color-text-on-primary);
+    }
+
+    .header .header-top .logo a svg {
+        height: 24px;
+        width: auto;
+        color: var(--color-text-on-primary);
+    }
+
+    .header .header-top .actions {
+        padding-left: 0;
+        gap: 12px;
+        order: 3;
+    }
+
+    .header .header-top .actions .user-group {
+        display: none;
+    }
+
+    .header .header-top .actions .wallet,
+    .header .header-top .actions .action-item {
+        padding-left: 0;
+    }
+
+    .header .header-top .actions .wallet svg,
+    .header .header-top .actions .action-item svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--color-text-on-primary);
+        fill: var(--color-text-on-primary);
+    }
+
+    .header .header-top .search {
+        order: 4;
+        width: 100%;
+        margin: 12px 0 0 0;
+        max-width: 100%;
+    }
+
+    .search-outer .search-overlay .search-form {
+        padding: 0;
+    }
+
+    .search-outer .search-overlay .search-form .search-input {
+        padding: 12px 42px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .search-outer .search-overlay .search-form .search-input::placeholder {
+        color: var(--color-text-muted);
+    }
+
+    .search-outer .search-overlay .search-form .search-icon svg {
+        stroke: var(--color-text-muted);
+    }
+
+    .header .nav-menu {
+        display: none !important;
+    }
+}
+
+/* ========== FOOTER ========== */
+.footer {
+    background: var(--color-primary);
+    color: var(--color-bg-white);
+    margin-top: 3rem;
+    padding: 2.5rem 0 1rem;
+}
+
+.footer-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1.2fr;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(161, 161, 170, 0.2);
+}
+
+.footer-brand h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.footer-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.footer-section h4 {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-links a {
+    color: var(--color-primary-bg);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.newsletter input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(161, 161, 170, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    margin-bottom: 0.5rem;
+}
+
+.newsletter input::placeholder {
+    color: #71717a;
+}
+
+.newsletter button {
+    width: 100%;
+    padding: 0.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.newsletter button:hover {
+    background: var(--primary-dark);
+}
+
+.footer-bottom {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+}
+
+.social {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social a {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a1a1aa;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.social a:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.payments {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.payments i {
+    font-size: 20px;
+    opacity: 0.5;
+}
+
+/* Loading */
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .nav {
+        flex-wrap: wrap;
+    }
+
+    .search {
+        order: 3;
+        flex: 1 1 100%;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .nav,
+    .container,
+    .footer-grid,
+    .footer-bottom {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .subnav-content {
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Change wallet and cart icons to white */
+.header .header-top .actions .wallet svg,
+.header .header-top .actions .cart-wrap .cart-label svg {
+    stroke: white;
+    fill: white;
+}
+
+/* Top Banner Styles */
+.top-banner {
+    background-color: white;
+    color: var(--color-primary);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.banner-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+ 
+}
+
+.shop-link {
+    color: var(--color-accent-blue);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.shop-link:hover {
+    text-decoration: underline;
+}
+
+.close-banner {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--color-primary);
+}
+
+/* ==================== BOTTOM NAVIGATION BAR ==================== */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    padding: 0.5rem 0 0.75rem;
+    z-index: 998;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+}
+
+.bottom-nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.8rem;
+    text-decoration: none;
+    color: #666;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 0.7rem;
+    font-weight: 500;
+    min-width: 60px;
+}
+
+.bottom-nav-item i {
+    font-size: 1.4rem;
+    transition: all 0.2s ease;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item:active {
+    color: var(--color-primary);
+}
+
+.bottom-nav-item.active {
+    color: var(--color-primary);
+}
+
+.bottom-nav-item.active i {
+    transform: scale(1.1);
+}
+
+/* Show bottom nav only on mobile */
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: block;
+    }
+    
+    body {
+        padding-bottom: 70px; /* Space for bottom nav */
+    }
+    
+    .footer {
+        margin-bottom: 70px; /* Keep footer above bottom nav */
+    }
+}
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Banner -->
+{% comment %} <div class="top-banner" id="topBanner">
+    <div class="banner-content">
+        <span style="text-align: center;">Free Indian delivery on Orders over 999 INR | <a href="/shop" class="shop-link">Shop Now</a></span>
+        <button class="close-banner" onclick="document.getElementById('topBanner').style.display='none';">&times;</button>
+    </div>
+</div> {% endcomment %}
+
+    <div class="header">
+        <section class="header-top">
+            <div class="page-container">
+                <div class="header-inner">
+                    <!-- Hamburger icon for mobile -->
+                    <button class="hamburger" aria-label="Open menu" onclick="toggleSidebar()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round">
+                            <path d="M3 6h18M3 12h18M3 18h18" />
+                        </svg>
+                    </button>
+
+                          <div class="logo"><a href="{% url 'store:home' %}">
+                                    <h1>Jannat
+                                    </h1>
+                                </a></div>
+
+                    <div class="search">
+                        <div class="search-outer">
+                            <div class="search-overlay">
+                                <form method="get" class="search-form" action="{% url 'store:product_list' %}" id="globalSearch1">
+                                    <div class="search-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M17 10.5C17 14.09 14.09 17 10.5 17C6.91 17 4 14.09 4 10.5C4 6.91 6.91 4 10.5 4C14.09 4 17 6.91 17 10.5Z"
+                                                stroke="#828282" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M16 16L20 20" stroke="#828282" stroke-linecap="round"
+                                                stroke-linejoin="round"></path>
+                                        </svg>
+                                    </div><input data-provide="typeahead" autocomplete="off" maxlength="160" name="q"
+                                        type="text" placeholder="Search For... Eg: Biotin" class="search-input"
+                                        value="{{ request.GET.q|default_if_none:'' }}">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        {% if user.is_authenticated %}
+                        <div class="user-group">
+                            <div class="user-menu">
+                                <button type="button" class="user-btn" aria-expanded="false" aria-haspopup="true" onclick="document.getElementById('userDropdown').classList.toggle('open')">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><circle cx="12" cy="8" r="3"></circle><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path></svg>
+                                    <span class="user-name">{{ user.get_short_name|default:user.username }}</span>
+                                </button>
+                                <div id="userDropdown" class="user-dropdown" role="menu" aria-hidden="true">
+                                    {% if user.profile.is_seller %}
+                                        <a class="dropdown-item" href="{% url 'accounts:seller_dashboard' %}">Seller Dashboard</a>
+                                        <a class="dropdown-item" href="{% url 'accounts:seller_orders' %}">Orders</a>
+                                        <a class="dropdown-item" href="{% url 'accounts:seller_products' %}">Products</a>
+                                        <a class="dropdown-item" href="{% url 'accounts:seller_analytics' %}">Analytics</a>
+                                    {% else %}
+                                        <a class="dropdown-item" href="{% url 'accounts:customer_dashboard' %}">Dashboard</a>
+                                        <a class="dropdown-item" href="{% url 'accounts:customer_orders' %}">Orders</a>
+                                        <a class="dropdown-item" href="{% url 'accounts:customer_notifications' %}">Notifications</a>
+                                    {% endif %}
+                                    <div class="dropdown-divider"></div>
+                                    <a class="btn logout-btn" href="{% url 'accounts:logout' %}">Logout</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="user-group">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-fill login-btn">Sign In</a>
+                            <a href="{% url 'accounts:register_choice' %}" class="btn btn-fill login-btn" style="margin-left:8px;">Sign Up</a>
+                        </div>
+                        {% endif %}
+                       
+                        <div class="action-item">
+                            <div class="cart-wrap">
+                                <a class="cart-label" href="{% url 'cart:cart_detail' %}">
+                                    <span class="cart-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span class="cart-badge">0</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="nav-menu">
+            <div class="nav-container">
+                <div class="menu-wrapper">
+                    <div class="menu main">
+                        <ul>
+                            <li>
+                                <div class="menu-link">
+                                    Quran<span class="dropdown-arrow"><svg width="16" height="16" viewBox="0 0 16 16"
+                                            fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M8.47149 10.4712C8.21114 10.7316 7.78903 10.7316 7.52868 10.4712L3.52868 6.47124C3.26833 6.21089 3.26833 5.78878 3.52868 5.52843C3.78903 5.26808 4.21114 5.26808 4.47149 5.52843L8.00008 9.05703L11.5287 5.52843C11.789 5.26808 12.2111 5.26808 12.4715 5.52843C12.7318 5.78878 12.7318 6.21089 12.4715 6.47124L8.47149 10.4712Z"
+                                                fill="white"></path>
+                                        </svg></span></div>
+                                <div class="dropdown display-none">
+                                    <ul class="dropdown-grid" id="quranMenu">
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Qur'an Editions</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/quran/arabic">Arabic Quran</a></li>
+                                                        <li><a itemprop="url" href="/quran/english">Hindi Quran</a></li>
+                                                        <li><a itemprop="url" href="/quran/urdu">English</a></li>
+                                                        <li><a itemprop="url" href="/quran/hindi">Quran with Hindi Translation</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Special Editions</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/quran/tajweed">Tajweed Qur'an</a></li>
+                                                        <li><a itemprop="url" href="/quran/pocket">Pocket Qur'an</a></li>
+                                                        <li><a itemprop="url" href="/quran/digital">Digital Qur'an (Pen Reader)</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="menu-link">
+                                    Books<span class="dropdown-arrow"><svg width="16" height="16"
+                                            viewBox="0 0 16 16" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M8.47149 10.4712C8.21114 10.7316 7.78903 10.7316 7.52868 10.4712L3.52868 6.47124C3.26833 6.21089 3.26833 5.78878 3.52868 5.52843C3.78903 5.26808 4.21114 5.26808 4.47149 5.52843L8.00008 9.05703L11.5287 5.52843C11.789 5.26808 12.2111 5.26808 12.4715 5.52843C12.7318 5.78878 12.7318 6.21089 12.4715 6.47124L8.47149 10.4712Z"
+                                                fill="white"></path>
+                                        </svg></span></div>
+                                <div class="dropdown display-none">
+                                    <ul class="dropdown-grid" id="booksMenu">
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Islamic Studies</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/books/hadith">Hadith Collections</a></li>
+                                                        <li><a itemprop="url" href="/books/tafsir">Tafsir & Qur'an Studies</a></li>
+                                                        <li><a itemprop="url" href="/books/seerah">Seerah (Prophet's Biography)</a></li>
+                                                        <li><a itemprop="url" href="/books/fiqh">Fiqh & Aqeedah</a></li>
+                                                        <li><a itemprop="url" href="/books/history">Islamic History</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Special Categories</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/books/dua">Dua & Supplication Books</a></li>
+                                                        <li><a itemprop="url" href="/books/kids">Islamic Books for Kids</a></li>
+                                                        <li><a itemprop="url" href="/books/women">Women in Islam</a></li>
+                                                        <li><a itemprop="url" href="/books/parenting">Parenting & Family</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="menu-link">
+                                    Prayer Essentials<span class="dropdown-arrow"><svg width="16" height="16"
+                                            viewBox="0 0 16 16" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M8.47149 10.4712C8.21114 10.7316 7.78903 10.7316 7.52868 10.4712L3.52868 6.47124C3.26833 6.21089 3.26833 5.78878 3.52868 5.52843C3.78903 5.26808 4.21114 5.26808 4.47149 5.52843L8.00008 9.05703L11.5287 5.52843C11.789 5.26808 12.2111 5.26808 12.4715 5.52843C12.7318 5.78878 12.7318 6.21089 12.4715 6.47124L8.47149 10.4712Z"
+                                                fill="white"></path>
+                                        </svg></span></div>
+                                <div class="dropdown display-none">
+                                    <ul class="dropdown-grid" id="prayerMenu">
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Prayer Items</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/prayer/janamaz">Janamaz (Prayer Mats)</a></li>
+                                                        <li><a itemprop="url" href="/prayer/tasbeeh">Tasbeeh / Misbaha</a></li>
+                                                        <li><a itemprop="url" href="/prayer/counter">Digital Tasbeeh Counter</a></li>
+                                                        <li><a itemprop="url" href="/prayer/compass">Qibla Compass</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Islamic Clothing</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/clothing/hijab">Hijab</a></li>
+                                                        <li><a itemprop="url" href="/clothing/cap">Prayer Cap</a></li>
+                                                        <li><a itemprop="url" href="/clothing/abaya">Abaya</a></li>
+                                                        <li><a itemprop="url" href="/clothing/thobe">Thobe</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="menu-link">
+                                    Gifts & Decor<span class="dropdown-arrow"><svg width="16" height="16"
+                                            viewBox="0 0 16 16" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M8.47149 10.4712C8.21114 10.7316 7.78903 10.7316 7.52868 10.4712L3.52868 6.47124C3.26833 6.21089 3.26833 5.78878 3.52868 5.52843C3.78903 5.26808 4.21114 5.26808 4.47149 5.52843L8.00008 9.05703L11.5287 5.52843C11.789 5.26808 12.2111 5.26808 12.4715 5.52843C12.7318 5.78878 12.7318 6.21089 12.4715 6.47124L8.47149 10.4712Z"
+                                                fill="white"></path>
+                                        </svg></span></div>
+                                <div class="dropdown display-none">
+                                    <ul class="dropdown-grid" id="giftsMenu">
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Gift Collections</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/gifts/sets">Gift Sets</a></li>
+                                                        <li><a itemprop="url" href="/gifts/calligraphy">Wall Art & Calligraphy</a></li>
+                                                        <li><a itemprop="url" href="/gifts/decor">Home Decor</a></li>
+                                                        <li><a itemprop="url" href="/gifts/ramadan">Ramadan & Eid Gifts</a></li>
+                                                        <li><a itemprop="url" href="/gifts/personalized">Personalized Gifts</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="menu-link">
+                                    Kids<span class="dropdown-arrow"><svg width="16" height="16"
+                                            viewBox="0 0 16 16" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M8.47149 10.4712C8.21114 10.7316 7.78903 10.7316 7.52868 10.4712L3.52868 6.47124C3.26833 6.21089 3.26833 5.78878 3.52868 5.52843C3.78903 5.26808 4.21114 5.26808 4.47149 5.52843L8.00008 9.05703L11.5287 5.52843C11.789 5.26808 12.2111 5.26808 12.4715 5.52843C12.7318 5.78878 12.7318 6.21089 12.4715 6.47124L8.47149 10.4712Z"
+                                                fill="white"></path>
+                                        </svg></span>
+                                </div>
+                                <div class="dropdown display-none">
+                                    <ul class="dropdown-grid" id="kidsMenu">
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Islamic Learning</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/kids/quran-learning">Qur'an Learning Sets</a></li>
+                                                        <li><a itemprop="url" href="/kids/arabic">Arabic Learning</a></li>
+                                                        <li><a itemprop="url" href="/kids/dua-books">Children's Dua Books</a></li>
+                                                        <li><a itemprop="url" href="/kids/story-books">Islamic Story Books</a></li>
+                                                        <li><a itemprop="url" href="/kids/activity-books">Islamic Activity Books</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Prayer & Practice</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/kids/prayer-mats">Kids Prayer Mats</a></li>
+                                                        <li><a itemprop="url" href="/kids/hijab">Kids Hijab & Caps</a></li>
+                                                        <li><a itemprop="url" href="/kids/prayer-clothing">Prayer Clothing</a></li>
+                                                        <li><a itemprop="url" href="/kids/digital-toys">Islamic Digital Toys</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col">
+                                            <div class="menu-section">
+                                                <div class="list-wrap">
+                                                    <h3 class="section-title">Fun & Games</h3>
+                                                    <ul>
+                                                        <li><a itemprop="url" href="/kids/board-games">Islamic Board Games</a></li>
+                                                        <li><a itemprop="url" href="/kids/puzzles">Educational Puzzles</a></li>
+                                                        <li><a itemprop="url" href="/kids/arts-crafts">Arts & Crafts</a></li>
+                                                        <li><a itemprop="url" href="/kids/toys">Islamic Toys</a></li>
+                                                        <li><a itemprop="url" href="/kids/gifts">Kids Gift Sets</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="menu-link"><a href="{% url 'store:product_list' %}">Shop All</a></div>
+                            </li>
+
+                            <li>
+                                <div class="menu-link"><a href="/about">About Us</a></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Mobile Sidebar -->
+    <div class="mobile-sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="mobile-sidebar-header">
+            <div class="mobile-user-section">
+                <div class="mobile-user-avatar">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6b6b6b" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <div class="mobile-user-info">
+                    {% if user.is_authenticated %}
+                        <div class="mobile-user-greeting">Hi, {{ user.get_short_name|default:user.username }}</div>
+                        <div class="mobile-user-links">
+                            {% if user.profile.is_seller %}
+                                <a href="{% url 'accounts:seller_dashboard' %}" class="mobile-link">Seller Dashboard</a>
+                                <a href="{% url 'accounts:seller_orders' %}" class="mobile-link">Orders</a>
+                                <a href="{% url 'accounts:seller_products' %}" class="mobile-link">Products</a>
+                                <a href="{% url 'accounts:seller_analytics' %}" class="mobile-link">Analytics</a>
+                            {% else %}
+                                <a href="{% url 'accounts:customer_dashboard' %}" class="mobile-link">Dashboard</a>
+                                <a href="{% url 'accounts:customer_orders' %}" class="mobile-link">Orders</a>
+                                <a href="{% url 'accounts:customer_notifications' %}" class="mobile-link">Notifications</a>
+                            {% endif %}
+                            <a href="{% url 'accounts:logout' %}" class="mobile-link mobile-logout-btn">Logout</a>
+                        </div>
+                    {% else %}
+                        <div class="mobile-user-greeting">Hello</div>
+                        <div style="display:flex;gap:8px;margin-top:8px;">
+                            <a href="{% url 'accounts:login' %}" class="mobile-login-btn" style="display:inline-block;padding:8px 14px;border-radius:8px;background:#2b2b2b;color:#fff;text-decoration:none;">Sign In</a>
+                            <a href="{% url 'accounts:register_choice' %}" class="mobile-login-btn" style="display:inline-block;padding:8px 14px;border-radius:8px;border:1px solid #2b2b2b;color:#2b2b2b;text-decoration:none;">Sign Up</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-sidebar-menu">
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link" onclick="toggleMobileSubmenu(this)">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+                        <span>Qur'an</span>
+                    </div>
+                    <div class="mobile-menu-arrow">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6l4 4 4-4" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mobile-submenu">
+                    <div class="mobile-submenu-content">
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'arabic-quran' %}">Arabic Qur'an</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'quran-english-translation' %}">Qur'an with English Translation</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'quran-urdu-translation' %}">Qur'an with Urdu Translation</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'quran-hindi-translation' %}">Qur'an with Hindi Translation</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'tajweed-quran' %}">Tajweed Qur'an</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'pocket-quran' %}">Pocket Qur'an</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'digital-quran-pen-reader' %}">Digital Qur'an (Pen Reader)</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link" onclick="toggleMobileSubmenu(this)">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        </div>
+                        <span>Books</span>
+                    </div>
+                    <div class="mobile-menu-arrow">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6l4 4 4-4" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mobile-submenu">
+                    <div class="mobile-submenu-content">
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'hadith-collections' %}">Hadith Collections</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'tafsir-quran-studies' %}">Tafsir & Qur'an Studies</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'seerah-prophet-biography' %}">Seerah (Prophet's Biography)</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'fiqh-aqeedah' %}">Fiqh & Aqeedah</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'islamic-history' %}">Islamic History</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'dua-supplication-books' %}">Dua & Supplication Books</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'islamic-books-for-kids' %}">Islamic Books for Kids</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'women-in-islam' %}">Women in Islam</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'parenting-family' %}">Parenting & Family</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link" onclick="toggleMobileSubmenu(this)">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <span>Prayer Essentials</span>
+                    </div>
+                    <div class="mobile-menu-arrow">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6l4 4 4-4" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mobile-submenu">
+                    <div class="mobile-submenu-content">
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'janamaz-prayer-mats' %}">Janamaz (Prayer Mats)</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'tasbeeh-misbaha' %}">Tasbeeh / Misbaha</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'digital-tasbeeh-counter' %}">Digital Tasbeeh Counter</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'qibla-compass' %}">Qibla Compass</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'hijab' %}">Hijab</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'prayer-cap' %}">Prayer Cap</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'abaya' %}">Abaya</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'thobe' %}">Thobe</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link" onclick="toggleMobileSubmenu(this)">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+                                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                                <path d="M8 21l0-10"></path>
+                                <path d="M16 21l0-10"></path>
+                            </svg>
+                        </div>
+                        <span>Gifts & Decor</span>
+                    </div>
+                    <div class="mobile-menu-arrow">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6l4 4 4-4" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mobile-submenu">
+                    <div class="mobile-submenu-content">
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'gift-sets' %}">Gift Sets</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'wall-art-calligraphy' %}">Wall Art & Calligraphy</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'home-decor' %}">Home Decor</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'ramadan-eid-gifts' %}">Ramadan & Eid Gifts</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'personalized-gifts' %}">Personalized Gifts</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link" onclick="toggleMobileSubmenu(this)">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <circle cx="8" cy="21" r="1"></circle>
+                                <circle cx="19" cy="21" r="1"></circle>
+                                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+                            </svg>
+                        </div>
+                        <span>Kids</span>
+                    </div>
+                    <div class="mobile-menu-arrow">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M4 6l4 4 4-4" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mobile-submenu">
+                    <div class="mobile-submenu-content">
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'quran-learning-sets' %}">Qur'an Learning Sets</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'arabic-learning' %}">Arabic Learning</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'childrens-dua-books' %}">Children's Dua Books</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'islamic-story-books' %}">Islamic Story Books</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'islamic-activity-books' %}">Islamic Activity Books</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'kids-prayer-mats' %}">Kids Prayer Mats</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'islamic-toys' %}">Islamic Toys</a></div>
+                        <div class="mobile-submenu-item"><a href="{% url 'store:product_list_by_category' 'kids-gift-sets' %}">Kids Gift Sets</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </div>
+                        <span><a href="{% url 'store:product_list' %}">Shop All</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <path d="M9 11H1v3h8v3l3-4.5L9 8v3z"></path>
+                                <path d="M22 12h-6"></path>
+                                <path d="M16 16h6"></path>
+                                <path d="M16 8h6"></path>
+                            </svg>
+                        </div>
+                        <span><a href="/about">About Us</a></span>
+
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-item">
+                <div class="mobile-menu-link">
+                    <div class="mobile-menu-link-content">
+                        <div class="mobile-menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2">
+                                <path d="M9 11H1v3h8v3l3-4.5L9 8v3z"></path>
+                                <path d="M22 12h-6"></path>
+                                <path d="M16 16h6"></path>
+                                <path d="M16 8h6"></path>
+                            </svg>
+                        </div>
+                        <span><a href="{% url 'accounts:logout' %}" class="sidebar-item" style="color: #dc3545; border-top: 1px solid #eee; margin-top: 0.5rem;">
+            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a></span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <main class="main">
+        
+            
+            {% block content %}{% endblock %}
+    
+    </main>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>ShopSphere</h3>
+                <p class="footer-desc">
+                    Premium e-commerce platform offering quality products with fast, reliable worldwide shipping.
+                </p>
+                <div class="social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Shop</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'store:product_list' %}">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Deals</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="{% if user.is_authenticated %}{% url 'accounts:customer_orders' %}{% else %}{% url 'accounts:login' %}{% endif %}">Track Order</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Privacy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p class="footer-desc">Get updates & offers</p>
+                <div class="newsletter">
+                    <input type="email" placeholder="Email address">
+                    <button type="submit">Subscribe</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>© 2025 ShopSphere. All rights reserved.</div>
+            <div class="payments">
+                <span style="font-size: 12px;">We Accept:</span>
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-container">
+            <a href="{% url 'store:product_list' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
+                <i class="fas fa-th-large"></i>
+                <span>Shop</span>
+            </a>
+            <a href="{% url 'store:product_list' %}?category=gifts" class="bottom-nav-item">
+                <i class="fas fa-gift"></i>
+                <span>Gifts</span>
+            </a>
+            <a href="{% url 'store:product_list' %}?category=kids" class="bottom-nav-item">
+                <i class="fas fa-child"></i>
+                <span>Kids</span>
+            </a>
+            {% if user.is_authenticated %}
+                {% if user.profile.is_seller %}
+                    <a href="{% url 'accounts:seller_dashboard' %}" class="bottom-nav-item {% if 'seller' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-store"></i>
+                        <span>Dashboard</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:customer_dashboard' %}" class="bottom-nav-item {% if 'customer' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="bottom-nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <script>
+        function updateCartCount() {
+            fetch('/cart/count/')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.querySelector('.cart-badge');
+                    if (badge) badge.textContent = data.count || 0;
+                })
+                .catch(error => console.log('Cart count update error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        const orig = btn.innerHTML;
+                        btn.innerHTML = '<span class="loading"></span>';
+                        btn.disabled = true;
+                        setTimeout(() => {
+                            btn.innerHTML = orig;
+                            btn.disabled = false;
+                        }, 5000);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.querySelector('.mobile-sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+
+        function toggleMobileSubmenu(element) {
+            const menuItem = element.parentElement;
+            const wasActive = menuItem.classList.contains('active');
+
+            // Close all submenus
+            document.querySelectorAll('.mobile-menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Open clicked submenu if it wasn't active
+            if (!wasActive) {
+                menuItem.classList.add('active');
+            }
+        }
+
+        // Desktop hover functionality - Only on larger screens
+        if (window.innerWidth > 900) {
+            const navItems = document.querySelectorAll('.menu > ul > li');
+            navItems.forEach(item => {
+                const menuLink = item.querySelector('.menu-link');
+                const dropdown = item.querySelector('.dropdown');
+                if (dropdown && menuLink) {
+                    item.addEventListener('mouseenter', () => {
+                        navItems.forEach(otherItem => {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active');
+                                const otherDropdown = otherItem.querySelector('.dropdown');
+                                if (otherDropdown) {
+                                    otherDropdown.classList.add('display-none');
+                                }
+                            }
+                        });
+                        item.classList.add('active');
+                        dropdown.classList.remove('display-none');
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.classList.remove('active');
+                        dropdown.classList.add('display-none');
+                    });
+                }
+            });
+        }
+    </script>
+    <script>
+    // Get CSRF token from cookie (Django standard)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-add-cart').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productId = btn.getAttribute('data-product-id');
+                if (!productId) {
+                    alert('Product ID missing');
+                    return;
+                }
+                
+                // Show loading state
+                const originalText = btn.textContent;
+                btn.textContent = 'Adding...';
+                btn.disabled = true;
+                
+                fetch(`/cart/add/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({quantity: 1})
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update cart count if function exists
+                        if (typeof updateCartCount === 'function') {
+                            updateCartCount();
+                        }
+                        btn.textContent = 'Added!';
+                        setTimeout(() => { 
+                            btn.textContent = originalText; 
+                            btn.disabled = false;
+                        }, 1200);
+                    } else {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        alert(`Error: ${data.message || 'Could not add to cart'}`);
+                    }
+                })
+                .catch(error => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    alert(`Network error: ${error.message}`);
+                    console.error('Cart add error:', error);
+                });
+            });
+        });
+    });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

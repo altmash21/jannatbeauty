@@ -1,0 +1,17 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Order {{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:720px;">
+    <div class="card">
+        <h3 style="margin:0 0 0.5rem 0;">Order Detail</h3>
+        <div class="order-info">
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+            <p><strong>Date:</strong> {{ order.date }}</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <!-- Add more order info as needed -->
+        </div>
+    </div>
+</div>
+{% endblock %}
