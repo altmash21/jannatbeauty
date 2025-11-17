@@ -1,0 +1,13 @@
+.range-item .item-title-overlay {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.range-section .item-image {
+    display: block;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}

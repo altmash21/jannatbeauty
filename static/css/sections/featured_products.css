@@ -1,0 +1,18 @@
+.deals-featured .swiper-container {
+    position: relative;
+}
+
+.deals-featured .btn-prev,
+.deals-featured .btn-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.deals-featured .btn-prev {
+    left: 0
+}
+
+.deals-featured .btn-next {
+    right: 0
+}

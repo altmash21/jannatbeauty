@@ -1,0 +1,10 @@
+.advertisement-wallpaper .wallpaper-container {
+    position: relative;
+}
+
+.advertisement-wallpaper .wallpaper-content {
+    position: absolute;
+    left: 40px;
+    top: 40px;
+    color: #fff;
+}

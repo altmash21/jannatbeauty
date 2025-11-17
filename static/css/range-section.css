@@ -1,0 +1,177 @@
+/* ==================== RANGE SECTION (DESKTOP) ==================== */
+.range-section {
+    padding: 0px 0;
+    background-color: var(--color-bg-light);
+}
+
+.range-tiles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.range-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    flex: 1 1 250px;
+    /* flexible base width */
+    max-width: 320px;
+    min-width: 200px;
+}
+
+.range-item:hover {
+    transform: translateY(-5px);
+}
+
+.item-image {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 16px;
+    display: block;
+}
+
+.item-title-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.arrow-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-primary);
+    transition: transform 0.3s ease;
+}
+
+.range-item:hover .arrow-icon {
+    transform: translateX(5px);
+}
+
+/* ==================== RESPONSIVE LAYOUT (SMART AUTO-FIT + SCROLL) ==================== */
+@media (max-width: 1024px) {
+    .range-tiles {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 16px;
+        padding: 0 16px;
+        scroll-snap-type: x mandatory;
+        justify-content: flex-start;
+    }
+
+    .range-tiles::-webkit-scrollbar {
+        display: none;
+    }
+
+    .range-item {
+        flex: 0 0 calc(33.333% - 12px);
+        /* 3 cards visible ideally */
+        min-width: 220px;
+        max-width: 260px;
+        scroll-snap-align: start;
+        border-radius: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .item-image {
+        height: 220px;
+        border-radius: 16px;
+        object-fit: cover;
+    }
+
+    .item-title-overlay {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+    }
+
+    .item-text {
+        font-size: 15px;
+        color: #1a1a1a;
+    }
+
+    .arrow-icon {
+        width: 16px;
+        height: 16px;
+        color: #1a1a1a;
+    }
+}
+
+/* ==================== MOBILE: 2–3 FIT + SCROLLABLE ==================== */
+@media (max-width: 768px) {
+    .range-tiles {
+        gap: 14px;
+        padding: 0 16px;
+    }
+
+    .range-item {
+        flex: 0 0 calc(50% - 10px);
+        /* show 2 fully, maybe part of 3rd */
+        min-width: 180px;
+        max-width: 240px;
+    }
+
+    .item-image {
+        height: 200px;
+    }
+
+    .item-text {
+        font-size: 14px;
+    }
+
+    .arrow-icon {
+        width: 15px;
+        height: 15px;
+    }
+}
+
+/* ==================== SMALLER MOBILE (1.5–2 CARDS VISIBLE) ==================== */
+@media (max-width: 480px) {
+    .range-tiles {
+        gap: 12px;
+        padding: 0 12px;
+    }
+
+    .range-item {
+        flex: 0 0 70%;
+        /* ~1.5 cards visible, slideable */
+        min-width: 180px;
+    }
+
+    .item-image {
+        height: 180px;
+    }
+
+    .item-title-overlay {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .item-text {
+        font-size: 13px;
+    }
+
+    .arrow-icon {
+        width: 14px;
+        height: 14px;
+    }
+}
