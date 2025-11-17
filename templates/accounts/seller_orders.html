@@ -32,8 +32,8 @@
                         <td style="padding: 1rem;">{{ item.order.created|date:"M d, Y" }}</td>
                         <td style="padding: 1rem;">{{ item.product.name }}</td>
                         <td style="padding: 1rem;">{{ item.quantity }}</td>
-                        <td style="padding: 1rem;">${{ item.price }}</td>
-                        <td style="padding: 1rem;">${{ item.get_cost }}</td>
+                        <td style="padding: 1rem;">₹{{ item.price }}</td>
+                        <td style="padding: 1rem;">₹{{ item.get_cost }}</td>
                         <td style="padding: 1rem;">
                             <form method="post" action="{% url 'orders:update_order_status' item.order.id item.id %}">
                                 {% csrf_token %}

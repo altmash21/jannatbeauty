@@ -11,7 +11,6 @@ urlpatterns = [
     # ============================================================================
     # AUTHENTICATION
     # ============================================================================
-    path('register/', views.register_choice, name='register_choice'),
     path('register/customer/', views.register_customer, name='register_customer'),
     path('register/seller/', views.register_seller, name='register_seller'),
     path('login/', views.user_login, name='login'),

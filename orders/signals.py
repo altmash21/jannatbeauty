@@ -14,7 +14,7 @@ def create_order_notification(sender, instance, created, **kwargs):
             user=instance.user,
             notification_type='order',
             title=f'Order Placed Successfully!',
-            message=f'Your order #{str(instance.id)[:8]} has been placed successfully. Total: ${instance.total_amount}',
+            message=f'Your order #{str(instance.id)[:8]} has been placed successfully. Total: ₹{instance.total_amount}',
             link=f'/orders/order/{instance.id}/'
         )
     else:

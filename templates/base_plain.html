@@ -1,39 +1,26 @@
-    <!-- Bottom Navbar for Mobile -->
-    <nav class="mobile-bottom-navbar d-md-none d-lg-none d-xl-none" style="position:fixed; left:0; right:0; bottom:0; z-index:1055; background:#06402B; box-shadow:0 -2px 8px rgba(0,0,0,0.08); border-top:1px solid #e0e0e0;">
-      <ul class="bottom-nav-list d-flex justify-content-between align-items-center m-0 p-0" style="list-style:none; padding:0 0.5rem;">
-        <li>
-          <a href="{% url 'store:home' %}" class="bottom-nav-link" style="display:flex; flex-direction:column; align-items:center; color:#fff; text-decoration:none; font-size:0.75rem; padding:0.15rem 0.2rem; min-width:48px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" style="margin-bottom:1px; fill:none; stroke:#fff; stroke-width:2;"><path d="M3 12l9-9 9 9"/><path d="M9 21V9h6v12"/></svg>
-            <span>Home</span>
+  <!-- Mobile Bottom Navbar -->
+  <nav class="mobile-bottom-navbar d-md-none d-lg-none d-xl-none fixed-bottom bg-white border-top shadow-sm">
+    <div class="container-fluid px-0">
+      <div class="d-flex justify-content-around align-items-center" style="height: 56px;">
+          <a href="{% url 'store:home' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <i class="fa-solid fa-house fa-lg mb-1"></i>
+            <div style="font-size: 0.8rem;">Home</div>
           </a>
-        </li>
-        <li>
-          <a href="{% url 'store:product_list' %}" class="bottom-nav-link" style="display:flex; flex-direction:column; align-items:center; color:#fff; text-decoration:none; font-size:0.75rem; padding:0.15rem 0.2rem; min-width:48px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" style="margin-bottom:1px; fill:#fff;"><use xlink:href="#shopping-bag"></use></svg>
-            <span>Shop</span>
+          <a href="{% url 'store:product_list' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <i class="fa-solid fa-store fa-lg mb-1"></i>
+            <div style="font-size: 0.8rem;">Shop</div>
           </a>
-        </li>
-        <li>
-          <a href="#contact" class="bottom-nav-link" style="display:flex; flex-direction:column; align-items:center; color:#fff; text-decoration:none; font-size:0.75rem; padding:0.15rem 0.2rem; min-width:48px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" style="margin-bottom:1px; fill:#fff;"><use xlink:href="#gift"></use></svg>
-            <span>Offers</span>
+          <a href="{% url 'cart:cart_detail' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <i class="fa-solid fa-cart-shopping fa-lg mb-1"></i>
+            <div style="font-size: 0.8rem;">Cart</div>
           </a>
-        </li>
-        <li>
-          {% if user.is_authenticated %}
-            <a href="{% url 'accounts:customer_dashboard' %}" class="bottom-nav-link" style="display:flex; flex-direction:column; align-items:center; color:#fff; text-decoration:none; font-size:0.75rem; padding:0.15rem 0.2rem; min-width:48px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" style="margin-bottom:1px; fill:#fff;"><use xlink:href="#user"></use></svg>
-              <span>Profile</span>
-            </a>
-          {% else %}
-            <a href="{% url 'accounts:login' %}" class="bottom-nav-link" style="display:flex; flex-direction:column; align-items:center; color:#fff; text-decoration:none; font-size:0.75rem; padding:0.15rem 0.2rem; min-width:48px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" style="margin-bottom:1px; fill:#fff;"><use xlink:href="#user"></use></svg>
-              <span>Sign In</span>
-            </a>
-          {% endif %}
-        </li>
-      </ul>
-    </nav>
+          <a href="{% url 'accounts:login' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <i class="fa-solid fa-user fa-lg mb-1"></i>
+            <div style="font-size: 0.8rem;">Sign In</div>
+          </a>
+      </div>
+    </div>
+  </nav>
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -51,6 +38,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{% static 'css/vendor.css' %}">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papm8z+Yd1Q6Xo8XzYkFQ6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
   <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 
@@ -196,9 +185,9 @@
   <div class="search-popup">
     <div class="search-popup-container">
 
-      <form role="search" method="get" class="form-group" action="">
+      <form role="search" method="get" class="form-group" action="{% url 'store:product_list' %}">
         <input type="search" id="search-form" class="form-control border-0 border-bottom"
-          placeholder="Type and press enter" value="" name="s" />
+          placeholder="Type and press enter" value="" name="q" />
         <button type="submit" class="search-submit border-0 position-absolute bg-white"
           style="top: 15px;right: 15px;"><svg class="search" width="24" height="24">
             <use xlink:href="#search"></use>
@@ -251,14 +240,14 @@
               <h6 class="my-0">{{ item.product.name }}</h6>
               <small class="text-body-secondary">{{ item.product.category.name }}</small>
             </div>
-            <span class="text-body-secondary">${{ item.total_price }}</span>
+            <span class="text-body-secondary">₹{{ item.total_price }}</span>
           </li>
           {% empty %}
           <li class="list-group-item text-center text-muted">Your cart is empty.</li>
           {% endfor %}
           <li class="list-group-item d-flex justify-content-between">
-            <span>Total (USD)</span>
-            <strong>${{ total }}</strong>
+            <span>Total (INR)</span>
+            <strong>₹{{ total }}</strong>
           </li>
         </ul>
         <a href="{% url 'orders:checkout' %}" class="w-100 btn btn-primary btn-lg">Continue to Checkout</a>

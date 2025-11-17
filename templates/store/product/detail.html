@@ -1,10 +1,41 @@
-{% extends 'base.html' %}
+{% extends 'base_plain.html' %}
 {% load static %}
 {% block title %}{{ product.name }} - Product Details{% endblock %}
 
 {% block content %}
+    <style>
+    {% comment %} /* Responsive font sizes for product detail page */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: clamp(1.1rem, 2vw + 1rem, 2.5rem);
+    } {% endcomment %}
+    .product-price h3, .product-price span {
+        font-size: clamp(1rem, 2vw + 0.5rem, 2rem);
+    }
+    .product-meta, .product-description, .breadcrumb, .form-control, .btn {
+        font-size: clamp(0.95rem, 1vw + 0.7rem, 1.2rem);
+    }
+    .quantity-label {
+        font-size: 1.1rem !important;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    @media (max-width: 600px) {
+        h1, h2, h3, h4, h5, h6 {
+            font-size: 1.1rem !important;
+        }
+        .product-price h3, .product-price span {
+            font-size: 1rem !important;
+        }
+        .product-meta, .product-description, .breadcrumb, .form-control, .btn {
+            font-size: 0.95rem !important;
+        }
+        .quantity-label {
+            font-size: 1rem !important;
+        }
+    }
+    </style>
     <!-- Product Detail Section -->
-        <section class="py-5">
+        <section class="py-2">
                 <div class="container">
                      
             <nav aria-label="breadcrumb">
@@ -67,9 +98,9 @@
                         </div>
 
                         <div class="product-price mb-4">
-                            <h3 class="text-primary">${{ product.price }}</h3>
+                            <h3 class="text-primary">₹{{ product.price }}</h3>
                             {% if product.compare_price %}
-                                <span class="text-decoration-line-through text-muted">${{ product.compare_price }}</span>
+                                <span class="text-decoration-line-through text-muted">₹{{ product.compare_price }}</span>
                             {% endif %}
                         </div>
 
@@ -79,15 +110,15 @@
 
 
                         <div class="mb-4">
-                            <h5 class="text-uppercase mb-3">Quantity</h5>
+                            <span class="quantity-label text-uppercase mb-3">Quantity</span>
                             <div class="input-group" style="max-width: 150px;">
-                                <button class="btn btn-outline-dark" type="button">
+                                <button class="btn btn-outline-dark" type="button" id="qty-minus">
                                     <svg width="20" height="20">
                                         <use xlink:href="#minus"></use>
                                     </svg>
                                 </button>
-                                <input type="number" class="form-control text-center" value="1" min="1">
-                                <button class="btn btn-outline-dark" type="button">
+                                <input type="number" class="form-control text-center" value="1" min="1" id="qty-input">
+                                <button class="btn btn-outline-dark" type="button" id="qty-plus">
                                     <svg width="20" height="20">
                                         <use xlink:href="#plus"></use>
                                     </svg>
@@ -96,24 +127,48 @@
                         </div>
 
                         <div class="d-flex gap-3 mb-4">
-                            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="d-inline w-100">
+                            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="d-inline w-100" id="cart-form">
                                 {% csrf_token %}
                                 <input type="hidden" name="quantity" value="1" id="cart-quantity-input">
-                                <button type="submit" class="btn btn-primary btn-lg flex-grow-1 w-100">
+                                <button type="submit" class="btn btn-primary btn-lg flex-grow-1 w-100"style="background-color:#06402B; border-color:#06402B;">
                                     <svg width="20" height="20" class="me-2">
                                         <use xlink:href="#cart"></use>
                                     </svg>
                                     Add to Cart
                                 </button>
                             </form>
-                            <button class="btn btn-outline-dark btn-lg">
+                            {% comment %} <button class="btn btn-outline-dark btn-lg">
                                 <svg width="20" height="20">
                                     <use xlink:href="#heart"></use>
                                 </svg>
-                            </button>
+                            </button> {% endcomment %}
                         </div>
 
                         <div class="product-meta border-top pt-4">
+                                                    <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        var qtyInput = document.getElementById('qty-input');
+                                                        var qtyMinus = document.getElementById('qty-minus');
+                                                        var qtyPlus = document.getElementById('qty-plus');
+                                                        var cartQtyInput = document.getElementById('cart-quantity-input');
+                                                        var cartForm = document.getElementById('cart-form');
+
+                                                        qtyMinus.addEventListener('click', function() {
+                                                            var val = parseInt(qtyInput.value) || 1;
+                                                            if (val > 1) qtyInput.value = val - 1;
+                                                        });
+                                                        qtyPlus.addEventListener('click', function() {
+                                                            var val = parseInt(qtyInput.value) || 1;
+                                                            qtyInput.value = val + 1;
+                                                        });
+                                                        qtyInput.addEventListener('change', function() {
+                                                            if (qtyInput.value < 1) qtyInput.value = 1;
+                                                        });
+                                                        cartForm.addEventListener('submit', function(e) {
+                                                            cartQtyInput.value = qtyInput.value;
+                                                        });
+                                                    });
+                                                    </script>
                             <div class="row">
                                 <div class="col-6 mb-3">
                                     <strong>SKU:</strong> <span class="text-muted">{{ product.id }}</span>
@@ -142,10 +197,6 @@
                                 data-bs-target="#description" type="button" role="tab">Description</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link text-uppercase" id="info-tab" data-bs-toggle="tab"
-                                data-bs-target="#info" type="button" role="tab">Additional Information</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
                             <button class="nav-link text-uppercase" id="reviews-tab" data-bs-toggle="tab"
                                 data-bs-target="#reviews" type="button" role="tab">Reviews (24)</button>
                         </li>
@@ -153,32 +204,6 @@
                     <div class="tab-content py-4" id="productTabContent">
                         <div class="tab-pane fade show active" id="description" role="tabpanel">
                             <p>{{ product.description }}</p>
-                        </div>
-                        <div class="tab-pane fade" id="info" role="tabpanel">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Material</strong></td>
-                                        <td>100% Genuine Leather</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Lining</strong></td>
-                                        <td>Cotton Blend</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Care Instructions</strong></td>
-                                        <td>Professional Dry Clean Only</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Origin</strong></td>
-                                        <td>Made in Italy</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Fit</strong></td>
-                                        <td>Regular Fit</td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                         <div class="tab-pane fade" id="reviews" role="tabpanel">
                             <div class="reviews-section">
@@ -249,7 +274,7 @@
             <!-- Related Products -->
             <div class="row mt-5">
                 <div class="col-12">
-                    <h2 class="section-title text-center mb-5">Related Products</h2>
+                    <h3 class="section-title text-center mb-5">Related Products</h3>
                 </div>
                 {% for related in related_products %}
                 <div class="col-md-3 col-sm-6 mb-4">
@@ -266,7 +291,7 @@
                         <div class="product-detail text-center mt-3">
                             <h5 class="text-uppercase mb-2"><a href="{{ related.get_absolute_url }}"
                                     class="text-decoration-none text-dark">{{ related.name }}</a></h5>
-                            <span class="text-primary fw-bold">${{ related.price }}</span>
+                            <span class="text-primary fw-bold">₹{{ related.price }}</span>
                         </div>
                     </div>
                 </div>

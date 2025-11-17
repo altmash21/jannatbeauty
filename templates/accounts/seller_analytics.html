@@ -12,8 +12,8 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
         <!-- Total Revenue -->
         <div class="card" style="padding: 1.5rem; text-align: center;">
-            <i class="fas fa-dollar-sign" style="font-size: 2.5rem; color: #27ae60; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">${{ analytics.total_revenue|floatformat:2 }}</h3>
+            <i class="fa-solid fa-indian-rupee-sign" style="font-size: 2.5rem; color: #27ae60; margin-bottom: 0.5rem;"></i>
+            <h3 style="margin: 0.5rem 0;">₹{{ analytics.total_revenue|floatformat:2 }}</h3>
             <p style="color: #888; margin: 0;">Total Revenue</p>
         </div>
         
@@ -34,7 +34,7 @@
         <!-- Average Order Value -->
         <div class="card" style="padding: 1.5rem; text-align: center;">
             <i class="fas fa-chart-bar" style="font-size: 2.5rem; color: #9b59b6; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">${{ analytics.average_order_value|floatformat:2 }}</h3>
+            <h3 style="margin: 0.5rem 0;">₹{{ analytics.average_order_value|floatformat:2 }}</h3>
             <p style="color: #888; margin: 0;">Avg Order Value</p>
         </div>
     </div>

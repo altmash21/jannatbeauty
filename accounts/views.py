@@ -18,9 +18,7 @@ from orders.models import Order, OrderItem
 # AUTHENTICATION VIEWS
 # ============================================================================
 
-def register_choice(request):
-    """Let users choose between customer or seller registration"""
-    return render(request, 'accounts/register_choice.html')
+
 
 
 def register_customer(request):

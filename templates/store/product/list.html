@@ -4,6 +4,18 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/shop.css' %}" >
 <style>
+                /* Ensure product cards have equal height */
+                .product-card {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                }
+                .product-detail {
+                    flex: 1 1 auto;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                }
         .product-card .product-actions {
             transition: opacity 0.3s ease;
         }
@@ -271,16 +283,16 @@
                             <div class="price-range">
                                 <ul class="list-unstyled">
                                     <li class="mb-2">
-                                        <a href="?min_price=0&max_price=50" class="text-decoration-none">Under $50</a>
+                                        <a href="?min_price=0&max_price=50" class="text-decoration-none">Under ₹50</a>
                                     </li>
                                     <li class="mb-2">
-                                        <a href="?min_price=50&max_price=100" class="text-decoration-none">$50 - $100</a>
+                                        <a href="?min_price=50&max_price=100" class="text-decoration-none">₹50 - ₹100</a>
                                     </li>
                                     <li class="mb-2">
-                                        <a href="?min_price=100&max_price=200" class="text-decoration-none">$100 - $200</a>
+                                        <a href="?min_price=100&max_price=200" class="text-decoration-none">₹100 - ₹200</a>
                                     </li>
                                     <li class="mb-2">
-                                        <a href="?min_price=200" class="text-decoration-none">Above $200</a>
+                                        <a href="?min_price=200" class="text-decoration-none">Above ₹200</a>
                                     </li>
                                 </ul>
                             </div>
@@ -314,7 +326,7 @@
                                 {% elif product.is_on_sale %}
                                     <span class="badge bg-danger position-absolute top-0 start-0 m-3">Sale</span>
                                 {% endif %}
-                                <div class="image-holder mb-3">
+                                <div class="image-holder mb-1">
                                     <a href="{{ product.get_absolute_url }}">
                                         {% if product.image %}
                                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
@@ -333,17 +345,17 @@
                                         </form>
                                     </div>
                                 </div>
-                                <div class="product-detail text-center" style="padding:0 4px;">
-                                    <h6 class="mb-1" style="font-size:1.1rem; font-weight:500; line-height:1.2;">
+                                <div class="product-detail text-center" style="padding:0 4px; flex">
+                                    <h6 class="mb-0" style="font-size:1.1rem; font-weight:500; line-height:1.2;">
                                         <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">{{ product.name }}</a>
                                     </h6>
-                                    <div class="d-flex justify-content-center align-items-center mb-2" style="gap:8px;">
+                                    <div class="d-flex justify-content-center align-items-center" style="gap:6px;">
                                         {% if product.compare_price %}
-                                            <span class="text-muted text-decoration-line-through" style="font-size:1rem;">${{ product.compare_price }}</span>
+                                            <span class="text-muted text-decoration-line-through" style="font-size:1rem;">₹{{ product.compare_price }}</span>
                                         {% endif %}
-                                        <span class="fw-bold text-success" style="font-size:1.1rem;">${{ product.price }}</span>
+                                        <span class="fw-bold text-success" style="font-size:1.1rem;">₹{{ product.price }}</span>
                                     </div>
-                                    <div class="d-flex gap-2 mt-2">
+                                    <div class="d-flex gap-2 mt-1">
                                         <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                                             {% csrf_token %}
                                             <input type="hidden" name="quantity" value="1">
@@ -431,35 +443,19 @@
                     <h5 class="text-uppercase mb-3">Categories</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <a href="#" class="text-decoration-none d-flex justify-content-between">
+                            <a href="{% url 'store:product_list' %}" class="text-decoration-none d-flex justify-content-between">
                                 <span>All Products</span>
-                                <span class="text-muted">(48)</span>
+                                <span class="text-muted">({{ products.paginator.count }})</span>
                             </a>
                         </li>
+                        {% for cat in categories %}
                         <li class="mb-2">
-                            <a href="#" class="text-decoration-none d-flex justify-content-between">
-                                <span>Jackets</span>
-                                <span class="text-muted">(12)</span>
+                            <a href="{{ cat.get_absolute_url }}" class="text-decoration-none d-flex justify-content-between">
+                                <span>{{ cat.name }}</span>
+                                <span class="text-muted">({{ cat.products.count }})</span>
                             </a>
                         </li>
-                        <li class="mb-2">
-                            <a href="#" class="text-decoration-none d-flex justify-content-between">
-                                <span>T-Shirts</span>
-                                <span class="text-muted">(18)</span>
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="#" class="text-decoration-none d-flex justify-content-between">
-                                <span>Dresses</span>
-                                <span class="text-muted">(8)</span>
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="#" class="text-decoration-none d-flex justify-content-between">
-                                <span>Accessories</span>
-                                <span class="text-muted">(10)</span>
-                            </a>
-                        </li>
+                        {% endfor %}
                     </ul>
                 </div>
 
@@ -469,54 +465,26 @@
                     <div class="price-range">
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="mobileprice1">
-                            <label class="form-check-label" for="mobileprice1">Under $50</label>
+                            <label class="form-check-label" for="mobileprice1">Under ₹50</label>
                         </div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="mobileprice2">
-                            <label class="form-check-label" for="mobileprice2">$50 - $100</label>
+                            <label class="form-check-label" for="mobileprice2">₹50 - ₹100</label>
                         </div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="mobileprice3">
-                            <label class="form-check-label" for="mobileprice3">$100 - $200</label>
+                            <label class="form-check-label" for="mobileprice3">₹100 - ₹200</label>
                         </div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="mobileprice4">
-                            <label class="form-check-label" for="mobileprice4">Above $200</label>
+                            <label class="form-check-label" for="mobileprice4">Above ₹200</label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Size Filter -->
-                <div class="filter-widget mb-4">
-                    <h5 class="text-uppercase mb-3">Size</h5>
-                    <div class="size-filter d-flex flex-wrap gap-2">
-                        <button class="btn btn-outline-dark">XS</button>
-                        <button class="btn btn-outline-dark">S</button>
-                        <button class="btn btn-outline-dark">M</button>
-                        <button class="btn btn-outline-dark">L</button>
-                        <button class="btn btn-outline-dark">XL</button>
-                        <button class="btn btn-outline-dark">XXL</button>
-                    </div>
-                </div>
+              
 
-                <!-- Color Filter -->
-                <div class="filter-widget mb-4">
-                    <h5 class="text-uppercase mb-3">Color</h5>
-                    <div class="color-filter d-flex flex-wrap gap-2">
-                        <button class="btn p-0"
-                            style="width: 35px; height: 35px; background-color: #000; border: 2px solid #ddd; border-radius: 50%;"></button>
-                        <button class="btn p-0"
-                            style="width: 35px; height: 35px; background-color: #fff; border: 2px solid #ddd; border-radius: 50%;"></button>
-                        <button class="btn p-0"
-                            style="width: 35px; height: 35px; background-color: #8C907E; border: 2px solid #ddd; border-radius: 50%;"></button>
-                        <button class="btn p-0"
-                            style="width: 35px; height: 35px; background-color: #c4a57b; border: 2px solid #ddd; border-radius: 50%;"></button>
-                        <button class="btn p-0"
-                            style="width: 35px; height: 35px; background-color: #4169e1; border: 2px solid #ddd; border-radius: 50%;"></button>
-                        <button class="btn p-0"
-                            style="width: 35px; height: 35px; background-color: #dc143c; border: 2px solid #ddd; border-radius: 50%;"></button>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

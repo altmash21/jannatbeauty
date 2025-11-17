@@ -1,9 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Jannat Beauty{% endblock %}
-
+{% block extra_css %}
+<style>
+  @media (max-width: 768px) {
+    .hero-section {
+      max-height: 70vh !important;
+      height: 70vh !important;
+      overflow: hidden;
+    }
+    .video-content .video-bg {
+      height: 220px !important;
+      min-height: 220px !important;
+      max-height: 300px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .video-content .video-image {
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+  }
+</style>
+{% endblock %}
 {% block content %}
-    <section id="hero" class="hero-section position-relative overflow-hidden">
+  <section id="hero" class="hero-section position-relative overflow-hidden">
     <!-- Video Background -->
     <video class="hero-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover" autoplay muted loop>
       <source src="{% static 'videos/background3.mp4' %}" type="video/mp4">
@@ -26,7 +48,7 @@
             <p class="hero-subtext fs-4 mb-4" data-aos="fade-up" data-aos-delay="300">
               Beautiful Qur'ans, prayer essentials, modest fashion and meaningful gifts — carefully curated for your family.
             </p>
-            <a href="/store/" class="btn btn-light btn-lg px-5 py-3 text-uppercase" data-aos="fade-up" data-aos-delay="600" style="background-color: #06402B; border-color: #06402B; color: white;">
+            <a href="{% url 'store:product_list' %}" class="btn btn-light btn-lg px-5rem py-3rem text-uppercase" data-aos="fade-up" data-aos-delay="600" style="background-color: #06402B; border-color: #06402B; color: white;">
               Explore Collections
             </a>
           </div>
@@ -94,7 +116,7 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="index.html" class="btn btn-common text-uppercase">Quran</a>
+                  <a href="{% url 'store:product_list' %}" class="btn btn-common text-uppercase">Quran</a>
                 </div>
               </div>
             </div>
@@ -111,7 +133,7 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="index.html" class="btn btn-common text-uppercase">For kids</a>
+                  <a href="{% url 'store:product_list' %}" class="btn btn-common text-uppercase">For kids</a>
                 </div>
               </div>
             </div>
@@ -128,7 +150,7 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="index.html" class="btn btn-common text-uppercase">Shop accessories</a>
+                  <a href="{% url 'store:product_list' %}" class="btn btn-common text-uppercase">Shop accessories</a>
                 </div>
               </div>
             </div>
@@ -141,8 +163,8 @@
   <section id="new-arrival" class="new-arrival product-carousel py-5 position-relative overflow-hidden">
     <div class="container">
       <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 mb-3">
-        <h4 class="text-uppercase">Our New Arrivals</h4>
-        <a href="index.html" class="btn-link">View All Products</a>
+        <h5 class="text-uppercase">Our New Arrivals</h5>
+        <a href="{% url 'store:product_list' %}" class="btn-link">View All Products</a>
       </div>
       <div class="swiper product-swiper open-up" data-aos="zoom-out">
         <div class="swiper-wrapper d-flex">
@@ -163,9 +185,9 @@
                   </svg>
                 </a>
                 <div class="product-content">
-                  <h5 class="element-title text-uppercase fs-5 mt-3">
+                  <h6 class="element-title text-uppercase mt-3" >
                     <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
-                  </h5>
+                  </h6>
                   <div class="d-flex align-items-center mb-2">
                     {% if product.compare_price %}
                       <span class="me-2 text-muted text-decoration-line-through">${{ product.compare_price }}</span>
@@ -231,8 +253,8 @@
   <section id="best-sellers" class="best-sellers product-carousel py-5 position-relative overflow-hidden">
     <div class="container">
       <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 mb-3">
-        <h4 class="text-uppercase">Best Selling Items</h4>
-        <a href="index.html" class="btn-link">View All Products</a>
+        <h5 class="text-uppercase">Best Selling Items</h5>
+        <a href="{% url 'store:product_list' %}" class="btn-link">View All Products</a>
       </div>
       <div class="swiper product-swiper open-up" data-aos="zoom-out">
         <div class="swiper-wrapper d-flex">
@@ -253,14 +275,14 @@
                   </svg>
                 </a>
                 <div class="product-content">
-                  <h5 class="element-title text-uppercase fs-5 mt-3">
+                  <h6 class="element-title text-uppercase mt-3">
                     <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
-                  </h5>
+                  </h6>
                   <div class="d-flex align-items-center mb-2">
                     {% if product.compare_price %}
-                      <span class="me-2 text-muted text-decoration-line-through">${{ product.compare_price }}</span>
+                      <span class="me-2 text-muted text-decoration-line-through">₹{{ product.compare_price }}</span>
                     {% endif %}
-                    <span class="fw-bold text-success">${{ product.price }}</span>
+                    <span class="fw-bold text-success">₹{{ product.price }}</span>
                   </div>
                   <div class="d-flex gap-2">
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
@@ -362,8 +384,8 @@
   <section id="related-products" class="related-products product-carousel py-5 position-relative overflow-hidden">
     <div class="container">
       <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 mb-3">
-        <h4 class="text-uppercase">You May Also Like</h4>
-        <a href="index.html" class="btn-link">View All Products</a>
+        <h5 class="text-uppercase">You May Also Like</h5>
+        <a href="{% url 'store:product_list' %}" class="btn-link">View All Products</a>
       </div>
       <div class="swiper product-swiper open-up" data-aos="zoom-out">
         <div class="swiper-wrapper d-flex">
@@ -384,14 +406,14 @@
                   </svg>
                 </a>
                 <div class="product-content">
-                  <h5 class="element-title text-uppercase fs-5 mt-3">
+                  <h6 class="element-title text-uppercase mt-3">
                     <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
-                  </h5>
+                  </h6>
                   <div class="d-flex align-items-center mb-2">
                     {% if product.compare_price %}
-                      <span class="me-2 text-muted text-decoration-line-through">${{ product.compare_price }}</span>
+                      <span class="me-2 text-muted text-decoration-line-through">₹{{ product.compare_price }}</span>
                     {% endif %}
-                    <span class="fw-bold text-success">${{ product.price }}</span>
+                    <span class="fw-bold text-success">₹{{ product.price }}</span>
                   </div>
                   <div class="d-flex gap-2">
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">

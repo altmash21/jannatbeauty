@@ -1,4 +1,4 @@
-{% extends 'base_simple.html' %}
+{% extends 'base_plain.html' %}
 
 {% block title %}My Profile - Jannat{% endblock %}
 
@@ -52,9 +52,10 @@
     }
 
     .profile-sidebar {
-        background: #fff;
+        background: #f8f9fa;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+        border: 1px solid #e0e0e0;
         height: fit-content;
         position: sticky;
         top: 80px;
@@ -88,10 +89,11 @@
     }
 
     .profile-content {
-        background: #fff;
+        background: #f6f7f9;
         border-radius: 8px;
         padding: 2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+        border: 1px solid #e0e0e0;
     }
 
     /* Profile Header - Same across all sections */
@@ -101,7 +103,9 @@
         gap: 2rem;
         margin-bottom: 2rem;
         padding-bottom: 2rem;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f8f9fa;
+        border-radius: 8px 8px 0 0;
     }
 
     .profile-avatar {
@@ -138,6 +142,10 @@
 
     .form-section {
         margin-bottom: 2rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 1.5rem;
     }
     .form-section h3 {
         font-size: 1.1rem;
@@ -821,7 +829,7 @@
                             <td>{{ order.id }}</td>
                             <td>{{ order.created|date:"M d, Y" }}</td>
                             <td>{{ order.get_order_status_display }}</td>
-                            <td>${{ order.total_amount }}</td>
+                            <td>₹{{ order.total_amount }}</td>
                         </tr>
                     {% empty %}
                         <tr><td colspan="4" style="text-align: center; padding: 2rem; color: #999;">No orders found.</td></tr>
@@ -969,7 +977,7 @@
                                 <span style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; background: #d4edda; color: #155724;">{{ order.get_order_status_display }}</span>
                             </div>
                             <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">{{ order.created|date:"M d, Y" }}</div>
-                            <div style="font-weight: 600; margin-top: 0.5rem;">Total: ${{ order.total_amount }}</div>
+                            <div style="font-weight: 600; margin-top: 0.5rem;">Total: ₹{{ order.total_amount }}</div>
                         </div>
                         {% endfor %}
                     </div>
