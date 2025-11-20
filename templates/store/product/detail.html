@@ -3,302 +3,480 @@
 {% block title %}{{ product.name }} - Product Details{% endblock %}
 
 {% block content %}
-    <style>
-    {% comment %} /* Responsive font sizes for product detail page */
-    h1, h2, h3, h4, h5, h6 {
-        font-size: clamp(1.1rem, 2vw + 1rem, 2.5rem);
-    } {% endcomment %}
-    .product-price h3, .product-price span {
-        font-size: clamp(1rem, 2vw + 0.5rem, 2rem);
+<style>
+    /* Product Detail Page Styles - All consolidated */
+    * {
+        box-sizing: border-box;
     }
-    .product-meta, .product-description, .breadcrumb, .form-control, .btn {
-        font-size: clamp(0.95rem, 1vw + 0.7rem, 1.2rem);
-    }
-    .quantity-label {
-        font-size: 1.1rem !important;
-        font-weight: 600;
-        letter-spacing: 1px;
-    }
+    
     @media (max-width: 600px) {
-        h1, h2, h3, h4, h5, h6 {
+        .fixed-bottom-action-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 56px;
+            z-index: 1051;
+            background: #fff;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.07);
+            padding: 0.5rem 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .mobile-breadcrumb {
+            padding: 0.5rem 0 !important;
+            margin-bottom: 0.5rem !important;
+            background-color: transparent !important;
+            font-size: 0.85rem !important;
+        }
+        .mobile-product-layout {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 0.5rem !important;
+        }
+        .mobile-image-section {
+            display: grid !important;
+            grid-template-columns: 1fr auto !important;
+            gap: 0.75rem !important;
+        }
+        .mobile-main-image {
+            width: 100% !important;
+            order: 1;
+        }
+        .mobile-main-image img {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 60vh !important;
+            object-fit: contain !important;
+            background: #f8f9fa !important;
+            border-radius: 0.5rem !important;
+        }
+        .mobile-extra-images {
+            width: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            order: 2;
+            overflow-y: auto !important;
+            padding-bottom: 0.5rem !important;
+            -webkit-overflow-scrolling: touch !important;
+            max-height: 60vh !important;
+        }
+        .mobile-extra-images > div {
+            flex: 0 0 80px !important;
+            max-width: 80px !important;
+            aspect-ratio: 1/1 !important;
+        }
+        .mobile-extra-images img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 0.375rem !important;
+            border: 2px solid transparent !important;
+            transition: border-color 0.2s !important;
+        }
+        .mobile-extra-images img:active {
+            border-color: #06402B !important;
+        }
+        .mobile-product-title {
+            font-size: 1.5rem !important;
+            margin-bottom: 0.5rem !important;
+            font-weight: 700 !important;
+        }
+        .mobile-price {
             font-size: 1.1rem !important;
+            font-weight: 500 !important;
         }
-        .product-price h3, .product-price span {
+        .mobile-compare-price {
             font-size: 1rem !important;
+            font-weight: 400 !important;
         }
-        .product-meta, .product-description, .breadcrumb, .form-control, .btn {
-            font-size: 0.95rem !important;
+        .mobile-hide-description {
+            display: none !important;
         }
-        .quantity-label {
-            font-size: 1rem !important;
+        .mobile-hide-quantity {
+            display: none !important;
+        }
+        .related-products-grid {
+            display: flex !important;
+            overflow-x: auto !important;
+            gap: 1rem !important;
+            scroll-snap-type: x mandatory !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .related-product-card {
+            flex: 0 0 40% !important;
+            scroll-snap-align: start !important;
         }
     }
-    </style>
-    <!-- Product Detail Section -->
-        <section class="py-2">
-                <div class="container">
-                     
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Shop</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
-                </ol>
-            </nav>
+</style>
+<section style="padding: 1rem 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+        <nav aria-label="breadcrumb" style="margin-bottom: 1rem;">
+            <ol class="mobile-breadcrumb" style="display: flex; flex-wrap: wrap; padding: 0.75rem 1rem; margin-bottom: 1rem; list-style: none;; border-radius: 0.25rem;">
+                <li style="display: flex; align-items: center;"><a href="/" style="color: #0d6efd; text-decoration: none;">Home</a><span style="margin: 0 0.5rem; color: #6c757d;">/</span></li>
+                <li style="display: flex; align-items: center;"><a href="{% url 'store:product_list' %}" style="color: #0d6efd; text-decoration: none;">Shop</a><span style="margin: 0 0.5rem; color: #6c757d;">/</span></li>
+                <li style="color: #6c757d;">{{ product.name }}</li>
+            </ol>
+        </nav>
 
-            <div class="row g-5 mt-2">
-                <div class="col-lg-6">
-                    <div class="product-gallery">
-                        <div class="swiper product-swiper">
-                            <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    {% if product.image %}
-                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
-                                    {% else %}
-                                        <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="img-fluid rounded">
-                                    {% endif %}
-                                </div>
-                                {# If you have a ProductImage model, you can loop here for more images #}
-                                {% if product.images.all %}
-                                    {% for img in product.images.all %}
-                                        <div class="swiper-slide">
-                                            <img src="{{ img.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            <div class="swiper-pagination"></div>
-                        </div>
+        <div class="mobile-product-layout" style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 1rem;">
+            <div style="width: 100%; margin-bottom: 0; padding-bottom: 0;">
+                <div class="mobile-image-section">
+                    <div class="mobile-main-image" style="margin-bottom: 0; padding-bottom: 0;">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%; height: auto; border-radius: 0.25rem; margin-bottom: 0; padding-bottom: 0; display: block;">
+                        {% else %}
+                            <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" style="max-width: 100%; height: auto; border-radius: 0.25rem; margin-bottom: 0; padding-bottom: 0; display: block;">
+                        {% endif %}
                     </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="product-info">
-                        <h1 class="mb-3">{{ product.name }}</h1>
-
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="rating text-warning me-2">
-                                <svg width="18" height="18">
-                                    <use xlink:href="#star-solid"></use>
-                                </svg>
-                                <svg width="18" height="18">
-                                    <use xlink:href="#star-solid"></use>
-                                </svg>
-                                <svg width="18" height="18">
-                                    <use xlink:href="#star-solid"></use>
-                                </svg>
-                                <svg width="18" height="18">
-                                    <use xlink:href="#star-solid"></use>
-                                </svg>
-                                <svg width="18" height="18">
-                                    <use xlink:href="#star-outline"></use>
-                                </svg>
-                            </div>
-                            <span class="text-muted">(24 Reviews)</span>
+                    {% if product.images.all %}
+                        <div class="mobile-extra-images">
+                            {% for img in product.images.all %}
+                                <div>
+                                    <img src="{{ img.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; border-radius: 0.25rem; object-fit: cover; cursor: pointer;" onclick="document.querySelector('.mobile-main-image img').src='{{ img.image.url }}'">
+                                </div>
+                            {% endfor %}
                         </div>
+                    {% endif %}
+                </div>
+            </div>
 
-                        <div class="product-price mb-4">
-                            <h3 class="text-primary">₹{{ product.price }}</h3>
+            <div style="width: 100%;">
+                <div>
+                    <h3 class="mobile-product-title" style="margin-bottom: 0.5rem; font-size: 2.2rem; font-weight: 700; color: #111;">{{ product.name }}</h3>
+
+                    <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="color: #ffc107; margin-right: 0.5rem;">
+                            <svg width="18" height="18">
+                                <use xlink:href="#star-solid"></use>
+                            </svg>
+                            <svg width="18" height="18">
+                                <use xlink:href="#star-solid"></use>
+                            </svg>
+                            <svg width="18" height="18">
+                                <use xlink:href="#star-solid"></use>
+                            </svg>
+                            <svg width="18" height="18">
+                                <use xlink:href="#star-solid"></use>
+                            </svg>
+                            <svg width="18" height="18">
+                                <use xlink:href="#star-outline"></use>
+                            </svg>
+                        </div>
+                        <span style="color: #6c757d;">(24 Reviews)</span>
+                    </div>
+
+                    <div style="margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: baseline; gap: 1.2em;">
+                            <span class="mobile-price" style="color: #111; font-size: 1.3rem; font-weight: 500; margin-bottom: 0;">₹{{ product.price }}</span>
                             {% if product.compare_price %}
-                                <span class="text-decoration-line-through text-muted">₹{{ product.compare_price }}</span>
+                                <span class="mobile-compare-price" style="text-decoration: line-through; color: #6c757d; font-size: 1.1rem; font-weight: 400; margin-bottom: 0;">₹{{ product.compare_price }}</span>
                             {% endif %}
                         </div>
+                    </div>
 
-                        <p class="mb-4">Premium quality soft leather jacket with exceptional comfort and style. Perfect
-                            for daily worship, gifting, and bringing barakah to your home.</p>
-                        <p class="mb-4">{{ product.description }}</p>
+                    
+                    <p class="mobile-hide-description" style="margin-bottom: 1.5rem; color: #495057; line-height: 1.6;">{{ product.description }}</p>
 
-
-                        <div class="mb-4">
-                            <span class="quantity-label text-uppercase mb-3">Quantity</span>
-                            <div class="input-group" style="max-width: 150px;">
-                                <button class="btn btn-outline-dark" type="button" id="qty-minus">
-                                    <svg width="20" height="20">
-                                        <use xlink:href="#minus"></use>
-                                    </svg>
-                                </button>
-                                <input type="number" class="form-control text-center" value="1" min="1" id="qty-input">
-                                <button class="btn btn-outline-dark" type="button" id="qty-plus">
-                                    <svg width="20" height="20">
-                                        <use xlink:href="#plus"></use>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-3 mb-4">
-                            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="d-inline w-100" id="cart-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="quantity" value="1" id="cart-quantity-input">
-                                <button type="submit" class="btn btn-primary btn-lg flex-grow-1 w-100"style="background-color:#06402B; border-color:#06402B;">
-                                    <svg width="20" height="20" class="me-2">
-                                        <use xlink:href="#cart"></use>
-                                    </svg>
-                                    Add to Cart
-                                </button>
-                            </form>
-                            {% comment %} <button class="btn btn-outline-dark btn-lg">
+                    <div class="mobile-hide-quantity" style="margin-bottom: 1.5rem;">
+                        <span style="display: block; text-transform: uppercase; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 600; letter-spacing: 1px; color: #111;">Quantity</span>
+                        <div style="display: flex; max-width: 150px;">
+                            <button type="button" id="qty-minus" style="padding: 0.5rem 1rem; border: 1px solid #212529; background: #fff; color: #212529; cursor: pointer; border-radius: 0.25rem 0 0 0.25rem;" {% if product.stock == 0 %}disabled{% endif %}>
                                 <svg width="20" height="20">
-                                    <use xlink:href="#heart"></use>
+                                    <use xlink:href="#minus"></use>
                                 </svg>
-                            </button> {% endcomment %}
+                            </button>
+                            <input type="number" id="qty-input" value="1" min="1" max="{{ product.stock }}" style="width: 60px; text-align: center; border: 1px solid #212529; border-left: 0; border-right: 0; padding: 0.5rem;" {% if product.stock == 0 %}disabled{% endif %}>
+                            <button type="button" id="qty-plus" style="padding: 0.5rem 1rem; border: 1px solid #212529; background: #fff; color: #212529; cursor: pointer; border-radius: 0 0.25rem 0.25rem 0;" {% if product.stock == 0 %}disabled{% endif %}>
+                                <svg width="20" height="20">
+                                    <use xlink:href="#plus"></use>
+                                </svg>
+                            </button>
                         </div>
+                    </div>
 
-                        <div class="product-meta border-top pt-4">
-                                                    <script>
-                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                        var qtyInput = document.getElementById('qty-input');
-                                                        var qtyMinus = document.getElementById('qty-minus');
-                                                        var qtyPlus = document.getElementById('qty-plus');
-                                                        var cartQtyInput = document.getElementById('cart-quantity-input');
-                                                        var cartForm = document.getElementById('cart-form');
+                    <!-- Desktop buttons -->
+                    <div style="display: none; gap: 1rem; margin-bottom: 1.5rem;">
+                        <form method="post" action="{% url 'cart:cart_add' product.id %}" style="display: inline-block; width: 100%;" id="cart-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1" id="cart-quantity-input">
+                            <button type="submit" style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; background-color: #06402B; border: 1px solid #06402B; color: #fff; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" {% if product.stock == 0 %}disabled{% endif %}>
+                                <svg width="20" height="20" style="margin-right: 0.5rem;">
+                                    <use xlink:href="#cart"></use>
+                                </svg>
+                                {% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}
+                            </button>
+                        </form>
+                        <form method="get" action="{% url 'orders:checkout' %}" style="display: inline-block; width: 100%;" id="buy-now-form">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="quantity" id="buy-now-quantity-input" value="1">
+                            <button type="submit" style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; border: 2px solid #176a3a; color: #176a3a; background: transparent; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                <svg width="20" height="20" style="fill: #176a3a; margin-right: 0.5rem;">
+                                    <use xlink:href="#cart"></use>
+                                </svg>
+                                Buy Now
+                            </button>
+                        </form>
+                    </div>
 
-                                                        qtyMinus.addEventListener('click', function() {
-                                                            var val = parseInt(qtyInput.value) || 1;
-                                                            if (val > 1) qtyInput.value = val - 1;
-                                                        });
-                                                        qtyPlus.addEventListener('click', function() {
-                                                            var val = parseInt(qtyInput.value) || 1;
-                                                            qtyInput.value = val + 1;
-                                                        });
-                                                        qtyInput.addEventListener('change', function() {
-                                                            if (qtyInput.value < 1) qtyInput.value = 1;
-                                                        });
-                                                        cartForm.addEventListener('submit', function(e) {
-                                                            cartQtyInput.value = qtyInput.value;
-                                                        });
-                                                    });
-                                                    </script>
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <strong>SKU:</strong> <span class="text-muted">{{ product.id }}</span>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <strong>Category:</strong> <a href="{% url 'store:product_list_by_category' product.category.slug %}" class="text-muted">{{ product.category.name }}</a>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <strong>Tags:</strong> <span class="text-muted">{% if product.tags %}{{ product.tags }}{% else %}Islamic, Essentials{% endif %}</span>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <strong>Availability:</strong> <span class="{% if product.available %}text-success{% else %}text-danger{% endif %}">{% if product.available %}In Stock{% else %}Out of Stock{% endif %}</span>
-                                </div>
+                    <!-- Mobile fixed action bar -->
+                    <div class="fixed-bottom-action-bar" style="display: flex;">
+                        <form method="post" action="{% url 'cart:cart_add' product.id %}" style="display: inline-block; width: 100%;" id="cart-form-mobile">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1" id="cart-quantity-input-mobile">
+                            <button type="submit" style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #06402B; border: 1px solid #06402B; color: #fff; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;" {% if product.stock == 0 %}disabled{% endif %}>
+                                <svg width="16" height="16" style="margin-right: 0.25rem;">
+                                    <use xlink:href="#cart"></use>
+                                </svg>
+                                {% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}
+                            </button>
+                        </form>
+                        <form method="get" action="{% url 'orders:checkout' %}" style="display: inline-block; width: 100%;" id="buy-now-form-mobile">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="quantity" id="buy-now-quantity-input-mobile" value="1">
+                            <button type="submit" style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; border: 2px solid #176a3a; color: #176a3a; background: transparent; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                                <svg width="16" height="16" style="fill: #176a3a; margin-right: 0.25rem;">
+                                    <use xlink:href="#cart"></use>
+                                </svg>
+                                Buy Now
+                            </button>
+                        </form>
+                    </div>
+
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var qtyInput = document.getElementById('qty-input');
+                        var qtyMinus = document.getElementById('qty-minus');
+                        var qtyPlus = document.getElementById('qty-plus');
+                        var cartQtyInput = document.getElementById('cart-quantity-input');
+                        var cartQtyInputMobile = document.getElementById('cart-quantity-input-mobile');
+                        var buyNowQtyInput = document.getElementById('buy-now-quantity-input');
+                        var buyNowQtyInputMobile = document.getElementById('buy-now-quantity-input-mobile');
+                        var cartForm = document.getElementById('cart-form');
+                        var cartFormMobile = document.getElementById('cart-form-mobile');
+                        var buyNowForm = document.getElementById('buy-now-form');
+                        var buyNowFormMobile = document.getElementById('buy-now-form-mobile');
+
+                        qtyMinus.addEventListener('click', function() {
+                            var val = parseInt(qtyInput.value) || 1;
+                            if (val > 1) qtyInput.value = val - 1;
+                        });
+                        
+                        qtyPlus.addEventListener('click', function() {
+                            var val = parseInt(qtyInput.value) || 1;
+                            var maxStock = parseInt(qtyInput.getAttribute('max')) || 999;
+                            if (val < maxStock) {
+                                qtyInput.value = val + 1;
+                            }
+                        });
+                        
+                        qtyInput.addEventListener('change', function() {
+                            if (qtyInput.value < 1) qtyInput.value = 1;
+                        });
+                        
+                        if (cartForm) {
+                            cartForm.addEventListener('submit', function(e) {
+                                cartQtyInput.value = qtyInput.value;
+                            });
+                        }
+                        
+                        if (cartFormMobile) {
+                            cartFormMobile.addEventListener('submit', function(e) {
+                                cartQtyInputMobile.value = qtyInput.value;
+                            });
+                        }
+                        
+                        if (buyNowForm) {
+                            buyNowForm.addEventListener('submit', function(e) {
+                                buyNowQtyInput.value = qtyInput.value;
+                            });
+                        }
+                        
+                        if (buyNowFormMobile) {
+                            buyNowFormMobile.addEventListener('submit', function(e) {
+                                buyNowQtyInputMobile.value = qtyInput.value;
+                            });
+                        }
+                    });
+                    </script>
+                    <div style="border-top: 1px solid #dee2e6; padding-top: 1.5rem; margin-top: 2rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <strong style="color: #111;">SKU:</strong> <span style="color: #6c757d;">{{ product.id }}</span>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <strong style="color: #111;">Category:</strong> <a href="{% url 'store:product_list_by_category' product.category.slug %}" style="color: #6c757d; text-decoration: none;">{{ product.category.name }}</a>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <strong style="color: #111;">Tags:</strong> <span style="color: #6c757d;">{% if product.tags %}{{ product.tags }}{% else %}Islamic, Essentials{% endif %}</span>
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <strong style="color: #111;">Availability:</strong> <span style="color: {% if product.stock > 0 %}#198754{% else %}#dc3545{% endif %};">{% if product.stock > 0 %}In Stock ({{ product.stock }} available){% else %}Out of Stock{% endif %}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Product Details Tabs -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <ul class="nav nav-tabs border-bottom" id="productTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active text-uppercase" id="description-tab" data-bs-toggle="tab"
-                                data-bs-target="#description" type="button" role="tab">Description</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link text-uppercase" id="reviews-tab" data-bs-toggle="tab"
-                                data-bs-target="#reviews" type="button" role="tab">Reviews (24)</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content py-4" id="productTabContent">
-                        <div class="tab-pane fade show active" id="description" role="tabpanel">
-                            <p>{{ product.description }}</p>
-                        </div>
-                        <div class="tab-pane fade" id="reviews" role="tabpanel">
-                            <div class="reviews-section">
-                                <h4 class="mb-4">Customer Reviews</h4>
-                                <div class="review-item border-bottom pb-4 mb-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div>
-                                            <strong>Sarah Johnson</strong>
-                                            <div class="rating text-warning">
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                            </div>
+        <!-- Product Details Tabs -->
+        <div style="margin-top: 3rem;">
+            <div style="width: 100%;">
+                <ul style="display: flex; border-bottom: 1px solid #dee2e6; list-style: none; padding: 0; margin: 0;" id="productTabs" role="tablist">
+                    <li style="margin-right: 1rem;" role="presentation">
+                        <button style="padding: 1rem 1.5rem; border: none; background: none; text-transform: uppercase; cursor: pointer; color: #111; border-bottom: 2px solid #0d6efd;" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
+                    </li>
+                    <li style="margin-right: 1rem;" role="presentation">
+                        <button style="padding: 1rem 1.5rem; border: none; background: none; text-transform: uppercase; cursor: pointer; color: #6c757d; border-bottom: 2px solid transparent;" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (24)</button>
+                    </li>
+                </ul>
+                <div style="padding: 2rem 0;" id="productTabContent">
+                    <div style="display: block;" id="description" role="tabpanel">
+                        <p style="color: #495057; line-height: 1.6;">{{ product.description }}</p>
+                    </div>
+                    <div style="display: none;" id="reviews" role="tabpanel">
+                        <div>
+                            <p style="margin-bottom: 1.5rem; font-size: 1rem; font-weight: 500; color: #111;">Customer Reviews</p>
+                            {% if not reviews %}
+                            <div style="background: #e3f7ff; color: #176a3a; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                                No reviews yet. Be the first to review this product!
+                            </div>
+                            {% endif %}
+                            <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <div>
+                                        <strong style="color: #111; font-size: 0.95rem;">Sarah Johnson</strong>
+                                        <div style="color: #ffc107;">
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
                                         </div>
-                                        <span class="text-muted">2 days ago</span>
                                     </div>
-                                    <p>Absolutely love this jacket! The quality is outstanding and it fits perfectly.
-                                        Highly recommended!</p>
+                                    <span style="color: #6c757d; font-size: 0.85rem;">2 days ago</span>
                                 </div>
-                                <div class="review-item border-bottom pb-4 mb-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div>
-                                            <strong>Michael Chen</strong>
-                                            <div class="rating text-warning">
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-solid"></use>
-                                                </svg>
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#star-outline"></use>
-                                                </svg>
-                                            </div>
+                                <p style="color: #495057; font-size: 0.9rem;">Absolutely love this jacket! The quality is outstanding and it fits perfectly. Highly recommended!</p>
+                            </div>
+                            <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <div>
+                                        <strong style="color: #111; font-size: 0.95rem;">Michael Chen</strong>
+                                        <div style="color: #ffc107;">
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-solid"></use>
+                                            </svg>
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#star-outline"></use>
+                                            </svg>
                                         </div>
-                                        <span class="text-muted">1 week ago</span>
                                     </div>
-                                    <p>Great jacket, very comfortable. The only reason I didn't give 5 stars is that it
-                                        took a bit longer to arrive than expected.</p>
+                                    <span style="color: #6c757d; font-size: 0.85rem;">1 week ago</span>
                                 </div>
+                                <p style="color: #495057; font-size: 0.9rem;">Great jacket, very comfortable. The only reason I didn't give 5 stars is that it took a bit longer to arrive than expected.</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Reviews Section -->
-            {% include 'reviews/review_section.html' %}
+        </div>
+        
+        <!-- Reviews Section -->
+        {% include 'reviews/review_section.html' %}
 
-            <!-- Related Products -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <h3 class="section-title text-center mb-5">Related Products</h3>
-                </div>
+        <!-- Related Products -->
+        <div style="margin-top: 3rem;">
+            <div style="width: 100%;">
+                <h3 style="text-align: center; margin-bottom: 2rem; font-size: 1.75rem; font-weight: 500; color: #111;">Related Products</h3>
+            </div>
+            <div class="related-products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; overflow-x: auto;">
                 {% for related in related_products %}
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <div class="product-card">
-                        <div class="image-holder">
-                            <a href="{{ related.get_absolute_url }}">
+                <div class="related-product-card" style="min-width: 40vw;">
+                    <div>
+                        <div>
+                            <a href="{{ related.get_absolute_url }}" style="display: block;">
                                 {% if related.image %}
-                                    <img src="{{ related.image.url }}" alt="{{ related.name }}" class="img-fluid">
+                                    <img src="{{ related.image.url }}" alt="{{ related.name }}" style="width: 100%; height: auto; border-radius: 0.25rem;">
                                 {% else %}
-                                    <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ related.name }}" class="img-fluid">
+                                    <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ related.name }}" style="width: 100%; height: auto; border-radius: 0.25rem;">
                                 {% endif %}
                             </a>
                         </div>
-                        <div class="product-detail text-center mt-3">
-                            <h5 class="text-uppercase mb-2"><a href="{{ related.get_absolute_url }}"
-                                    class="text-decoration-none text-dark">{{ related.name }}</a></h5>
-                            <span class="text-primary fw-bold">₹{{ related.price }}</span>
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <h5 style="text-transform: uppercase; margin-bottom: 0.5rem; font-size: 1rem;"><a href="{{ related.get_absolute_url }}" style="text-decoration: none; color: #212529;">{{ related.name }}</a></h5>
+                            <span style="color: #111; font-weight: 600;">₹{{ related.price }}</span>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <div class="col-12 text-center text-muted">No related products found in this category.</div>
+                <div style="grid-column: 1 / -1; text-align: center; color: #6c757d; padding: 2rem 0;">No related products found in this category.</div>
                 {% endfor %}
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<style>
+@media (min-width: 768px) {
+    .fixed-bottom-action-bar {
+        display: none !important;
+    }
+    
+    div[style*="display: none"][style*="gap: 1rem"][style*="margin-bottom: 1.5rem"] {
+        display: flex !important;
+    }
+    
+    div[style*="grid-template-columns: 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    
+    .mobile-image-section {
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        gap: 1rem !important;
+    }
+    
+    .mobile-main-image {
+        order: 1 !important;
+    }
+    
+    .mobile-main-image img {
+        max-height: 70vh !important;
+        object-fit: contain !important;
+    }
+    
+    .mobile-extra-images {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        overflow-y: auto !important;
+        overflow-x: visible !important;
+        max-height: 70vh !important;
+    }
+    
+    .mobile-extra-images > div {
+        flex: 0 0 80px !important;
+        max-width: 80px !important;
+    }
+}
+</style>
+
 {% endblock %}

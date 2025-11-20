@@ -1,56 +1,247 @@
 {% extends 'base_plain.html' %}
-
-{% block title %}Login - E-Commerce Store{% endblock %}
-
+{% load static %}
+{% block title %}Sign In - Jannat Beauty{% endblock %}
+{% block extra_css %}
+<style>
+  .login-container {
+    min-height: calc(100vh - 400px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .login-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(6, 64, 43, 0.08);
+    overflow: hidden;
+    max-width: 780px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+  .login-image {
+    flex: 1;
+    background: linear-gradient(135deg, #06402B 0%, #0a6c4e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    min-height: 420px;
+  }
+  .login-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .login-form-section {
+    flex: 1.2;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .brand-logo {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .brand-logo h1 {
+    font-family: 'Marcellus', serif;
+    color: #06402B;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0;
+  }
+  .login-header {
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .login-header h2 {
+    font-family: 'Marcellus', serif;
+    color: #06402B;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .login-header p {
+    color: #666;
+    font-size: 0.85rem;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    color: #333;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: #06402B;
+    box-shadow: 0 0 0 3px rgba(6, 64, 43, 0.08);
+  }
+  .form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .form-check input {
+    width: auto;
+    margin-right: 6px;
+  }
+  .form-check label {
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 0;
+  }
+  .forgot-password {
+    text-align: right;
+    margin-bottom: 16px;
+  }
+  .forgot-password a {
+    color: #06402B;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .forgot-password a:hover {
+    text-decoration: underline;
+  }
+  .btn-login {
+    width: 100%;
+    padding: 12px;
+    background: #06402B;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-login:hover {
+    background: #0a6c4e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(6, 64, 43, 0.2);
+  }
+  .signup-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.85rem;
+  }
+  .signup-link a {
+    color: #06402B;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+  .btn-seller-signup:hover {
+    background: #06402B !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(6, 64, 43, 0.2);
+  }
+  .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 768px) {
+    .login-card {
+      flex-direction: column;
+    }
+    .login-image {
+      display: none;
+    }
+    .login-form-section {
+      padding: 32px 20px;
+    }
+    .login-container {
+      padding: 30px 16px;
+      min-height: calc(100vh - 300px);
+    }
+    .brand-logo h1 {
+      font-size: 1.4rem;
+    }
+    .login-header h2 {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+{% endblock %}
 {% block content %}
-<div class="container">
-    <div style="max-width: 420px; margin: 1.25rem auto;">
-        <div class="card" style="padding: 1.25rem; text-align: center;">
-            <div style="margin-bottom: 0.75rem;">
-                <i class="fas fa-sign-in-alt" style="font-size: 1.6rem; color: #2563eb; display:inline-block; padding:0.45rem; border-radius:8px; background:#eff6ff;"></i>
-            </div>
-            <h2 style="font-size:1.25rem; margin-bottom:0.25rem; color:#111827;">Welcome back</h2>
-            <p style="color:#6b7280; font-size:0.95rem; margin-bottom:1rem;">Sign in to your account</p>
-
-            <form method="post" id="loginForm">
-                {% csrf_token %}
-
-                {% if messages %}
-                <div class="messages" style="margin-bottom:0.75rem; text-align:left;">
-                    {% for message in messages %}
-                        <div style="padding:0.6rem; border-radius:6px; margin-bottom:0.5rem; background: #fff3cd; color:#664d03;">{{ message }}</div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <div class="form-group">
-                    <label for="id_username"><i class="fas fa-user" style="color:#9ca3af;"></i> Username</label>
-                    <input type="text" class="form-control" id="id_username" name="username" placeholder="your.username" required style="padding:0.6rem; border-radius:6px; border:1px solid #e6eef8; background:#fff; color:#0f172a;">
-                </div>
-
-                <div class="form-group">
-                    <label for="id_password"><i class="fas fa-lock" style="color:#9ca3af;"></i> Password</label>
-                    <input type="password" class="form-control" id="id_password" name="password" placeholder="••••••••" required style="padding:0.6rem; border-radius:6px; border:1px solid #e6eef8; background:#fff; color:#0f172a;">
-                </div>
-
-                <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;">
-                    <i class="fas fa-sign-in-alt" style="font-size:0.95rem;"></i> Sign in
-                </button>
-            </form>
-
-            <div style="margin-top:0.9rem; font-size:0.95rem; color:#6b7280;">
-                <span>Don't have an account?</span>
-                <a href="{% url 'accounts:register_customer' %}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-weight:600; margin-left:0.6rem;">
-                    <i class="fas fa-user-plus"></i> Create
-                </a>
-            </div>
-            <div style="margin-top:0.9rem; font-size:0.95rem; color:#6b7280;">
-                <span>Want to become seller?</span>
-                <a href="{% url 'accounts:register_seller' %}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-weight:600; margin-left:0.6rem;">
-                    <i class="fas fa-user-plus"></i> Create
-                </a>
-            </div>
-        </div>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-image d-none d-md-flex">
+      <img src="{% static 'images/login.webp' %}" alt="Jannat Beauty" onerror="this.src='{% static 'images/main-logo.png' %}'">
     </div>
+    <div class="login-form-section">
+      <div class="brand-logo">
+        <h1>JANNAT BEAUTY</h1>
+      </div>
+      
+      <div class="login-header">
+        <h2>Welcome back</h2>
+        <p>Sign in to your account</p>
+      </div>
+      
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      
+      <form method="post" action="{% url 'accounts:login' %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label for="email">Email or Username</label>
+          <input type="text" name="username" id="email" placeholder="Enter your email or username" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" placeholder="Enter your password" required>
+        </div>
+        
+        <div class="remember-forgot">
+          <div class="form-check">
+            <input type="checkbox" name="remember" id="remember">
+            <label for="remember">Remember me</label>
+          </div>
+          <div class="forgot-password">
+            <a href="{% url 'accounts:forgot_password' %}">Forgot password?</a>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-login">Sign in</button>
+        
+        <div class="signup-link">
+          Don't have an account? <a href="{% url 'accounts:register_customer' %}">Sign up</a>
+        </div>
+        <div class="signup-link">
+          Want to become a seller? <a href="{% url 'accounts:register_seller' %}">Become a seller</a>
+        </div>
+        
+        
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

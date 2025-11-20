@@ -1,14 +1,39 @@
 
-{% extends 'base.html' %}
+{% extends 'base_plain.html' %}
 {% load static %}
 {% block title %}Checkout{% endblock %}
 
 {% block content %}
-<section class="py-5">
+<section class="py-2">
+    <style>
+        /* Make checkout text colors darker for better readability */
+        .billing-details label,
+        .billing-details .form-label,
+        .billing-details .form-check-label,
+        .billing-details input,
+        .billing-details .form-control {
+            color: #222 !important;
+        }
+        .order-summary,
+        .order-summary h4,
+        .order-summary h5,
+        .order-summary strong,
+        .order-summary span,
+        .order-summary .form-check-label,
+        .order-summary .form-check-input {
+            color: #222 !important;
+        }
+        .order-summary .text-primary {
+            color: #176a3a !important;
+        }
+        .order-summary .text-muted {
+            color: #555 !important;
+        }
+    </style>
     <div class="container">
         <div class="row mb-4">
             <div class="col-12">
-                <h1 class="display-5">Checkout</h1>
+                {% comment %} <h1 class="display-5">Checkout</h1> {% endcomment %}
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
@@ -22,8 +47,18 @@
             <div class="col-lg-7">
                 <!-- Billing Details -->
                 <div class="billing-details">
-                    <h4 class="mb-4 text-uppercase">Billing Details</h4>
-                    <form method="post" action="">
+                    <h5 class="mb-4 text-uppercase">Billing Details</h5>
+                    {% if messages %}
+                    <div class="alert-container mb-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <form method="post" action="{% url 'orders:checkout' %}">
                         {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -65,22 +100,49 @@
                                 <input type="email" class="form-control" id="email" name="email" value="{{ initial_data.email|default:'' }}" required>
                             </div>
                             <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="createAccount" name="create_account">
-                                    <label class="form-check-label" for="createAccount">
-                                        Create an account?
-                                    </label>
-                                </div>
+                                    <!-- Removed create account checkbox -->
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
-                    </form>
-                </div>
-                <!-- Shipping Details, Order Notes, etc. can be added here as needed -->
+                        
+                        <!-- Payment Methods moved inside the form -->
+                        <div class="payment-methods mt-4">
+                            <h5 class="text-uppercase mb-3">Payment Method</h5>
+                            <div class="form-check mb-3 p-3 border">
+                                <input class="form-check-input" type="radio" name="payment" id="razorpay" value="razorpay">
+                                <label class="form-check-label w-100" for="razorpay">
+                                    <strong>Razorpay (UPI, Card, Netbanking)</strong>
+                                    <p class="text-muted small mt-2 mb-0">Pay securely online using Razorpay.</p>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3 p-3 border">
+                                <input class="form-check-input" type="radio" name="payment" id="cashOnDelivery" value="cod" checked>
+                                <label class="form-check-label w-100" for="cashOnDelivery">
+                                    <strong>Cash on Delivery</strong>
+                                    <p class="text-muted small mt-2 mb-0">Pay with cash upon delivery.</p>
+                                </label>
+                            </div>
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I have read and agree to the website <a href="{% url 'store:about' %}" target="_blank">terms and conditions</a> *
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            {% if razorpay_order_id %}
+                                Pay Now ₹{{ cart_total|floatformat:2 }}
+                            {% else %}
+                                Place Order
+                            {% endif %}
+                        </button>
+                        </form>
+                    </div>
+                    <!-- Shipping Details, Order Notes, etc. can be added here as needed -->
             </div>
             <div class="col-lg-5">
                 <div class="order-summary bg-light p-4">
-                    <h4 class="text-uppercase mb-4">Your Order</h4>
+                    <h4 class="text-uppercase mb-4">Cart Total</h4>
                     <div class="order-items">
                         <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                             <strong>Product</strong>
@@ -92,65 +154,177 @@
                             <span>₹{{ item.total_price|floatformat:2 }}</span>
                         </div>
                         {% endfor %}
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal</span>
-                            <span>₹{{ subtotal|floatformat:2 }}</span>
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-top pt-3 mt-3">
+                            <span>Price ({{ cart|length }} item{{ cart|length|pluralize }})</span>
+                            <span class="fw-bold">₹{{ mrp_total|floatformat:2 }}</span>
                         </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Discount on MRP</span>
+                                <span class="fw-bold text-success">-₹{{ discount|floatformat:2 }}</span>
+                            </div>
                         <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                            <span>Shipping</span>
-                            <span>Free Shipping</span>
+                            <span>Convenience Fee</span>
+                            <span class="fw-bold text-success">₹0</span>
                         </div>
                         <div class="d-flex justify-content-between mb-4">
-                            <strong class="text-uppercase">Total</strong>
+                            <strong class="text-uppercase">Total Amount</strong>
                             <strong class="text-primary fs-5">₹{{ cart_total|floatformat:2 }}</strong>
                         </div>
-                    </div>
-                    <!-- Payment Methods -->
-                    <div class="payment-methods">
-                        <h5 class="text-uppercase mb-3">Payment Method</h5>
-                        <div class="form-check mb-3 p-3 border">
-                            <input class="form-check-input" type="radio" name="payment" id="bankTransfer" checked>
-                            <label class="form-check-label w-100" for="bankTransfer">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <strong>Direct Bank Transfer</strong>
-                                </div>
-                                <p class="text-muted small mt-2 mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference.</p>
-                            </label>
-                        </div>
-                        <div class="form-check mb-3 p-3 border">
-                            <input class="form-check-input" type="radio" name="payment" id="checkPayment">
-                            <label class="form-check-label w-100" for="checkPayment">
-                                <strong>Check Payments</strong>
-                                <p class="text-muted small mt-2 mb-0">Please send a check to our store address.</p>
-                            </label>
-                        </div>
-                        <div class="form-check mb-3 p-3 border">
-                            <input class="form-check-input" type="radio" name="payment" id="cashOnDelivery">
-                            <label class="form-check-label w-100" for="cashOnDelivery">
-                                <strong>Cash on Delivery</strong>
-                                <p class="text-muted small mt-2 mb-0">Pay with cash upon delivery.</p>
-                            </label>
-                        </div>
-                        <div class="form-check mb-4 p-3 border">
-                            <input class="form-check-input" type="radio" name="payment" id="paypal">
-                            <label class="form-check-label w-100" for="paypal">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <strong>PayPal</strong>
-                                    <img src="{% static 'images/paypal-card.png' %}" alt="PayPal" height="25">
-                                </div>
-                            </label>
-                        </div>
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="terms" required>
-                            <label class="form-check-label" for="terms">
-                                I have read and agree to the website <a href="#">terms and conditions</a> *
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+// Handle payment method selection persistence
+document.addEventListener('DOMContentLoaded', function() {
+    // Get stored payment method from localStorage
+    const storedPayment = localStorage.getItem('selectedPaymentMethod');
+    if (storedPayment) {
+        const paymentRadio = document.getElementById(storedPayment === 'razorpay' ? 'razorpay' : 'cashOnDelivery');
+        if (paymentRadio) {
+            paymentRadio.checked = true;
+        }
+    }
+    
+    // Store payment method when changed
+    const paymentRadios = document.querySelectorAll('input[name="payment"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            localStorage.setItem('selectedPaymentMethod', this.value);
+            console.log('Payment method changed to:', this.value);
+        });
+    });
+    
+    // Clear stored payment method on successful form submission
+    const form = document.querySelector('form[action*="checkout"]');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const selectedPayment = document.querySelector('input[name="payment"]:checked');
+            if (selectedPayment) {
+                console.log('Submitting form with payment method:', selectedPayment.value);
+                // Don't clear localStorage here - let the backend handle the redirect
+            }
+        });
+    }
+});
+</script>
+
+<!-- Razorpay Integration -->
+{% if razorpay_order_id %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Only trigger Razorpay modal if Razorpay is selected
+    var razorpayRadio = document.getElementById('razorpay');
+    if (razorpayRadio && razorpayRadio.checked) {
+        var options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": "{{ amount }}",
+            "currency": "INR",
+            "name": "Jannat Beauty",
+            "description": "Order Payment",
+            "image": "",
+            "order_id": "{{ razorpay_order_id }}",
+            "config": {
+                "display": {
+                    "blocks": {
+                        "cards": {
+                            "name": "Pay using Cards",
+                            "instruments": [
+                                {
+                                    "method": "card"
+                                }
+                            ]
+                        },
+                        "other": {
+                            "name": "More Payment Options",
+                            "instruments": [
+                                {
+                                    "method": "netbanking"
+                                },
+                                {
+                                    "method": "wallet"
+                                },
+                                {
+                                    "method": "upi"
+                                }
+                            ]
+                        }
+                    },
+                    "sequence": ["block.cards", "block.other"],
+                    "preferences": {
+                        "show_default_blocks": true
+                    }
+                }
+            },
+            "handler": function (response) {
+                console.log('Payment Success:', response);
+                // Submit payment verification form
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{% url "orders:razorpay_verify" %}';
+                // Add CSRF token
+                var csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = '{{ csrf_token }}';
+                form.appendChild(csrfInput);
+                // Add payment data
+                var paymentId = document.createElement('input');
+                paymentId.type = 'hidden';
+                paymentId.name = 'razorpay_payment_id';
+                paymentId.value = response.razorpay_payment_id;
+                form.appendChild(paymentId);
+                var orderId = document.createElement('input');
+                orderId.type = 'hidden';
+                orderId.name = 'razorpay_order_id';
+                orderId.value = response.razorpay_order_id;
+                form.appendChild(orderId);
+                var signature = document.createElement('input');
+                signature.type = 'hidden';
+                signature.name = 'razorpay_signature';
+                signature.value = response.razorpay_signature;
+                form.appendChild(signature);
+                var orderIdField = document.createElement('input');
+                orderIdField.type = 'hidden';
+                orderIdField.name = 'order_id';
+                orderIdField.value = '{{ order_id }}';
+                form.appendChild(orderIdField);
+                console.log('Submitting verification form...');
+                document.body.appendChild(form);
+                form.submit();
+            },
+            "prefill": {
+                "name": "{{ initial_data.first_name }} {{ initial_data.last_name }}",
+                "email": "{{ initial_data.email }}",
+                "contact": ""
+            },
+            "notes": {
+                "address": "{{ initial_data.address }}"
+            },
+            "theme": {
+                "color": "#176a3a"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    // Redirect to cart if payment is cancelled
+                    window.location.href = "{% url 'cart:cart_detail' %}";
+                }
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+        rzp1.on('payment.failed', function (response) {
+            console.log('Payment Failed:', response);
+            alert('Payment Failed: ' + response.error.description + ' (Error Code: ' + response.error.code + ')');
+            window.location.href = "{% url 'cart:cart_detail' %}";
+        });
+    }
+});
+</script>
+{% endif %}
+
 {% endblock %}

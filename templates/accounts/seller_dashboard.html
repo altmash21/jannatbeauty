@@ -3,134 +3,535 @@
 
 {% block title %}Seller Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Dashboard Header */
+    .dashboard-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+    }
+    
+    .dashboard-header p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+    
+    .status-approved {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.2s;
+    }
+    
+    .stat-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+        font-size: 1.125rem;
+    }
+    
+    .stat-icon.blue {
+        background: #e7f3ff;
+        color: #0066cc;
+    }
+    
+    .stat-icon.green {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .stat-icon.orange {
+        background: #fff3e0;
+        color: #e65100;
+    }
+    
+    .stat-icon.purple {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
+    .stat-icon.gray {
+        background: #f5f5f5;
+        color: #616161;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    /* Navigation Cards */
+    .nav-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .nav-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #e9ecef;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .nav-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+        border-color: #dee2e6;
+    }
+    
+    .nav-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .nav-icon.products {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .nav-icon.orders {
+        background: #fff3e0;
+        color: #e65100;
+    }
+    
+    .nav-icon.analytics {
+        background: #e7f3ff;
+        color: #0066cc;
+    }
+    
+    .nav-icon.profile {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
+    .nav-card h3 {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-card p {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    /* Recent Orders Table */
+    .orders-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section-header h2 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #212529;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-header h2 i {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+    
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .orders-table th {
+        text-align: left;
+        padding: 0.75rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .orders-table td {
+        padding: 0.875rem 0.75rem;
+        font-size: 0.875rem;
+        color: #495057;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .orders-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .orders-table tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .order-status {
+        display: inline-block;
+        padding: 0.25rem 0.625rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    
+    .order-status.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .order-status.processing {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .order-status.shipped {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .order-status.delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .shipment-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        background: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+    
+    .shipment-btn:hover {
+        background: #218838;
+    }
+    
+    .shipment-status {
+        font-size: 0.8125rem;
+        color: #6c757d;
+    }
+    
+    .shipment-status.created {
+        color: #28a745;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.125rem;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+    
+    .empty-state p {
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .nav-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .orders-table {
+            font-size: 0.8125rem;
+        }
+        
+        .orders-table th,
+        .orders-table td {
+            padding: 0.5rem;
+        }
+        
+        .orders-section {
+            overflow-x: auto;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .nav-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="margin-bottom: 2rem;">
-    <div>
-        <h1><i class="fas fa-store"></i> Welcome Back!</h1>
-        <p style="color: #7f8c8d;">{{ user.get_full_name|default:user.username }}</p>
-        {% if seller_profile %}
-            <p style="color: #7f8c8d;">Business: <strong>{{ seller_profile.business_name }}</strong></p>
-            <p style="color: {% if seller_profile.is_approved %}#27ae60{% else %}#e67e22{% endif %};">
-                Status: <strong>{{ seller_profile.get_approval_status_display }}</strong>
-            </p>
-        {% endif %}
-    </div>
-</div>
-
-    <!-- Quick Stats -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <div class="card" style="text-align: center; padding: 1.5rem;">
-            <i class="fas fa-box" style="font-size: 2.5rem; color: #3498db; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">{{ total_products }}</h3>
-            <p style="color: #888; margin: 0;">Products</p>
-        </div>
-        <div class="card" style="text-align: center; padding: 1.5rem;">
-            <i class="fas fa-shopping-cart" style="font-size: 2.5rem; color: #27ae60; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">{{ total_orders }}</h3>
-            <p style="color: #888; margin: 0;">Total Orders</p>
-        </div>
-        <div class="card" style="text-align: center; padding: 1.5rem;">
-            <i class="fas fa-clock" style="font-size: 2.5rem; color: #e67e22; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">{{ pending_orders }}</h3>
-            <p style="color: #888; margin: 0;">Pending Orders</p>
-        </div>
-        <div class="card" style="text-align: center; padding: 1.5rem;">
-            <i class="fas fa-shipping-fast" style="font-size: 2.5rem; color: #f39c12; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">{{ pending_shipments }}</h3>
-            <p style="color: #888; margin: 0;">Pending Shipments</p>
-        </div>
-        <div class="card" style="text-align: center; padding: 1.5rem;">
-            <i class="fa-solid fa-indian-rupee-sign" style="font-size: 2.5rem; color: #9b59b6; margin-bottom: 0.5rem;"></i>
-            <h3 style="margin: 0.5rem 0;">₹{{ total_revenue|floatformat:2 }}</h3>
-            <p style="color: #888; margin: 0;">Revenue</p>
-        </div>
-    </div>
-
-    <!-- Navigation Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-        <a href="{% url 'accounts:seller_products' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
-            <i class="fas fa-boxes" style="font-size: 3rem; color: #27ae60; margin-bottom: 1rem;"></i>
-            <h3 style="color: #2c3e50;">Products</h3>
-            <p style="color: #888;">Manage your inventory</p>
-        </a>
-
-        <a href="{% url 'accounts:seller_orders' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
-            <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e67e22; margin-bottom: 1rem;"></i>
-            <h3 style="color: #2c3e50;">Orders</h3>
-            <p style="color: #888;">Track customer orders</p>
-        </a>
-
-        <a href="{% url 'accounts:seller_analytics' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
-            <i class="fas fa-chart-line" style="font-size: 3rem; color: #3498db; margin-bottom: 1rem;"></i>
-            <h3 style="color: #2c3e50;">Analytics</h3>
-            <p style="color: #888;">View performance</p>
-        </a>
-
-        <a href="{% url 'accounts:seller_profile' %}" class="card" style="text-align: center; padding: 2rem; text-decoration: none; cursor: pointer; transition: transform 0.2s;">
-            <i class="fas fa-user-cog" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
-            <h3 style="color: #2c3e50;">Profile</h3>
-            <p style="color: #888;">Update your info</p>
-        </a>
-    </div>
-
-    <!-- Recent Orders -->
-    {% if order_items %}
-    <div class="card" style="margin-top: 2rem; padding: 1.5rem;">
-        <h2 style="margin-bottom: 1rem;"><i class="fas fa-history"></i> Recent Orders</h2>
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #eee;">
-                        <th style="padding: 1rem; text-align: left;">Order ID</th>
-                        <th style="padding: 1rem; text-align: left;">Product</th>
-                        <th style="padding: 1rem; text-align: left;">Quantity</th>
-                        <th style="padding: 1rem; text-align: left;">Price</th>
-                        <th style="padding: 1rem; text-align: left;">Status</th>
-                        <th style="padding: 1rem; text-align: left;">Shipment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in order_items %}
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 1rem;">#{{ item.order.id }}</td>
-                        <td style="padding: 1rem;">{{ item.product.name }}</td>
-                        <td style="padding: 1rem;">{{ item.quantity }}</td>
-                        <td style="padding: 1rem;">${{ item.price }}</td>
-                        <td style="padding: 1rem;">
-                            <span style="padding: 0.25rem 0.75rem; border-radius: 12px; background: #e8f4f8; color: #2980b9;">
-                                {{ item.order.order_status }}
-                            </span>
-                        </td>
-                        <td style="padding: 1rem;">
-                            {% if item.order.shiprocket_order_id %}
-                                <span style="color: #28a745; font-size: 0.85rem;">
-                                    <i class="fas fa-check-circle"></i> Created
-                                    {% if item.order.awb_code %}
-                                    <br><a href="{% url 'orders:track_shipment' item.order.id %}" style="color:#007bff; text-decoration:none;">Track</a>
-                                    {% endif %}
-                                </span>
-                            {% elif item.order.paid %}
-                                <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" 
-                                   style="padding:0.4rem 0.8rem; background:#28a745; color:#fff; text-decoration:none; border-radius:6px; font-size:0.85rem;">
-                                    <i class="fas fa-shipping-fast"></i> Create
-                                </a>
-                            {% else %}
-                                <span style="color:#999; font-size:0.85rem;">Awaiting Payment</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p>{{ user.get_full_name|default:user.username }}</p>
+    {% if seller_profile %}
+        <p style="color: #6c757d; font-size: 0.875rem; margin-top: 0.25rem;">
+            {{ seller_profile.business_name }}
+        </p>
+        <span class="status-badge status-{{ seller_profile.approval_status }}">
+            <i class="fas fa-{% if seller_profile.is_approved %}check-circle{% elif seller_profile.approval_status == 'pending' %}clock{% else %}times-circle{% endif %}"></i>
+            {{ seller_profile.get_approval_status_display }}
+        </span>
     {% endif %}
 </div>
 
-<style>
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-</style>
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-value">{{ total_products }}</div>
+        <p class="stat-label">Products</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-value">{{ total_orders }}</div>
+        <p class="stat-label">Total Orders</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-value">{{ pending_orders }}</div>
+        <p class="stat-label">Pending Orders</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i class="fas fa-shipping-fast"></i>
+        </div>
+        <div class="stat-value">{{ pending_shipments }}</div>
+        <p class="stat-label">Pending Shipments</p>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon gray">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+        </div>
+        <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+        <p class="stat-label">Total Revenue</p>
+    </div>
+</div>
+
+<!-- Navigation Cards -->
+<div class="nav-grid">
+    <a href="{% url 'accounts:seller_products' %}" class="nav-card">
+        <div class="nav-icon products">
+            <i class="fas fa-boxes"></i>
+        </div>
+        <h3>Products</h3>
+        <p>Manage inventory</p>
+    </a>
+    
+    <a href="{% url 'accounts:seller_orders' %}" class="nav-card">
+        <div class="nav-icon orders">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <h3>Orders</h3>
+        <p>Track orders</p>
+    </a>
+    
+    <a href="{% url 'accounts:seller_analytics' %}" class="nav-card">
+        <div class="nav-icon analytics">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <h3>Analytics</h3>
+        <p>View performance</p>
+    </a>
+    
+    <a href="{% url 'accounts:seller_profile' %}" class="nav-card">
+        <div class="nav-icon profile">
+            <i class="fas fa-user-cog"></i>
+        </div>
+        <h3>Profile</h3>
+        <p>Update settings</p>
+    </a>
+</div>
+
+<!-- Recent Orders -->
+{% if order_items %}
+<div class="orders-section">
+    <div class="section-header">
+        <h2><i class="fas fa-history"></i> Recent Orders</h2>
+        <a href="{% url 'accounts:seller_orders' %}" style="font-size: 0.875rem; color: #0066cc; text-decoration: none;">View all</a>
+    </div>
+    
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Shipment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items|slice:":10" %}
+            <tr>
+                <td>#{{ item.order.id }}</td>
+                <td>{{ item.product.name|truncatechars:30 }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }}</td>
+                <td>
+                    <span class="order-status {{ item.order.order_status }}">
+                        {{ item.order.order_status }}
+                    </span>
+                </td>
+                <td>
+                    {% if item.order.shiprocket_order_id %}
+                        <span class="shipment-status created">
+                            <i class="fas fa-check-circle"></i> Created
+                            {% if item.order.awb_code %}
+                            <br><a href="{% url 'orders:track_shipment' item.order.id %}" style="color:#0066cc; text-decoration:none; font-size:0.75rem;">Track</a>
+                            {% endif %}
+                            <br>
+                            <form action="{% url 'orders:cancel_shiprocket_order' item.order.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="shipment-btn" style="color:#dc3545;background:none;border:none;font-size:0.8rem;cursor:pointer;padding:0;margin-top:4px;">
+                                    <i class="fas fa-times-circle"></i> Cancel Shipment
+                                </button>
+                            </form>
+                            <form action="{% url 'orders:cancel_order' item.order.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="shipment-btn" style="color:#6c757d;background:none;border:none;font-size:0.8rem;cursor:pointer;padding:0;margin-top:4px;">
+                                    <i class="fas fa-ban"></i> Cancel Order
+                                </button>
+                            </form>
+                        </span>
+                    {% elif not item.order.shiprocket_order_id %}
+                        <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" class="shipment-btn">
+                            <i class="fas fa-shipping-fast"></i> Create
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="orders-section">
+    <div class="empty-state">
+        <i class="fas fa-clipboard-list"></i>
+        <h3>No orders yet</h3>
+        <p>Your orders will appear here once customers start purchasing your products.</p>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

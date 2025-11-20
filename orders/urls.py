@@ -14,4 +14,7 @@ urlpatterns = [
     path('<uuid:order_id>/shiprocket/create/', views.create_shiprocket_order, name='create_shiprocket_order'),
     path('<uuid:order_id>/track/', views.track_shipment, name='track_shipment'),
     path('shiprocket/webhook/', views.shiprocket_webhook, name='shiprocket_webhook'),
+
+    # Seller: Cancel order
+    path('seller/orders/<uuid:order_id>/cancel/', views.cancel_order, name='cancel_order'),
 ]

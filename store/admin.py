@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductImage, SubCategory
+from .models import Category, Product, ProductImage, SubCategory, Lead
 
 
 @admin.register(Category)
@@ -19,8 +19,8 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'seller', 'category', 'price', 'stock', 'available', 'approved', 'created']
-    list_filter = ['available', 'approved', 'featured', 'created', 'updated', 'category', 'seller']
+    list_display = ['name', 'seller', 'category', 'major_category', 'price', 'stock', 'available', 'approved', 'created']
+    list_filter = ['available', 'approved', 'featured', 'created', 'updated', 'category', 'major_category', 'seller']
     list_editable = ['price', 'stock', 'available', 'approved']
     search_fields = ['name', 'description', 'seller__username', 'seller__seller_profile__business_name']
     prepopulated_fields = {'slug': ('name',)}
@@ -29,7 +29,7 @@ class ProductAdmin(admin.ModelAdmin):
     
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'seller', 'category', 'description')
+            'fields': ('name', 'slug', 'seller', 'category', 'major_category', 'description')
         }),
         ('Pricing', {
             'fields': ('price', 'compare_price')
@@ -66,3 +66,12 @@ class SubCategoryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description', 'category__name']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ['created', 'updated']
+
+
+@admin.register(Lead)
+class LeadAdmin(admin.ModelAdmin):
+    list_display = ['name', 'mobile', 'email_sent', 'created']
+    list_filter = ['email_sent', 'created']
+    search_fields = ['name', 'mobile']
+    readonly_fields = ['created', 'updated']
+    list_editable = ['email_sent']

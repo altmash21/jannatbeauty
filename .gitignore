@@ -9,6 +9,10 @@ venv/
 ENV/
 .venv/
 *.env
+.env
+logs/
+staticfiles/
+media/
 
 # Django
 db.sqlite3

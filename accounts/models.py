@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
+import random
+import string
 
 
 class Profile(models.Model):
@@ -150,3 +153,99 @@ class Notification(models.Model):
             'account': 'fas fa-user',
         }
         return icons.get(self.notification_type, 'fas fa-bell')
+
+
+class PasswordResetOTP(models.Model):
+    """Model to handle password reset via email OTP"""
+    email = models.EmailField()
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_otps')
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP for {self.email} - {self.otp_code}"
+
+    def is_valid(self):
+        """Check if OTP is still valid (not expired and not used)"""
+        return not self.is_used and timezone.now() < self.expires_at
+
+    def is_expired(self):
+        """Check if OTP has expired"""
+        return timezone.now() > self.expires_at
+
+    @classmethod
+    def generate_otp(cls, user):
+        """Generate a new OTP for the user"""
+        # Generate 6-digit OTP
+        otp_code = ''.join(random.choices(string.digits, k=6))
+        
+        # Set expiry time (10 minutes from now)
+        expires_at = timezone.now() + timezone.timedelta(minutes=10)
+        
+        # Create new OTP
+        otp_instance = cls.objects.create(
+            email=user.email,
+            otp_code=otp_code,
+            expires_at=expires_at,
+            user=user
+        )
+        
+        return otp_instance
+
+    def mark_as_used(self):
+        """Mark the OTP as used"""
+        self.is_used = True
+        self.save()
+
+
+class RegistrationOTP(models.Model):
+    """Model to handle account registration via email OTP"""
+    email = models.EmailField()
+    password = models.CharField(max_length=128)  # Store hashed password temporarily
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Registration OTP for {self.email} - {self.otp_code}"
+
+    def is_valid(self):
+        """Check if OTP is still valid (not expired and not used)"""
+        return not self.is_used and timezone.now() < self.expires_at
+
+    def is_expired(self):
+        """Check if OTP has expired"""
+        return timezone.now() > self.expires_at
+
+    @classmethod
+    def generate_otp(cls, email, password):
+        """Generate a new OTP for registration"""
+        # Generate 6-digit OTP
+        otp_code = ''.join(random.choices(string.digits, k=6))
+        
+        # Set expiry time (10 minutes from now)
+        expires_at = timezone.now() + timezone.timedelta(minutes=10)
+        
+        # Create new OTP
+        otp_instance = cls.objects.create(
+            email=email,
+            password=password,  # Store password temporarily (will be hashed when creating user)
+            otp_code=otp_code,
+            expires_at=expires_at
+        )
+        
+        return otp_instance
+
+    def mark_as_used(self):
+        """Mark the OTP as used"""
+        self.is_used = True
+        self.save()

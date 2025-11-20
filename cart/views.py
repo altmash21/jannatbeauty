@@ -14,10 +14,15 @@ def cart_add(request, product_id):
     logger.debug(f"Request POST data: {request.POST}")
     logger.debug(f"Request headers: {dict(request.headers)}")
 
+    # Check if this is a "Buy Now" request
+    buy_now = request.POST.get('buy_now', '0') == '1'
+    
     try:
         cart = Cart(request)
-        product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, id=product_id, available=True, approved=True)
         quantity = int(request.POST.get('quantity', 1))
+        if quantity <= 0:
+            raise ValueError('Quantity must be greater than zero.')
         cart.add(product=product, quantity=quantity)
         success = True
         message = f'{product.name} added to cart!'
@@ -29,7 +34,7 @@ def cart_add(request, product_id):
         message = f"Unexpected error: {str(e)}"
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        # Build a safe JSON response with float prices
+        # AJAX request - return JSON response
         cart_items = []
         for item in cart:
             cart_items.append({
@@ -41,10 +46,15 @@ def cart_add(request, product_id):
             })
         response_data = {
             'success': success,
-            'cart_total_items': len(cart),
+            'cart_total_items': cart.get_total_quantity(),
             'cart_items': cart_items,
             'message': message
         }
+        
+        # If Buy Now, include redirect URL
+        if buy_now and success:
+            response_data['redirect_url'] = '/cart/'
+            
         return JsonResponse(response_data)
 
     from django.contrib import messages
@@ -53,22 +63,41 @@ def cart_add(request, product_id):
     else:
         messages.success(request, message)
 
-    return redirect('cart:cart_detail')
+    # For regular form submissions
+    if buy_now:
+        # Buy Now - always redirect to cart
+        return redirect('cart:cart_detail')
+    else:
+        # Add to Cart - redirect back to referring page or cart
+        redirect_url = request.META.get('HTTP_REFERER', '/cart/')
+        return redirect(redirect_url)
 
 
 @require_POST
 def cart_remove(request, product_id):
-    cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    cart.remove(product)
+    try:
+        cart = Cart(request)
+        product = get_object_or_404(Product, id=product_id)
+        cart.remove(product)
+        success = True
+        message = f'{product.name} removed from cart!'
+    except Exception as e:
+        success = False
+        message = f'Error removing product: {str(e)}'
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
-            'success': True,
+            'success': success,
             'cart_total_items': len(cart),
             'cart_total_price': float(cart.get_total_price()),
-            'message': f'{product.name} removed from cart!'
+            'message': message
         })
+    
+    from django.contrib import messages
+    if not success:
+        messages.error(request, message)
+    else:
+        messages.success(request, message)
 
     return redirect('cart:cart_detail')
 
@@ -87,22 +116,32 @@ def cart_update(request, product_id):
                 try:
                     pid = int(key.split('_')[1])
                     quantity = int(value)
-                    product = get_object_or_404(Product, id=pid)
+                    if quantity < 0:
+                        raise ValueError('Quantity cannot be negative.')
+                    product = get_object_or_404(Product, id=pid, available=True, approved=True)
                     if quantity > 0:
                         cart.add(product=product, quantity=quantity, override_quantity=True)
                     else:
                         cart.remove(product)
+                except (ValueError, TypeError) as e:
+                    success = False
+                    message = f'Error updating product {pid}: {str(e)}'
                 except Exception as e:
                     success = False
                     message = f'Error updating product {pid}: {str(e)}'
     else:
-        product = get_object_or_404(Product, id=product_id)
-        quantity = int(request.POST.get('quantity', 1))
         try:
+            product = get_object_or_404(Product, id=product_id, available=True, approved=True)
+            quantity = int(request.POST.get('quantity', 1))
+            if quantity < 0:
+                raise ValueError('Quantity cannot be negative.')
             if quantity > 0:
                 cart.add(product=product, quantity=quantity, override_quantity=True)
             else:
                 cart.remove(product)
+        except (ValueError, TypeError) as e:
+            success = False
+            message = f'Error updating product {product_id}: {str(e)}'
         except Exception as e:
             success = False
             message = f'Error updating product {product_id}: {str(e)}'
@@ -129,14 +168,41 @@ def cart_detail(request):
         messages.error(request, 'Sellers cannot access the cart.')
         return redirect('accounts:seller_dashboard')
     cart = Cart(request)
+    
+    # Calculate MRP total (compare price) and discount
+    mrp_total = 0
+    compare_discount = 0
+    for item in cart:
+        product = item['product']
+        quantity = item['quantity']
+        if hasattr(product, 'compare_price') and product.compare_price and product.compare_price > 0:
+            mrp_total += float(product.compare_price) * quantity
+            if product.compare_price > product.price:
+                compare_discount += float(product.compare_price - product.price) * quantity
+        else:
+            # If no compare price, use regular price as MRP
+            mrp_total += float(product.price) * quantity
+    
+    # Coupon discount (if any)
+    coupon_discount = request.session.get('coupon_discount', 0)
+    
+    # Actual selling price (subtotal)
     subtotal = cart.get_total_price()
-    discount = 0  # Update this if you add coupon logic
-    total = subtotal - discount
+    
+    # Total discount
+    total_discount = compare_discount + float(coupon_discount)
+    
+    # Final amount (actual price after all discounts)
+    total = max(0, subtotal - float(coupon_discount))
+    
     return render(request, 'cart/detail.html', {
         'cart': cart,
+        'mrp_total': mrp_total,  # Price shown as "Price (X items)"
         'subtotal': subtotal,
-        'discount': discount,
-        'total': total
+        'compare_discount': compare_discount,
+        'coupon_discount': coupon_discount,
+        'discount': total_discount,  # Total discount on MRP
+        'total': total  # Final amount to pay
     })
 
 

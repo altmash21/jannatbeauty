@@ -6,7 +6,7 @@ import requests
 
 # Your API credentials from settings (NOT your login credentials)
 SHIPROCKET_API_EMAIL = 'altmash975@gmail.com'
-SHIPROCKET_API_PASSWORD = '#QÍr#9CMnbvk8^'
+SHIPROCKET_API_PASSWORD = 'Z60&W*1vGuIOFjrh'
 SHIPROCKET_API_URL = 'https://apiv2.shiprocket.in/v1/external'
 
 def test_shiprocket_login():

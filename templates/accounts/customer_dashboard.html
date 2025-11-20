@@ -1,1186 +1,1579 @@
 {% extends 'base_plain.html' %}
-
-{% block title %}My Profile - Jannat{% endblock %}
-
+{% load static %}
+{% block title %}Dashboard - Jannat Beauty{% endblock %}
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    .profile-breadcrumb {
-        padding: 1rem 0;
-        font-size: 0.9rem;
-        color: #666;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    .profile-breadcrumb a {
-        color: #333;
-        text-decoration: none;
-        font-weight: 500;
-    }
-    .profile-breadcrumb a:hover {
-        text-decoration: underline;
-    }
-
-    .profile-container {
-        display: grid;
-        grid-template-columns: 250px 1fr;
-        gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
-
-    /* Mobile header - hidden on desktop */
-    .mobile-header {
-        display: none;
-    }
-
-    /* Mobile greeting card - hidden on desktop */
-    .mobile-greeting-card {
-        display: none;
-    }
-
-    /* Mobile quick actions - hidden on desktop */
-    .mobile-quick-actions {
-        display: none;
-    }
-
-    /* Mobile accordion wrapper - hidden on desktop */
-    .mobile-accordion-wrapper {
-        display: none;
-    }
-
-    .profile-sidebar {
-        background: #f8f9fa;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-        border: 1px solid #e0e0e0;
-        height: fit-content;
-        position: sticky;
-        top: 80px;
-    }
-
-    .sidebar-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 1.5rem;
-        cursor: pointer;
-        border-left: 4px solid transparent;
-        transition: all 0.3s ease;
-        color: #333;
-        text-decoration: none;
-    }
-    .sidebar-item:hover {
-        background: #f5f5f5;
-        color: var(--color-primary);
-    }
-    .sidebar-item.active {
-        background: var(--color-primary-bg);
-        border-left-color: var(--color-primary);
-        color: var(--color-primary);
-        font-weight: 600;
-    }
-    .sidebar-item i {
-        width: 20px;
-        text-align: center;
-        font-size: 1.1rem;
-    }
-
-    .profile-content {
-        background: #f6f7f9;
-        border-radius: 8px;
-        padding: 2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-        border: 1px solid #e0e0e0;
-    }
-
-    /* Profile Header - Same across all sections */
-    .profile-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 2rem;
-        margin-bottom: 2rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid #e0e0e0;
-        background: #f8f9fa;
-        border-radius: 8px 8px 0 0;
-    }
-
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 3px solid var(--color-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--color-primary-bg);
-        font-size: 2.5rem;
-        color: var(--color-primary);
-    }
-
-    .profile-user-info h2 {
-        margin: 0 0 0.5rem;
-        font-size: 1.5rem;
-        color: #111;
-    }
-    .profile-user-info p {
-        margin: 0 0 0.25rem;
-        color: #666;
-        font-size: 0.9rem;
-    }
-
-    /* Content Sections - Hide all by default, show active */
-    .content-section {
-        display: none;
-    }
-    .content-section.active {
-        display: block;
-    }
-
-    .form-section {
-        margin-bottom: 2rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        padding: 1.5rem;
-    }
-    .form-section h3 {
-        font-size: 1.1rem;
-        margin-bottom: 1.5rem;
-        color: #111;
-        font-weight: 600;
-    }
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-    .form-group label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        color: #333;
-        font-size: 0.9rem;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        font-family: inherit;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px rgba(6, 64, 43, 0.1);
-    }
-
-    .gender-options {
-        display: flex;
-        gap: 1rem;
-    }
-    .gender-option {
-        flex: 1;
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: #fff;
-    }
-    .gender-option:hover {
-        border-color: var(--color-primary);
-    }
-    .gender-option input[type="radio"] {
-        display: none;
-    }
-    .gender-option input[type="radio"]:checked + span {
-        color: var(--color-primary);
-        font-weight: 600;
-    }
-
-    .action-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-    .action-btn {
-        padding: 0.75rem 1.5rem;
-        border: 1px solid #ddd;
-        background: #fff;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .action-btn:hover {
-        border-color: #999;
-        background: #f5f5f5;
-    }
-
-    .save-button {
-        grid-column: 1 / -1;
-        background: var(--color-primary);
-        color: white;
-        border: none;
-        padding: 1rem;
-        font-size: 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    .save-button:hover {
-        background: var(--color-primary-dark);
-    }
-
-    /* Orders Table Styles */
-    .orders-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.95rem;
-    }
-    .orders-table thead th {
-        text-align: left;
-        color: #6b7280;
-        font-weight: 600;
-        padding: 0.75rem 0.5rem;
-        border-bottom: 2px solid #e5e7eb;
-    }
-    .orders-table tbody td {
-        padding: 0.75rem 0.5rem;
-        border-top: 1px solid #f1f5f9;
-    }
-    .orders-table tbody tr:hover {
-        background: #f9fafb;
-    }
-
-    /* Notifications Styles */
-    .notifications-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .notification-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 1.5rem;
-        display: flex;
-        gap: 1rem;
-        transition: all 0.3s;
-    }
-    
-    .notification-card.unread {
-        background: #f8f9fa;
-        border-left: 4px solid var(--color-primary);
-    }
-    
-    .notification-card:hover {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .notification-icon-box {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        flex-shrink: 0;
-    }
-    
-    .notification-icon-box.order {
-        background: #e3f2fd;
-        color: #2196f3;
-    }
-    
-    .notification-icon-box.product {
-        background: #f3e5f5;
-        color: #9c27b0;
-    }
-    
-    .notification-icon-box.promotion {
-        background: #fff3e0;
-        color: #ff9800;
-    }
-    
-    .notification-icon-box.system {
-        background: #e0f2f1;
-        color: #009688;
-    }
-    
-    .notification-icon-box.account {
-        background: #e8f5e9;
-        color: #4caf50;
-    }
-    
-    .notification-content-box {
-        flex: 1;
-    }
-    
-    .notification-title {
-        font-weight: 600;
-        font-size: 1.05rem;
-        margin-bottom: 0.5rem;
-        color: #333;
-    }
-    
-    .notification-message {
-        color: #666;
-        line-height: 1.6;
-        margin-bottom: 0.75rem;
-    }
-    
-    .notification-time {
-        font-size: 0.85rem;
-        color: #999;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #999;
-    }
-    
-    .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        color: #ddd;
-    }
-
-    /* Bottom Navigation - Hidden on desktop */
-    .bottom-nav {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        .profile-breadcrumb {
-            display: none;
+        /* Override background for dashboard */
+        body {
+            background: #f8f9fa !important;
+            background-image: none !important;
         }
-
-        .profile-container {
-            grid-template-columns: 1fr;
-            gap: 0;
-            padding: 0;
-            background: #f5f5f5;
-        }
-
-        /* Mobile Header */
-        .mobile-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: #fff;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .back-button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #333;
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mobile-header h1 {
+        * {
             margin: 0;
-            font-size: 1.2rem;
-            flex: 1;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Mobile Greeting Card */
-        .mobile-greeting-card {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-            background: #fff;
-            margin: 1rem;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-height: 100vh;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
 
-        .greeting-avatar {
-            width: 80px;
-            height: 80px;
-            min-width: 80px;
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: #ffffff;
+            border-right: 1px solid #e9ecef;
+            padding: 24px 0;
+            overflow-y: auto;
+           
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 0 12px 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            border: 2px solid #ddd;
+            margin: 0 auto 12px;
+            background: #f1f3f5;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f9f9f9;
-            font-size: 2rem;
-            color: #666;
+            overflow: hidden;
         }
 
-        .greeting-content h3 {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #999;
-            font-weight: 400;
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .greeting-content p {
-            margin: 0.25rem 0 0;
-            font-size: 1.1rem;
+        .profile-avatar i {
+            font-size: 40px;
+            color: #6c757d;
+        }
+
+        .profile-name {
+            font-size: 15px;
             font-weight: 600;
-            color: #333;
+            color: #212529;
+            margin-bottom: 4px;
         }
 
-        .edit-link {
-            margin-left: auto;
+        .profile-email {
+            font-size: 11px;
+            color: #6c757d;
+        }
+
+        .nav-menu {
+            padding: 12px 0;
+        }
+
+        .nav-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #666;
+          
+            color: #495057;
             text-decoration: none;
-            font-size: 0.9rem;
-            white-space: nowrap;
+            transition: all 0.2s;
+            cursor: pointer;
         }
 
-        .edit-link i {
-            font-size: 0.8rem;
+        .nav-item:hover {
+            background: #f1f3f5;
+            color: #212529;
         }
 
-        /* Mobile Quick Actions */
-        .mobile-quick-actions {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            padding: 0 1rem 1rem;
+        .nav-item.active {
+            background: #e7f5ff;
+            color: #0d6efd;
+            border-left: 3px solid #0d6efd;
+            font-weight: 500;
         }
 
-        .quick-action-card {
+        .nav-item i {
+            width: 16px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+
+        .nav-item .nav-arrow {
+            margin-left: auto;
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.75rem;
-            padding: 1.5rem 1rem;
-            background: #fff;
+        }
+
+        .welcome-header {
+            margin-bottom: 32px;
+        }
+
+        .welcome-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+
+        /* Profile Description Section */
+        .profile-description-section {
+            margin-bottom: 32px;
+        }
+
+        .profile-description-card {
+            background: #ffffff;
             border-radius: 12px;
-            text-decoration: none;
-            color: #333;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            cursor: pointer;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
         }
 
-        .quick-action-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            transform: translateY(-2px);
+        .profile-description-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 20px;
         }
 
-        .quick-action-card i {
-            font-size: 2rem;
-            width: 50px;
-            height: 50px;
+        .profile-description-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #f1f3f5;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            background: #f0f0f0;
-        }
-
-        .quick-action-card.vital-cash i {
-            background: #fef3cd;
-            color: #ff9800;
-        }
-
-        .quick-action-card.my-orders i {
-            background: #e8f5e9;
-            color: #4caf50;
-        }
-
-        .quick-action-card span {
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        /* Mobile Accordion Sections */
-        .mobile-accordion-wrapper {
-            display: block;
-            margin: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .mobile-accordion-section {
-            background: #fff;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            flex-shrink: 0;
         }
 
-        .mobile-accordion-header {
+        .profile-description-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-description-avatar i {
+            font-size: 50px;
+            color: #6c757d;
+        }
+
+        .profile-description-info {
+            flex: 1;
+        }
+
+        .profile-description-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .profile-description-email {
+            font-size: 15px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .profile-description-phone {
+            font-size: 14px;
+            color: #495057;
+            margin-top: 8px;
+        }
+
+        .profile-description-phone i {
+            margin-right: 8px;
+            color: #0d6efd;
+        }
+
+        .profile-description-address {
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .profile-description-address i {
+            color: #0d6efd;
+            margin-top: 2px;
+        }
+
+        /* Navigation List Items */
+        .nav-list {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .nav-list-item {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            user-select: none;
+            padding: 10px 12px;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid #e9ecef;
             transition: background 0.2s;
         }
 
-        .mobile-accordion-header:hover {
-            background: #f9f9f9;
+        .nav-list-item:last-child {
+            border-bottom: none;
         }
 
-        .accordion-icon-wrapper {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #f0f0f0;
+        .nav-list-item:hover {
+            background: #f1f3f5;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-list-icon {
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            color: #666;
+            margin-right: 8px;
+            flex-shrink: 0;
         }
 
-        .accordion-title-text {
+        .nav-list-icon i {
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .nav-list-content {
             flex: 1;
-            font-weight: 500;
-            font-size: 0.95rem;
         }
 
-        .accordion-chevron {
-            transition: transform 0.3s;
-            color: #999;
-            font-size: 0.8rem;
+        .nav-list-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
         }
 
-        .mobile-accordion-section.active .accordion-chevron {
-            transform: rotate(90deg);
+        .nav-list-description {
+            font-size: 11px;
+            color: #6c757d;
         }
 
-        .mobile-accordion-content {
-            max-height: 0;
+        .nav-list-arrow {
+            margin-left: 12px;
+            color: #adb5bd;
+            font-size: 14px;
+        }
+
+        /* Notifications */
+        .notifications-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .notification-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: all 0.3s;
+        }
+
+        .notification-card.unread {
+            background: #e7f5ff;
+            border-left: 3px solid #0d6efd;
+        }
+
+        .notification-icon {
+            width: 48px;
+            height: 48px;
+            background: #f1f3f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #0d6efd;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 6px;
+        }
+
+        .notification-description {
+            font-size: 14px;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        /* Addresses */
+        .addresses-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .address-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .address-type {
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .edit-address-btn {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edit-address-btn:hover {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .address-content {
+            color: #495057;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .address-content p {
+            margin-bottom: 8px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #adb5bd;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        /* Profile Form */
+        .profile-form-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .profile-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .profile-form label {
+            display: block;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .profile-form input,
+        .profile-form select,
+        .profile-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .profile-form input:focus,
+        .profile-form select:focus,
+        .profile-form textarea:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .profile-form .form-control:disabled {
+            background: #f1f3f5;
+            cursor: not-allowed;
+        }
+
+        .gender-radio-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .gender-radio-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .gender-radio-group input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        /* Action Cards Grid */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 18px 12px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .action-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            margin: 0 auto 10px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-icon i {
+            font-size: 16px;
+            color: #495057;
+        }
+
+        .action-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .action-description {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 7px 14px;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #0d6efd;
+        }
+
+        /* Recent Orders Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .view-all-link {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .view-all-link:hover {
+            text-decoration: underline;
+        }
+
+        .orders-table-container {
+            background: #fff;
+            border-radius: 12px;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .mobile-accordion-section.active .mobile-accordion-content {
-            max-height: 3000px;
-            transition: max-height 0.5s ease-in;
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .mobile-accordion-body {
-            padding: 1.5rem;
-            border-top: 1px solid #f0f0f0;
+        .orders-table thead {
+            background: #f1f3f5;
         }
 
-        /* Hide desktop elements on mobile */
-        .profile-sidebar {
+        .orders-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .orders-table td {
+            padding: 16px;
+            border-top: 1px solid #e9ecef;
+            color: #212529;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+
+        .status-processing {
+            background: #ffeaa7;
+            color: #e17055;
+        }
+
+        .status-shipped {
+            background: #cfe2ff;
+            color: #0d6efd;
+        }
+
+        .status-delivered {
+            background: #e7f5ff;
+            color: #0d6efd;
+        }
+
+        /* Order Card for Mobile */
+        .order-card {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-card-id {
+            font-weight: 600;
+            color: #212529;
+            font-size: 14px;
+        }
+
+        .order-card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .order-card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .order-card-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .order-card-value {
+            color: #212529;
+            font-weight: 600;
+        }
+
+        /* Order Detail Cards */
+        .order-detail-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .order-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 24px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f1f3f5;
+        }
+
+        .order-detail-header-left {
+            flex: 1;
+        }
+
+        .order-detail-id {
+            font-size: 20px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .order-detail-date {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .order-detail-header-right {
+            margin-left: 16px;
+        }
+
+        .order-items-section {
+            padding: 24px;
+        }
+
+        .order-items-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 16px;
+        }
+
+        .order-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .order-item-row {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .order-item-image {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .order-item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .order-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+            margin: 0;
+        }
+
+        .order-item-name a:hover {
+            color: #0d6efd;
+        }
+
+        .order-item-meta {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .order-item-price {
+            font-size: 15px;
+            font-weight: 600;
+            color: #212529;
+            margin: 0;
+        }
+
+        .order-summary-section {
+            padding: 20px 24px;
+            background: #f1f3f5;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .order-summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .order-summary-total {
+            padding-top: 12px;
+            border-top: 2px solid #e9ecef;
+            margin-top: 12px;
+        }
+
+        .order-summary-label {
+            font-size: 15px;
+            color: #495057;
+        }
+
+        .order-summary-total .order-summary-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .order-summary-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .order-summary-total .order-summary-value {
+            font-size: 18px;
+            color: #0d6efd;
+        }
+
+        #logout-form {
             display: none;
         }
 
-        #profileContent {
-            display: none;
-        }
+        /* Tablet Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+                top: 70px;
+                
+            }
 
-        .mobile-accordion-wrapper {
-            display: block !important;
+
+            .action-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .main-content {
+                margin-left:0;
+                margin-right:0;
+            }
         }
 
         /* Bottom Navigation Bar */
-        .bottom-nav {
-            display: block;
+        .dashboard-bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: #fff;
-            border-top: 1px solid #eee;
-            padding: 0.5rem 0;
+            border-top: 1px solid #e9ecef;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            display: none;
         }
 
-        .bottom-nav-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .bottom-nav-item {
+        .dashboard-bottom-nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.5rem 1rem;
+            justify-content: center;
+            padding: 8px 4px;
             text-decoration: none;
-            color: #666;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 0.75rem;
+            color: #6c757d;
+            transition: all 0.2s;
+            flex: 1;
         }
 
-        .bottom-nav-item i {
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
+        .dashboard-bottom-nav-item:hover,
+        .dashboard-bottom-nav-item.active {
+            color: #0d6efd;
+            text-decoration: none;
         }
 
-        .bottom-nav-item:hover {
-            color: var(--color-primary);
+        .dashboard-bottom-nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
         }
 
-        .bottom-nav-item.active {
-            color: var(--color-primary);
+        .dashboard-bottom-nav-item span {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
-        .bottom-nav-item.active i {
-            transform: scale(1.1);
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                
+            }
+
+            .mobile-menu-toggle {
+                display: none;
+            }
+
+            .sidebar-overlay {
+                display: none;
+            }
+
+            .dashboard-bottom-nav {
+                display: flex;
+            }
+
+            .welcome-title {
+                font-size: 22px;
+                margin-top: 0;
+                margin-bottom: 8px;
+            }
+
+            .welcome-subtitle {
+                font-size: 14px;
+            }
+
+            .profile-description-card {
+                padding: 24px;
+            }
+
+            .profile-description-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .profile-description-avatar {
+                width: 80px;
+                height: 80px;
+            }
+
+            .profile-description-name {
+                font-size: 20px;
+            }
+
+            .nav-list {
+                margin-bottom: 24px;
+            }
+
+            .nav-list-item {
+                padding: 14px 16px;
+            }
+
+            .nav-list-icon {
+                width: 36px;
+                height: 36px;
+                margin-right: 12px;
+            }
+
+            .nav-list-icon i {
+                font-size: 18px;
+            }
+
+            .nav-list-title {
+                font-size: 15px;
+            }
+
+            .nav-list-description {
+                font-size: 12px;
+            }
+
+            .action-card {
+                padding: 24px 20px;
+            }
+
+            .action-icon {
+                width: 56px;
+                height: 56px;
+            }
+
+            .action-icon i {
+                font-size: 24px;
+            }
+
+            .action-title {
+                font-size: 17px;
+            }
+
+            .action-description {
+                font-size: 13px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            /* Hide table on mobile, show cards */
+            .orders-table-container {
+                display: none;
+            }
+
+            .order-card {
+                display: block;
+            }
+
+            .profile-avatar {
+                width: 64px;
+                height: 64px;
+            }
+
+            .profile-avatar i {
+                font-size: 32px;
+            }
+
+            .profile-name {
+                font-size: 16px;
+            }
+
+            .profile-email {
+                font-size: 12px;
+            }
+            #logout-form {
+                display: block;
+            }
         }
 
-        .mobile-accordion-wrapper {
-            padding-bottom: 5rem; /* Space for bottom nav */
+        @media (max-width: 480px) {
+            
+            .welcome-title {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+
+            .welcome-subtitle {
+                font-size: 13px;
+            }
+
+            .profile-description-card {
+                padding: 20px;
+            }
+
+            .profile-description-avatar {
+                width: 70px;
+                height: 70px;
+            }
+
+            .profile-description-name {
+                font-size: 18px;
+            }
+
+            .profile-form-container {
+                padding: 20px;
+            }
+
+            .nav-list-item {
+                padding: 12px 14px;
+            }
+
+            .nav-list-icon {
+                width: 32px;
+                height: 32px;
+                margin-right: 10px;
+            }
+
+            .nav-list-icon i {
+                font-size: 16px;
+            }
+
+            .nav-list-title {
+                font-size: 14px;
+            }
+
+            .nav-list-description {
+                font-size: 11px;
+            }
+
+            .action-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .order-detail-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .order-detail-header-right {
+                margin-left: 0;
+                align-self: flex-start;
+            }
+
+            .order-items-section {
+                padding: 16px;
+            }
+
+            .order-item-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .order-item-image {
+                width: 100%;
+                height: 200px;
+            }
+
+            .order-summary-section {
+                padding: 16px;
+            }
+
+            .action-icon i {
+                font-size: 20px;
+            }
+
+            .action-title {
+                font-size: 16px;
+            }
+
+            .action-description {
+                font-size: 12px;
+                margin-bottom: 16px;
+            }
+
+            .action-btn {
+                padding: 8px 20px;
+                font-size: 13px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+
+            .order-card {
+                padding: 14px;
+            }
+
+            .order-card-id {
+                font-size: 13px;
+            }
+
+            .order-card-row {
+                font-size: 12px;
+            }
+
+            .order-status {
+                padding: 4px 10px;
+                font-size: 10px;
+            }
+
+            .profile-section {
+                padding: 0 16px 20px;
+            }
+
+            .nav-item {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+           
         }
-    }
-</style>
+
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+
+            .dashboard-bottom-nav {
+                display: none;
+            }
+
+            .order-card {
+                display: none;
+            }
+
+            .orders-table-container {
+                display: block;
+            }
+        }
+
+        /* Small tablet */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .action-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 {% endblock %}
-
 {% block content %}
-<!-- Desktop breadcrumb - hidden on mobile -->
-<div class="profile-breadcrumb">
-    <a href="{% url 'store:home' %}">Home</a> / 
-    <a href="#">My Profile</a> / 
-    <span id="breadcrumb-current">Profile Details</span>
-</div>
-
-<div class="profile-container">
-    <!-- Mobile header -->
-    {% comment %} <div class="mobile-header">
-        <button class="back-button" onclick="window.history.back()">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <h1 id="mobile-page-title">My Profile</h1>
-    </div> {% endcomment %}
-
-    <!-- Mobile greeting card -->
-    <div class="mobile-greeting-card">
-        <div class="greeting-avatar">
-            <i class="fas fa-user"></i>
-        </div>
-        <div class="greeting-content">
-            <h3>Hello</h3>
-            <p>{{ user.get_full_name|default:user.username }}</p>
-        </div>
-        <a href="#" class="edit-link" onclick="event.preventDefault(); showSection('profile'); scrollToTop();">
-            <i class="fas fa-pen"></i>
-        </a>
-    </div>
-
-    <!-- Desktop Sidebar -->
-    <aside class="profile-sidebar" id="profileSidebar">
-        <a href="#" class="sidebar-item active" data-section="profile" onclick="event.preventDefault(); showSection('profile');">
-            <i class="fas fa-user"></i><span>Profile Details</span>
-        </a>
-        <a href="#" class="sidebar-item" data-section="orders" onclick="event.preventDefault(); showSection('orders');">
-            <i class="fas fa-shopping-bag"></i><span>My Orders</span>
-        </a>
-        <a href="#" class="sidebar-item" data-section="address" onclick="event.preventDefault(); showSection('address');">
-            <i class="fas fa-map-marker-alt"></i><span>My Address</span>
-        </a>
-        <a href="#" class="sidebar-item" data-section="notifications" onclick="event.preventDefault(); showSection('notifications');">
-            <i class="fas fa-bell"></i><span>Notifications</span>
-        </a>
-        <a href="#" class="sidebar-item" data-section="policies" onclick="event.preventDefault(); showSection('policies');">
-            <i class="fas fa-file-alt"></i><span>Policies</span>
-        </a>
-        <a href="#" class="sidebar-item">
-            <i class="fas fa-headset"></i><span>Contact Us</span>
-        </a>
-        <a href="#" class="sidebar-item">
-            <i class="fas fa-info-circle"></i><span>About Us</span>
-        </a>
-        <a href="{% url 'accounts:logout' %}" class="sidebar-item" style="color: #dc3545; border-top: 1px solid #eee; margin-top: 0.5rem;">
-            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-        </a>
-    </aside>
-
-    <!-- Main Content (Desktop only) -->
-    <main class="profile-content" id="profileContent">
-        <!-- Profile Header - Same across all sections -->
-        <div class="profile-header">
-            <div class="profile-avatar"><i class="fas fa-user"></i></div>
-            <div class="profile-user-info">
-                <h2>{{ user.get_full_name|default:user.username }}</h2>
-                <p><strong>Username:</strong> {{ user.username }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-            </div>
-        </div>
-
-        <!-- Profile Details Section -->
-        <div class="content-section active" id="section-profile">
-            <form method="POST" class="profile-form">
-                {% csrf_token %}
-                <div class="form-section">
-                    <h3>Basic Information</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="id_first_name">First Name</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="form-group">
-                            <label for="id_last_name">Last Name</label>
-                            {{ form.last_name }}
-                        </div>
-                    </div>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" value="{{ user.username }}" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label for="id_email">Email Id</label>
-                            {{ form.email }}
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="id_phone">Phone Number</label>
-                            {{ form.phone }}
-                        </div>
-                        <div class="form-group">
-                            <label>Gender</label>
-                            <div class="gender-options">
-                                <label class="gender-option">
-                                    <input type="radio" name="gender" value="male" {% if form.instance.gender == 'male' %}checked{% endif %}>
-                                    <span>Male ♂</span>
-                                </label>
-                                <label class="gender-option">
-                                    <input type="radio" name="gender" value="female" {% if form.instance.gender == 'female' %}checked{% endif %}>
-                                    <span>Female ♀</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="id_date_of_birth">Date of Birth</label>
-                            {{ form.date_of_birth }}
-                        </div>
-                        <div class="form-group">
-                            <!-- Empty for grid layout -->
-                        </div>
-                    </div>
+    <div class="dashboard-container p-3" style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Profile Picture" />
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
                 </div>
-
-                <div class="action-buttons">
-                    <button type="button" class="action-btn">Delete Profile</button>
-                    <button type="button" class="action-btn">Deactivate Profile</button>
-                </div>
-
-                <button type="submit" class="save-button">SAVE</button>
-            </form>
-        </div>
-
-        <!-- My Orders Section -->
-        <div class="content-section" id="section-orders">
-            <h3 style="margin:0 0 1.5rem 0;">Order History</h3>
-            <div style="overflow:auto;">
-                <table class="orders-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for order in orders %}
-                        <tr>
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.created|date:"M d, Y" }}</td>
-                            <td>{{ order.get_order_status_display }}</td>
-                            <td>₹{{ order.total_amount }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="4" style="text-align: center; padding: 2rem; color: #999;">No orders found.</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="profile-name">{{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}</div>
+                <div class="profile-email">{{ user.email }}</div>
             </div>
-        </div>
 
-        <!-- My Address Section -->
-        <div class="content-section" id="section-address">
-            <h3 style="margin:0 0 1.5rem 0;">My Address</h3>
-            {% if user.profile.address %}
-            <div style="line-height: 1.8; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
-                <strong>{{ user.get_full_name|default:user.username }}</strong><br>
-                {{ user.profile.address }}<br>
-                {{ user.profile.city }}, {{ user.profile.state }} {{ user.profile.zipcode }}<br>
-                {{ user.profile.country }}<br>
-                Phone: {{ user.profile.phone }}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-map-marked-alt"></i>
-                <p>No address saved. Please update your profile.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Notifications Section -->
-        <div class="content-section" id="section-notifications">
-            <h3 style="margin:0 0 1.5rem 0;">My Notifications</h3>
-            {% if notifications %}
-            <div class="notifications-list">
-                {% for notification in notifications|slice:":10" %}
-                <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
-                    <div class="notification-icon-box {{ notification.notification_type }}">
-                        <i class="{{ notification.icon }}"></i>
-                    </div>
-                    <div class="notification-content-box">
-                        <div class="notification-title">{{ notification.title }}</div>
-                        <div class="notification-message">{{ notification.message }}</div>
-                        <div class="notification-time">
-                            <i class="far fa-clock"></i> {{ notification.created|timesince }} ago
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="far fa-bell-slash"></i>
-                <h3>No Notifications</h3>
-                <p>You don't have any notifications yet.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Policies Section -->
-        <div class="content-section" id="section-policies">
-            <h3 style="margin:0 0 1.5rem 0;">Policies</h3>
-            <div class="empty-state">
-                <i class="fas fa-file-contract"></i>
-                <h3>Policies</h3>
-                <p>Policy information will be displayed here.</p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Mobile Accordion Sections (Mobile only) -->
-    <div class="mobile-accordion-wrapper">
-        
-        <!-- Profile Details Section -->
-        <div class="mobile-accordion-section active" id="mobile-profile-section">
-            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-profile')">
-                <div class="accordion-icon-wrapper">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="accordion-title-text">Profile Details</div>
-                <i class="fas fa-chevron-right accordion-chevron"></i>
-            </div>
-            <div class="mobile-accordion-content">
-                <div class="mobile-accordion-body">
-                    <form method="POST">
+            <nav class="nav-menu">
+                <a href="{% url 'accounts:customer_dashboard' %}" class="nav-item {% if current_page == 'home' %}active{% endif %} p-2">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'accounts:customer_orders' %}" class="nav-item {% if current_page == 'orders' %}active{% endif %} p-2">
+                    <i class="fas fa-box"></i>
+                    <span>Orders</span>
+                    <i class="fas fa-chevron-right nav-arrow"></i>
+                </a>
+                <a href="{% url 'accounts:customer_notifications' %}" class="nav-item {% if current_page == 'notifications' %}active{% endif %} p-2">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <i class="fas fa-chevron-right nav-arrow"></i>
+                </a>
+                <a href="{% url 'accounts:customer_addresses' %}" class="nav-item {% if current_page == 'addresses' %}active{% endif %} p-2">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Saved Addresses</span>
+                    <i class="fas fa-chevron-right nav-arrow"></i>
+                </a>
+                <a href="{% url 'accounts:customer_profile' %}" class="nav-item {% if current_page == 'profile' %}active{% endif %} p-2">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Account Details</span>
+                    <i class="fas fa-chevron-right nav-arrow"></i>
+                </a>
+                    <form action="{% url 'accounts:logout' %}" method="post" style="margin-top:32px;padding:0 24px;">
                         {% csrf_token %}
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">First Name</label>
-                            {{ form.first_name }}
+                        <button type="submit" class="action-btn" style="width:100%;background:#dc3545;margin-top:0;"> <i class="fas fa-sign-out-alt"></i> Log Out</button>
+                    </form>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% if current_page == 'home' %}
+                <!-- Home Page -->
+                <div class="dashboard-main-box mx-3" style="width:100%;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,0.07);padding:32px 32px;margin:0 auto;">
+                    <div class="profile-description-section" style="width:100%;">
+                        <div class="profile-description-card" style="width:100%;box-shadow:none;border:none;padding:0;">
+                            <div class="profile-description-header">
+                                <div class="profile-description-avatar">
+                                    {% if user.profile.avatar %}
+                                        <img src="{{ user.profile.avatar.url }}" alt="Profile Picture" />
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="profile-description-info">
+                                    <h2 class="profile-description-name">{{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}</h2>
+                                    <p class="profile-description-email">{{ user.email }}</p>
+                                    {% if profile.phone %}
+                                        <p class="profile-description-phone"><i class="fas fa-phone"></i> {{ profile.phone }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if profile.address or profile.city %}
+                                <div class="profile-description-address">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ profile.full_address|default:"No address added yet" }}</span>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Last Name</label>
-                            {{ form.last_name }}
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Username</label>
-                            <input type="text" value="{{ user.username }}" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; background: #f5f5f5; color: #999;">
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Email Id</label>
-                            {{ form.email }}
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Phone Number</label>
-                            {{ form.phone }}
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Gender</label>
-                            <div class="gender-options">
-                                <label class="gender-option">
-                                    <input type="radio" name="gender" value="male" {% if form.instance.gender == 'male' %}checked{% endif %}>
-                                    <span>Male ♂</span>
-                                </label>
-                                <label class="gender-option">
-                                    <input type="radio" name="gender" value="female" {% if form.instance.gender == 'female' %}checked{% endif %}>
-                                    <span>Female ♀</span>
-                                </label>
+                    </div>
+
+                    <div class="welcome-header" style="width:100%;margin-top:24px;">
+                        <h1 class="welcome-title">Welcome to Your Dashboard</h1>
+                        <p class="welcome-subtitle">Manage your account, orders, and preferences from here</p>
+                    </div>
+
+                    <!-- Navigation List -->
+                    <div class="nav-list" style="width:100%;margin-top:24px;">
+                        <a href="{% url 'accounts:customer_orders' %}" class="nav-list-item">
+                            <div class="nav-list-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="nav-list-content">
+                                <div class="nav-list-title">Orders</div>
+                                <div class="nav-list-description">Check your order status</div>
+                            </div>
+                            <i class="fas fa-chevron-right nav-list-arrow"></i>
+                        </a>
+
+                        <a href="{% url 'accounts:customer_notifications' %}" class="nav-list-item">
+                            <div class="nav-list-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="nav-list-content">
+                                <div class="nav-list-title">Notifications</div>
+                                <div class="nav-list-description">Stay updated with your account activity</div>
+                            </div>
+                            <i class="fas fa-chevron-right nav-list-arrow"></i>
+                        </a>
+
+                        <a href="{% url 'accounts:customer_addresses' %}" class="nav-list-item">
+                            <div class="nav-list-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="nav-list-content">
+                                <div class="nav-list-title">Addresses</div>
+                                <div class="nav-list-description">Save addresses for a hassle-free checkout</div>
+                            </div>
+                            <i class="fas fa-chevron-right nav-list-arrow"></i>
+                        </a>
+
+                        <a href="{% url 'accounts:customer_profile' %}" class="nav-list-item">
+                            <div class="nav-list-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="nav-list-content">
+                                <div class="nav-list-title">Account Details</div>
+                                <div class="nav-list-description">Update your personal information</div>
+                            </div>
+                            <i class="fas fa-chevron-right nav-list-arrow"></i>
+                        </a>
+                        
+                         <form action="{% url 'accounts:logout' %}" method="post" style="margin-top:32px;padding:0 24px;" id="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn" style="width:100%;background:#dc3545;margin-top:0;"> <i class="fas fa-sign-out-alt"></i> Log Out</button>
+                        </form>
+                        
+
+                    </div>
+                </div>
+
+            {% elif current_page == 'orders' %}
+                <!-- Orders Page -->
+                <div class="dashboard-main-box" style="width:100%;background:#fff;box-shadow:0 1px 8px rgba(0,0,0,0.05);padding:24px;margin:0 auto;">
+                    <div class="welcome-header" style="width:100%;margin-bottom:20px;border-bottom:1px solid #e9ecef;padding-bottom:16px;">
+                        <h1 class="welcome-title" style="margin-bottom:4px;font-size:20px;">My Orders</h1>
+                        <p class="welcome-subtitle" style="font-size:12px;">Track and manage all your orders</p>
+                    </div>
+                    {% if orders %}
+                        <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+                        {% for order in orders %}
+                        <div class="order-detail-card" style="width:100%;border:1px solid #e9ecef;border-radius:8px;overflow:hidden;">
+                            <div class="order-detail-header" style="background:#f8f9fa;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e9ecef;">
+                                <div class="order-detail-header-left">
+                                    <h3 class="order-detail-id" style="font-size:14px;font-weight:600;margin-bottom:2px;color:#212529;">Order #{{ order.id|truncatechars:15 }}</h3>
+                                    <p class="order-detail-date" style="font-size:11px;color:#6c757d;margin:0;">{{ order.created|date:"b d, Y" }}</p>
+                                </div>
+                                <div class="order-detail-header-right">
+                                    {% if order.order_status == 'pending' %}
+                                        <span class="order-status" style="background:#fff3cd;color:#856404;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;">PENDING</span>
+                                    {% elif order.order_status == 'processing' %}
+                                        <span class="order-status" style="background:#ffeaa7;color:#e17055;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;">PROCESSING</span>
+                                    {% elif order.order_status == 'shipped' %}
+                                        <span class="order-status" style="background:#cfe2ff;color:#0d6efd;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;">SHIPPED</span>
+                                    {% elif order.order_status == 'delivered' %}
+                                        <span class="order-status" style="background:#d1e7dd;color:#0f5132;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;">DELIVERED</span>
+                                    {% else %}
+                                        <span class="order-status" style="background:#f8d7da;color:#842029;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;">{{ order.get_order_status_display }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="order-items-section" style="padding:12px 14px;background:#fff;">
+                                <h4 class="order-items-title" style="font-size:12px;font-weight:600;margin-bottom:8px;color:#495057;">Items ({{ order.items.count }})</h4>
+                                <div class="order-items-list" style="display:flex;flex-direction:column;gap:6px;">
+                                    {% for item in order.items.all %}
+                                    <div class="order-item-row" style="display:flex;align-items:center;gap:8px;padding:6px;background:#f8f9fa;border-radius:6px;">
+                                        <div class="order-item-image" style="width:40px;height:40px;border-radius:4px;overflow:hidden;background:#fff;flex-shrink:0;border:1px solid #e9ecef;">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:100%;height:100%;object-fit:cover;" />
+                                            {% else %}
+                                                <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ item.product.name }}" style="width:100%;height:100%;object-fit:cover;" />
+                                            {% endif %}
+                                        </div>
+                                        <div class="order-item-details" style="flex:1;min-width:0;">
+                                            <h5 class="order-item-name" style="font-size:12px;font-weight:600;margin:0 0 2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                                <a href="{% url 'store:product_detail' item.product.slug %}" style="color:#212529;text-decoration:none;">{{ item.product.name }}</a>
+                                            </h5>
+                                            <p class="order-item-meta" style="font-size:10px;color:#6c757d;margin:0;">Qty: {{ item.quantity }} × ₹{{ item.price }} = <strong style="color:#212529;">₹{{ item.get_cost }}</strong></p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="order-summary-section" style="padding:8px 14px;background:#f8f9fa;border-top:1px solid #e9ecef;">
+                                <div class="order-summary-row" style="display:flex;justify-content:space-between;align-items:center;">
+                                    <span class="order-summary-label" style="font-size:13px;font-weight:600;color:#212529;">Total Amount:</span>
+                                    <span class="order-summary-value" style="font-size:14px;color:#0d6efd;font-weight:700;">₹{{ order.get_total_cost }}</span>
+                                </div>
                             </div>
                         </div>
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; font-size: 0.9rem;">Date of Birth</label>
-                            {{ form.date_of_birth }}
+                        {% endfor %}
                         </div>
-                        <button type="submit" class="save-button">SAVE</button>
+                    {% else %}
+                        <div style="width:100%;background:#f8f9fa;border-radius:8px;padding:40px 20px;text-align:center;color:#6c757d;">
+                            <i class="fas fa-shopping-bag" style="font-size:40px;margin-bottom:12px;opacity:0.3;"></i>
+                            <h3 style="font-size:16px;margin-bottom:6px;color:#495057;">No orders yet</h3>
+                            <p style="font-size:12px;margin-bottom:16px;">Start shopping to see your orders here!</p>
+                            <a href="{% url 'store:product_list' %}" class="action-btn" style="display:inline-block;">Browse Products</a>
+                        </div>
+                    {% endif %}
+                </div>
+
+            {% elif current_page == 'notifications' %}
+                <!-- Notifications Page -->
+                <div class="welcome-header">
+                    <h1 class="welcome-title">Notifications</h1>
+                    <p class="welcome-subtitle">Stay updated with your account activity</p>
+                </div>
+
+                <div class="notifications-container">
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                        <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
+                            <div class="notification-icon">
+                                <i class="{{ notification.icon|default:'fas fa-bell' }}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h4 class="notification-title">{{ notification.title }}</h4>
+                                <p class="notification-description">{{ notification.message }}</p>
+                                <span class="notification-time">{{ notification.created|timesince }} ago</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No Notifications</h3>
+                            <p>You're all caught up! No new notifications.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            {% elif current_page == 'addresses' %}
+                <!-- Addresses Page -->
+                <div class="welcome-header">
+                    <h1 class="welcome-title">Saved Addresses</h1>
+                    <p class="welcome-subtitle">Manage your delivery addresses</p>
+                </div>
+
+                <div class="addresses-container">
+                    <div class="address-card">
+                        <div class="address-header">
+                            <h3 class="address-type">Default Address</h3>
+                            <a href="{% url 'accounts:customer_profile' %}" class="edit-address-btn">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        <div class="address-content">
+                            {% if profile.full_address %}
+                                <p><strong>{{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}</strong></p>
+                                <p>{{ profile.address }}</p>
+                                {% if profile.city %}<p>{{ profile.city }}{% if profile.state %}, {{ profile.state }}{% endif %}</p>{% endif %}
+                                {% if profile.zipcode %}<p>PIN: {{ profile.zipcode }}</p>{% endif %}
+                                {% if profile.phone %}<p><i class="fas fa-phone"></i> {{ profile.phone }}</p>{% endif %}
+                            {% else %}
+                                <p style="color:#718096;">No address added yet.</p>
+                                <a href="{% url 'accounts:customer_profile' %}" class="action-btn">Add Address</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            {% elif current_page == 'profile' %}
+                <!-- Profile Page -->
+                <div class="dashboard-main-box mx-3" style="width:100%;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,0.07);padding:32px;margin:0 auto;">
+                    <div class="welcome-header" style="text-align:center;margin-bottom:24px;">
+                        <h1 class="welcome-title" style="font-size:22px;margin-bottom:8px;">Account Details</h1>
+                        <p class="welcome-subtitle" style="font-size:13px;">Update your personal information</p>
+                    </div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    <form method="post" class="profile-form" style="background:#f8f9fa;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.07);">
+                        {% csrf_token %}
+                        <div class="form-group" style="margin-bottom:18px;">
+                            <label style="font-weight:600;color:#212529;">Email</label>
+                            <input type="email" value="{{ user.email }}" disabled class="form-control" style="background:#e9ecef;">
+                        </div>
+                        {% if form %}
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+                            {% for field in form %}
+                                {% if field.name != 'email' %}
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label for="{{ field.id_for_label }}" style="font-weight:500;color:#495057;">{{ field.label }}{% if field.field.required %} <span style="color:#e53e3e;">*</span>{% endif %}</label>
+                                    {% if field.name == 'gender' %}
+                                        <div class="gender-radio-group">
+                                            {{ field }}
+                                        </div>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <small style="color:#718096;font-size:11px;display:block;margin-top:2px;">{{ field.help_text }}</small>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div style="color:#e53e3e;font-size:11px;margin-top:2px;">
+                                            {% for error in field.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="action-btn" style="width:100%;margin-top:24px;">Save Changes</button>
                     </form>
                 </div>
-            </div>
-        </div>
-
-        <!-- My Orders Section -->
-        <div class="mobile-accordion-section" id="mobile-orders-section">
-            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-orders')">
-                <div class="accordion-icon-wrapper">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="accordion-title-text">My Orders</div>
-                <i class="fas fa-chevron-right accordion-chevron"></i>
-            </div>
-            <div class="mobile-accordion-content">
-                <div class="mobile-accordion-body">
-                    {% if orders %}
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        {% for order in orders %}
-                        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <div style="font-weight: 600; font-size: 0.9rem;">Order #{{ order.id|truncatechars:10 }}</div>
-                                <span style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; background: #d4edda; color: #155724;">{{ order.get_order_status_display }}</span>
-                            </div>
-                            <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">{{ order.created|date:"M d, Y" }}</div>
-                            <div style="font-weight: 600; margin-top: 0.5rem;">Total: ₹{{ order.total_amount }}</div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>No orders yet</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- My Address Section -->
-        <div class="mobile-accordion-section" id="mobile-address-section">
-            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-address')">
-                <div class="accordion-icon-wrapper">
-                    <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <div class="accordion-title-text">My Address</div>
-                <i class="fas fa-chevron-right accordion-chevron"></i>
-            </div>
-            <div class="mobile-accordion-content">
-                <div class="mobile-accordion-body">
-                    {% if user.profile.address %}
-                    <div style="line-height: 1.8;">
-                        <strong>{{ user.get_full_name|default:user.username }}</strong><br>
-                        {{ user.profile.address }}<br>
-                        {{ user.profile.city }}, {{ user.profile.state }} {{ user.profile.zipcode }}<br>
-                        {{ user.profile.country }}<br>
-                        Phone: {{ user.profile.phone }}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <p>No address saved. Please update your profile.</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Saved Payment Options Section -->
-        <div class="mobile-accordion-section" id="mobile-payment-section">
-            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-payment')">
-                <div class="accordion-icon-wrapper">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="accordion-title-text">Saved Payment Options</div>
-                <i class="fas fa-chevron-right accordion-chevron"></i>
-            </div>
-            <div class="mobile-accordion-content">
-                <div class="mobile-accordion-body">
-                    <div class="empty-state">
-                        <i class="fas fa-wallet"></i>
-                        <p>No saved payment methods</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifications Section -->
-        <div class="mobile-accordion-section" id="mobile-notifications-section">
-            <div class="mobile-accordion-header" onclick="toggleMobileAccordion('mobile-notifications')">
-                <div class="accordion-icon-wrapper">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div class="accordion-title-text">Notifications</div>
-                <i class="fas fa-chevron-right accordion-chevron"></i>
-            </div>
-            <div class="mobile-accordion-content">
-                <div class="mobile-accordion-body">
-                    {% if notifications %}
-                        {% for notification in notifications|slice:":5" %}
-                        <div style="padding: 1rem; border-bottom: 1px solid #f0f0f0; display: flex; gap: 1rem; {% if not notification.is_read %}background: #f8f9fa;{% endif %}">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #e3f2fd; color: #2196f3;">
-                                <i class="{{ notification.icon }}"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem;">{{ notification.title }}</div>
-                                <div style="font-size: 0.85rem; color: #666; line-height: 1.4;">{{ notification.message }}</div>
-                                <div style="font-size: 0.75rem; color: #999; margin-top: 0.25rem;">{{ notification.created|timesince }} ago</div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        <div style="padding: 1rem; text-align: center;">
-                            <a href="{% url 'accounts:customer_notifications' %}" style="color: #4CAF50; text-decoration: none; font-weight: 500;">View All Notifications</a>
-                        </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="far fa-bell"></i>
-                        <p>No notifications</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Logout Section -->
-        <div class="mobile-accordion-section" id="mobile-logout-section">
-            <a href="{% url 'accounts:logout' %}" class="mobile-accordion-header" style="color: #dc3545; border-top: 2px solid #f0f0f0;">
-                <div class="accordion-icon-wrapper" style="background: #ffe6e6; color: #dc3545;">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-                <div class="accordion-title-text" style="color: #dc3545; font-weight: 600;">Logout</div>
-                <i class="fas fa-chevron-right" style="color: #dc3545;"></i>
-            </a>
-        </div>
-
+            {% endif %}
+        </main>
     </div>
-</div>
 
-<!-- Bottom Navigation for Mobile -->
-<nav class="bottom-nav">
-    <div class="bottom-nav-container">
-        <a href="{% url 'store:home' %}" class="bottom-nav-item">
+    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <nav class="dashboard-bottom-nav">
+        <a href="{% url 'accounts:customer_dashboard' %}" class="dashboard-bottom-nav-item {% if current_page == 'home' %}active{% endif %}">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="{% url 'store:product_list' %}?category=gifts" class="bottom-nav-item">
-            <i class="fas fa-gift"></i>
-            <span>Gifts</span>
+        <a href="{% url 'accounts:customer_orders' %}" class="dashboard-bottom-nav-item {% if current_page == 'orders' %}active{% endif %}">
+            <i class="fas fa-box"></i>
+            <span>Orders</span>
         </a>
-        <a href="{% url 'store:product_list' %}?category=kids" class="bottom-nav-item">
-            <i class="fas fa-child"></i>
-            <span>Kids</span>
+        <a href="{% url 'accounts:customer_notifications' %}" class="dashboard-bottom-nav-item {% if current_page == 'notifications' %}active{% endif %}">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
         </a>
-        <a href="#" class="bottom-nav-item active" onclick="event.preventDefault();">
-            <i class="fas fa-user"></i>
+        <a href="{% url 'accounts:customer_addresses' %}" class="dashboard-bottom-nav-item {% if current_page == 'addresses' %}active{% endif %}">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Addresses</span>
+        </a>
+        <a href="{% url 'accounts:customer_profile' %}" class="dashboard-bottom-nav-item {% if current_page == 'profile' %}active{% endif %}">
+            <i class="fas fa-user-circle"></i>
             <span>Profile</span>
         </a>
-    </div>
-</nav>
-
-<script>
-function showSection(sectionName) {
-    // Hide all content sections
-    const allSections = document.querySelectorAll('.content-section');
-    allSections.forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    // Show the selected section
-    const selectedSection = document.getElementById('section-' + sectionName);
-    if (selectedSection) {
-        selectedSection.classList.add('active');
-    }
-    
-    // Update sidebar active state
-    const allSidebarItems = document.querySelectorAll('.sidebar-item');
-    allSidebarItems.forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('data-section') === sectionName) {
-            item.classList.add('active');
-        }
-    });
-    
-    // Update bottom nav active state
-    const allBottomNavItems = document.querySelectorAll('.bottom-nav-item');
-    allBottomNavItems.forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // Update breadcrumb
-    const breadcrumbMap = {
-        'profile': 'Profile Details',
-        'orders': 'My Orders',
-        'address': 'My Address',
-        'notifications': 'Notifications',
-        'policies': 'Policies'
-    };
-    const breadcrumb = document.getElementById('breadcrumb-current');
-    if (breadcrumb && breadcrumbMap[sectionName]) {
-        breadcrumb.textContent = breadcrumbMap[sectionName];
-    }
-    
-    // Update mobile title
-    const mobileTitle = document.getElementById('mobile-page-title');
-    if (mobileTitle && breadcrumbMap[sectionName]) {
-        mobileTitle.textContent = breadcrumbMap[sectionName];
-    }
-}
-
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Mobile accordion toggle function
-function toggleMobileAccordion(sectionName) {
-    const section = document.getElementById(sectionName + '-section');
-    if (!section) return;
-    
-    const allSections = document.querySelectorAll('.mobile-accordion-section');
-    
-    // Close all other sections
-    allSections.forEach(s => {
-        if (s !== section) {
-            s.classList.remove('active');
-        }
-    });
-    
-    // Toggle current section
-    section.classList.toggle('active');
-}
-</script>
+        <form action="{% url 'accounts:logout' %}" method="post" style="flex:1;display:flex;justify-content:center;align-items:center;margin:0;padding:0;">
+            {% csrf_token %}
+            <button type="submit" class="dashboard-bottom-nav-item" style="background:none;border:none;padding:0;color:#dc3545;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Log Out</span>
+            </button>
+        </form>
+    </nav>
+{% endblock %}
+{% block scripts %}
 {% endblock %}

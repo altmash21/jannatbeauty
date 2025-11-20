@@ -56,13 +56,11 @@
                                     <br><a href="{% url 'orders:track_shipment' item.order.id %}" style="color:#007bff;">Track</a>
                                     {% endif %}
                                 </div>
-                            {% elif item.order.paid %}
+                            {% elif not item.order.shiprocket_order_id %}
                                 <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" 
                                    style="padding:0.4rem 0.8rem; background:#28a745; color:#fff; text-decoration:none; border-radius:6px; font-size:0.85rem;">
-                                    Create Shipment
+                                    Create Shipment {% if not item.order.paid %}(COD){% endif %}
                                 </a>
-                            {% else %}
-                                <span style="color:#999; font-size:0.85rem;">Payment Pending</span>
                             {% endif %}
                         </td>
                     </tr>

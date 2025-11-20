@@ -4,36 +4,48 @@ from django.contrib.auth.models import User
 from .models import Profile, SellerProfile
 
 
-class CustomerRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
-    phone = forms.CharField(max_length=20, required=False)
+class CustomerRegistrationForm(forms.Form):
+    """Simple registration form with only email and password"""
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
+        'class': 'form-input',
+        'placeholder': 'your.email@example.com',
+        'autocomplete': 'email'
+    }))
+    password1 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Create a password',
+            'autocomplete': 'new-password'
+        }),
+        min_length=8,
+        help_text='Password must be at least 8 characters long.'
+    )
+    password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Confirm password',
+            'autocomplete': 'new-password'
+        }),
+        label='Confirm Password'
+    )
 
-    class Meta:
-        model = User
-        fields = ("username", "first_name", "last_name", "email", "password1", "password2")
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('An account with this email already exists.')
+        return email
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
-            field.widget.attrs['placeholder'] = field.label
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data["email"]
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
         
-        if commit:
-            user.save()
-            # Create or get customer profile
-            profile, created = Profile.objects.get_or_create(user=user)
-            profile.role = 'customer'
-            profile.phone = self.cleaned_data.get("phone", "")
-            profile.save()
-        return user
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Passwords do not match.')
+        
+        return cleaned_data
 
 
 class SellerRegistrationForm(UserCreationForm):
@@ -53,7 +65,14 @@ class SellerRegistrationForm(UserCreationForm):
             field.widget.attrs['class'] = 'form-control'
             if field_name == 'business_description':
                 field.widget.attrs['rows'] = 3
-            field.widget.attrs['placeholder'] = field.label
+            if field.label:
+                field.widget.attrs['placeholder'] = field.label
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and User.objects.filter(email=email).exists():
+            raise forms.ValidationError('An account with this email already exists.')
+        return email
 
     def save(self, commit=True):
         user = super().save(commit=False)

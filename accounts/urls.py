@@ -15,6 +15,21 @@ urlpatterns = [
     path('register/seller/', views.register_seller, name='register_seller'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
+
+    # AJAX: Check if email is taken
+    path('ajax/check-email/', views.check_email_taken, name='check_email_taken'),
+    
+    # Password Reset
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('reset-password/', views.reset_password, name='reset_password'),
+    
+    # Registration OTP
+    path('verify-registration-otp/', views.verify_registration_otp, name='verify_registration_otp'),
+
+    # Resend OTP endpoints (AJAX)
+    path('resend-registration-otp/', views.resend_registration_otp, name='resend_registration_otp'),
+    path('resend-passwordreset-otp/', views.resend_passwordreset_otp, name='resend_passwordreset_otp'),
     
     # ============================================================================
     # CUSTOMER ROUTES - /accounts/customer/*
@@ -23,6 +38,7 @@ urlpatterns = [
     path('customer/profile/', views.customer_profile, name='customer_profile'),
     path('customer/orders/', views.customer_orders, name='customer_orders'),
     path('customer/notifications/', views.customer_notifications, name='customer_notifications'),
+    path('customer/addresses/', views.customer_addresses, name='customer_addresses'),
     
     # ============================================================================
     # LEGACY ROUTES - For backward compatibility

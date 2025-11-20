@@ -15,6 +15,7 @@ class Order(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order_number = models.CharField(max_length=20, unique=True, blank=True, null=True, help_text='Human-readable order number')
     user = models.ForeignKey(User, related_name='orders', on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -26,6 +27,7 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
+    payment_method = models.CharField(max_length=20, choices=[('razorpay', 'Razorpay'), ('cod', 'Cash on Delivery')], default='cod', help_text='Payment method used for this order')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     
@@ -39,7 +41,19 @@ class Order(models.Model):
         ordering = ['-created']
 
     def __str__(self):
-        return f'Order {self.id}'
+        return f'Order {self.order_number or self.id}'
+    def save(self, *args, **kwargs):
+        # Auto-generate order_number if not set
+        if not self.order_number:
+            from django.utils import timezone
+            today = timezone.localdate()
+            prefix = 'JB'
+            date_str = today.strftime('%Y%m%d')
+            # Count orders for today to get sequence
+            from django.db.models import Count
+            daily_count = Order.objects.filter(created__date=today).count() + 1
+            self.order_number = f'{prefix}{date_str}{daily_count:03d}'
+        super().save(*args, **kwargs)
 
     @property
     def full_name(self):

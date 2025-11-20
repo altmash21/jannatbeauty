@@ -24,9 +24,9 @@ config = Config(repository=str(BASE_DIR))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-3=1a!&-m#23nips=*5&v-yw*tk_p+*-=1b7vi6!82nmf2)n&is')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost', cast=Csv())
 
 
 # Application definition
@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # CORS headers for Razorpay
+    'cloudinary_storage',  # Must be before 'django.contrib.staticfiles'
+    'cloudinary',  # Cloudinary integration
     'store.apps.StoreConfig',
     'cart.apps.CartConfig',
     'accounts.apps.AccountsConfig',
@@ -48,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.cart',
                 'accounts.context_processors.notification_count',
+                'store.context_processors.categories',
             ],
         },
     },
@@ -130,17 +135,47 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# ============================================================================
+# CLOUDINARY CONFIGURATION
+# ============================================================================
+# Cloudinary Configuration (optional - falls back to local storage if not configured)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+    'SECURE': True,
+    'STATICFILES_MANAGER': 'cloudinary_storage.storage.StaticHashedCloudinaryStorage',
+}
+
+# Media files - Use Cloudinary if configured, otherwise use local storage
+if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDINARY_STORAGE['API_SECRET']:
+    # Use Cloudinary for media files
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'  # Cloudinary will handle the actual URL
+    MEDIA_ROOT = None  # Not needed when using Cloudinary
+    CLOUDINARY_AVAILABLE = True
+else:
+    # Fallback to local storage if Cloudinary is not configured
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    CLOUDINARY_AVAILABLE = False
 
 # Login URLs
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Email Backend (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email Backend Configuration
+# For development: 'django.core.mail.backends.console.EmailBackend'
+# For production: 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 # Cart settings
 CART_SESSION_ID = 'cart'
@@ -149,9 +184,25 @@ CART_SESSION_ID = 'cart'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
         },
     },
     'root': {
@@ -159,9 +210,34 @@ LOGGING = {
         'level': 'INFO',
     },
     'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'store': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'accounts': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
         'cart': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'orders': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'services': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },
     },
@@ -191,17 +267,125 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False  # Use cookies, not sessions
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
-# Razorpay Test API Keys (Sandbox)
-RAZORPAY_KEY_ID = 'rzp_test_ReJMNUwpwzSgAm'
-RAZORPAY_KEY_SECRET = 'Sbg5n8v4Cgdf8IsinoiB2EWH'
-RAZORPAY_ENABLED = False  # Set to True to enable Razorpay payment
+# CSRF Trusted Origins - Configure in .env file for production
+CSRF_TRUSTED_ORIGINS = [
+    'https://checkout.razorpay.com',
+    'https://api.razorpay.com',
+    'https://attestive-gyroscopically-avery.ngrok-free.dev',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
+
+# Razorpay API Configuration
+# IMPORTANT: Set these in .env file - never commit credentials to version control
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
+RAZORPAY_ENABLED = config('RAZORPAY_ENABLED', default=True, cast=bool)
 
 # Shiprocket API Configuration
-# Use API credentials (not your login credentials)
-SHIPROCKET_API_EMAIL = 'altmash975@gmail.com'
-SHIPROCKET_API_PASSWORD = 'tCF&ZL!07EnZ1*K0'
-SHIPROCKET_API_URL = 'https://apiv2.shiprocket.in/v1/external'
-SHIPROCKET_ENABLED = False  # Set to True once account is unblocked
+SHIPROCKET_API_EMAIL = config('SHIPROCKET_API_EMAIL')
+SHIPROCKET_API_PASSWORD = config('SHIPROCKET_API_PASSWORD')
+SHIPROCKET_API_URL = config('SHIPROCKET_API_URL')
+SHIPROCKET_ENABLED = config('SHIPROCKET_ENABLED', default=True, cast=bool)
+SHIPROCKET_TOKEN = None
+SHIPROCKET_PICKUP_PINCODE = config('SHIPROCKET_PICKUP_PINCODE')
 
 # Currency setting
 CURRENCY = config('DJANGO_CURRENCY', default='INR')
+
+# ============================================================================
+# REDIS CONFIGURATION
+# ============================================================================
+# Redis Configuration (optional - falls back to local memory cache if Redis unavailable)
+REDIS_HOST = config('REDIS_HOST', default='localhost')
+REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+REDIS_DB = config('REDIS_DB', default=0, cast=int)
+REDIS_PASSWORD = config('REDIS_PASSWORD', default=None)
+
+# Try to use Redis, fallback to local memory cache if Redis is not available
+REDIS_AVAILABLE = False
+try:
+    import redis
+    # Test Redis connection with very short timeout to avoid blocking startup
+    redis_client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_DB,
+        password=REDIS_PASSWORD,
+        socket_connect_timeout=1,  # 1 second timeout
+        socket_timeout=1,
+        decode_responses=True
+    )
+    # Use a quick ping with timeout
+    redis_client.ping()
+    REDIS_AVAILABLE = True
+except (redis.ConnectionError, redis.TimeoutError, Exception) as e:
+    # Redis not available - use local memory cache
+    REDIS_AVAILABLE = False
+    # Only print in debug mode to avoid cluttering production logs
+    if DEBUG:
+        import sys
+        print(f"Redis not available, using local memory cache: {type(e).__name__}", file=sys.stderr)
+
+if REDIS_AVAILABLE:
+    # Use Redis for caching
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {
+                    'max_connections': 50,
+                    'retry_on_timeout': True,
+                },
+                'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+                'IGNORE_EXCEPTIONS': True,  # Don't break if Redis connection fails
+            },
+            'KEY_PREFIX': 'ecommerce',
+            'TIMEOUT': 300,  # 5 minutes default timeout
+        }
+    }
+    
+    # Optional: Use Redis for sessions (uncomment to enable)
+    # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    # SESSION_CACHE_ALIAS = 'default'
+else:
+    # Fallback to local memory cache if Redis is not available
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+            'TIMEOUT': 300,
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000
+            }
+        }
+    }
+
+# ============================================================================
+# CORS CONFIGURATION FOR RAZORPAY
+# ============================================================================
+CORS_ALLOWED_ORIGINS = [
+    "https://checkout.razorpay.com",
+    "https://api.razorpay.com",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Allow X-Frame-Options for Razorpay
+X_FRAME_OPTIONS = 'SAMEORIGIN'

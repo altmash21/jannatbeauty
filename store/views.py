@@ -3,6 +3,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from .models import Category, Product
 from .forms import ProductForm
 from accounts.models import SellerProfile
@@ -18,47 +21,57 @@ def product_list(request, category_slug=None):
         messages.error(request, 'Sellers cannot browse products.')
         return redirect('accounts:seller_dashboard')
     
-    category = None
-    categories = Category.objects.all()
+    # Build cache key based on filters
+    query = request.GET.get('q', '')
+    min_price = request.GET.get('min_price', '')
+    max_price = request.GET.get('max_price', '')
+    featured = request.GET.get('featured', '')
+    in_stock = request.GET.get('in_stock', '')
+    sort_by = request.GET.get('sort', 'name')
+    page = request.GET.get('page', '1')
     
-    # Only show approved products from approved sellers
+    # Only cache if no search/filters to avoid stale results
+    use_cache = not query and not min_price and not max_price and not featured and not in_stock
+    
+    category = None
+    # Cache categories list (they don't change often)
+    categories = cache.get('all_categories')
+    if categories is None:
+        categories = Category.objects.all()
+        cache.set('all_categories', categories, 60 * 60)  # Cache for 1 hour
+    
+    # Only show approved products from approved sellers (optimized query)
     products = Product.objects.filter(
         available=True,
         approved=True,
         seller__seller_profile__approval_status='approved'
-    )
+    ).select_related('category', 'seller', 'seller__seller_profile')
     
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
-        products = products.filter(category=category)
+        products = products.filter(category=category).select_related('category')
     
     # Search functionality
-    query = request.GET.get('q')
     if query:
         products = products.filter(
             Q(name__icontains=query) | Q(description__icontains=query)
         )
     
     # Price filtering
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
     if min_price:
         products = products.filter(price__gte=min_price)
     if max_price:
         products = products.filter(price__lte=max_price)
     
     # Featured filter
-    featured = request.GET.get('featured')
     if featured == 'true':
         products = products.filter(featured=True)
     
     # Stock filter
-    in_stock = request.GET.get('in_stock')
     if in_stock == 'true':
         products = products.filter(stock__gt=0)
     
     # Sorting
-    sort_by = request.GET.get('sort', 'name')
     valid_sorts = ['name', '-name', 'price', '-price', 'created', '-created']
     if sort_by in valid_sorts:
         products = products.order_by(sort_by)
@@ -67,7 +80,6 @@ def product_list(request, category_slug=None):
     
     # Pagination
     paginator = Paginator(products, 12)  # Show 12 products per page
-    page = request.GET.get('page')
     try:
         products = paginator.page(page)
     except PageNotAnInteger:
@@ -86,6 +98,7 @@ def product_list(request, category_slug=None):
         'in_stock': in_stock,
         'sort_by': sort_by,
     }
+    
     return render(request, 'store/product/list.html', context)
 
 
@@ -95,11 +108,32 @@ def product_detail(request, slug):
         messages.error(request, 'Sellers cannot view product details.')
         return redirect('accounts:seller_dashboard')
     
-    product = get_object_or_404(Product, slug=slug, available=True)
-    related_products = Product.objects.filter(
-        category=product.category, 
-        available=True
-    ).exclude(id=product.id)[:4]
+    # Cache product detail
+    cache_key = f'product_detail_{slug}'
+    cached_product = cache.get(cache_key)
+    
+    if cached_product:
+        product = cached_product
+    else:
+        product = get_object_or_404(
+            Product.objects.select_related('category', 'seller', 'seller__seller_profile')
+            .prefetch_related('reviews', 'images'),
+            slug=slug,
+            available=True
+        )
+        cache.set(cache_key, product, 60 * 30)  # Cache for 30 minutes
+    
+    # Cache related products
+    related_cache_key = f'related_products_{product.category_id}_{product.id}'
+    related_products = cache.get(related_cache_key)
+    
+    if related_products is None:
+        related_products = Product.objects.filter(
+            category=product.category, 
+            available=True,
+            approved=True
+        ).select_related('category', 'seller').exclude(id=product.id)[:4]
+        cache.set(related_cache_key, list(related_products), 60 * 30)  # Cache for 30 minutes
     
     # Get reviews data
     reviews = product.reviews.all() if hasattr(product, 'reviews') else []
@@ -129,27 +163,139 @@ def home(request):
         messages.error(request, 'Sellers cannot access the main store.')
         return redirect('accounts:seller_dashboard')
     
-    # Only surface approved products from approved sellers on the homepage
-    featured_products = Product.objects.filter(
-        featured=True,
-        available=True,
-        approved=True,
-        seller__seller_profile__approval_status='approved'
-    )[:8]
-    latest_products = Product.objects.all().order_by('-created')[:8]
-    categories = Category.objects.all()[:6]
+    # Cache home page data
+    new_arrivals = cache.get('home_new_arrivals')
+    if new_arrivals is None:
+        new_arrivals = Product.objects.filter(
+            major_category='new_arrivals',
+            available=True,
+            approved=True,
+            seller__seller_profile__approval_status='approved'
+        ).select_related('category', 'seller').order_by('-created')[:8]
+        cache.set('home_new_arrivals', list(new_arrivals), 60 * 15)  # Cache for 15 minutes
     
+    featured_products = cache.get('home_featured_products')
+    if featured_products is None:
+        featured_products = Product.objects.filter(
+            major_category='featured',
+            available=True,
+            approved=True,
+            seller__seller_profile__approval_status='approved'
+        ).select_related('category', 'seller').order_by('-created')[:8]
+        cache.set('home_featured_products', list(featured_products), 60 * 15)  # Cache for 15 minutes
+    
+    best_selling_products = cache.get('home_best_selling_products')
+    if best_selling_products is None:
+        best_selling_products = Product.objects.filter(
+            major_category='best_selling',
+            available=True,
+            approved=True,
+            seller__seller_profile__approval_status='approved'
+        ).select_related('category', 'seller').order_by('-created')[:8]
+        cache.set('home_best_selling_products', list(best_selling_products), 60 * 15)  # Cache for 15 minutes
+    
+    categories = cache.get('home_categories')
+    if categories is None:
+        categories = Category.objects.all()[:6]
+        cache.set('home_categories', list(categories), 60 * 60)  # Cache for 1 hour
+
     context = {
+        'new_arrivals': new_arrivals,
         'featured_products': featured_products,
-        'latest_products': latest_products,
+        'best_selling_products': best_selling_products,
         'categories': categories,
     }
     return render(request, 'store/home.html', context)
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from django.conf import settings
+import json
+from .models import Lead
+
+
+@csrf_exempt
+def submit_lead(request):
+    """Handle lead submission from discount popup"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name = data.get('name', '').strip()
+            phone = data.get('phone', '').strip()
+            
+            if not name or not phone:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Please provide both name and phone number.'
+                })
+            
+            # Create lead record
+            lead = Lead.objects.create(
+                name=name,
+                mobile=phone
+            )
+            
+            # Send email to admin
+            try:
+                subject = f'New Lead: {name} - 10% Discount Offer'
+                message = f'''
+New lead has been submitted from the discount popup:
+
+Name: {name}
+Mobile: {phone}
+Date: {lead.created.strftime("%Y-%m-%d %H:%M:%S")}
+
+This lead is interested in the 10% discount offer.
+You can view this lead in the admin dashboard.
+                '''
+                
+                # Get admin email from settings or use default
+                admin_email = getattr(settings, 'ADMIN_EMAIL', settings.DEFAULT_FROM_EMAIL)
+                
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [admin_email],
+                    fail_silently=False,
+                )
+                
+                lead.email_sent = True
+                lead.save()
+                
+            except Exception as e:
+                # Log error but don't fail the request
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Error sending lead email: {str(e)}')
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Thank you! Your details have been submitted. You will receive your 10% discount code shortly.'
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid data format.'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': 'Something went wrong. Please try again.'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+
 @login_required
 def add_product(request):
     """View for sellers to add new products"""
+    if not hasattr(request.user, 'profile'):
+        messages.error(request, 'Profile not found. Please contact support.')
+        return redirect('store:home')
     # Check if user is a seller or admin
     if not request.user.profile.is_seller and not request.user.is_superuser:
         messages.error(request, 'Access denied. Only sellers can add products.')
@@ -235,6 +381,9 @@ def edit_product(request, product_id):
 @login_required
 def delete_product(request, product_id):
     """View for sellers to delete their products"""
+    if not hasattr(request.user, 'profile'):
+        messages.error(request, 'Profile not found. Please contact support.')
+        return redirect('store:home')
     product = get_object_or_404(Product, id=product_id)
     
     # Check if user owns this product or is superuser

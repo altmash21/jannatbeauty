@@ -21,4 +21,7 @@ urlpatterns = [
     path('admin/manage-products/', views.admin_manage_products, name='admin_manage_products'),
     path('admin/approve-product/<int:product_id>/', views.approve_product, name='approve_product'),
     path('admin/manage-sellers/', views.manage_sellers, name='manage_sellers'),
+    
+    # Lead submission
+    path('submit-lead/', views.submit_lead, name='submit_lead'),
 ]

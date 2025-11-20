@@ -114,7 +114,7 @@ class ShiprocketAPI:
             "shipping_email": "",
             "shipping_phone": "",
             "order_items": order_items,
-            "payment_method": "Prepaid" if order.paid else "COD",
+            "payment_method": "COD" if order.payment_method == 'cod' else "Prepaid",
             "shipping_charges": 0,
             "giftwrap_charges": 0,
             "transaction_charges": 0,

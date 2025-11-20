@@ -1,6 +1,32 @@
+# Import login_required before using it
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+# Seller: Cancel entire order
+@login_required
+@require_POST
+def cancel_order(request, order_id):
+    """Seller cancels the entire order (sets status to 'cancelled' for order and all items)"""
+    if not hasattr(request.user, 'profile') or not request.user.profile.is_seller:
+        messages.error(request, 'Access denied. Only sellers can cancel orders.')
+        return redirect('accounts:seller_dashboard')
+
+    order = get_object_or_404(Order, id=order_id)
+    # Verify seller owns products in this order
+    seller_products = Product.objects.filter(seller=request.user)
+    if not order.items.filter(product__in=seller_products).exists():
+        messages.error(request, 'You do not have permission to cancel this order.')
+        return redirect('orders:seller_orders')
+
+    # Set status to cancelled for order and all items
+    order.order_status = 'cancelled'
+    order.save()
+    order.items.update(status='cancelled')
+    messages.success(request, f'Order {order.id} cancelled successfully.')
+    return redirect('orders:seller_orders')
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from .models import Order, OrderItem
 from cart.cart import Cart
 from store.models import Product
@@ -96,6 +122,23 @@ def checkout(request):
         messages.error(request, 'Your cart is empty.')
         return redirect('cart:cart_detail')
 
+    # Calculate MRP total (compare price) and discount
+    mrp_total = 0
+    compare_discount = 0
+    for item in cart:
+        product = item['product']
+        quantity = item['quantity']
+        if hasattr(product, 'compare_price') and product.compare_price and product.compare_price > 0:
+            mrp_total += float(product.compare_price) * quantity
+            if product.compare_price > product.price:
+                compare_discount += float(product.compare_price - product.price) * quantity
+        else:
+            # If no compare price, use regular price as MRP
+            mrp_total += float(product.price) * quantity
+
+    # Coupon discount (if any)
+    coupon_discount = request.session.get('coupon_discount', 0)
+
     # Ensure cart items persist after login
     request.session['cart'] = cart.serialize()
 
@@ -112,6 +155,11 @@ def checkout(request):
         city = request.POST.get('city', '').strip()
         state = request.POST.get('state', '').strip()
         zipcode = request.POST.get('zipcode', '').strip()
+        payment_method = request.POST.get('payment', 'cod')  # Default to COD instead of razorpay
+        print(f"DEBUG: Payment method from form: {payment_method}")
+        print(f"DEBUG: All POST data: {dict(request.POST)}")
+        print(f"DEBUG: Payment method comparison: payment_method == 'razorpay' is {payment_method == 'razorpay'}")
+        print(f"DEBUG: Payment method comparison: payment_method == 'cod' is {payment_method == 'cod'}")
 
         # Basic validation - ensure required fields are present
         missing = []
@@ -133,49 +181,118 @@ def checkout(request):
             return render(request, 'orders/checkout.html', {
                 'cart': cart,
                 'initial_data': initial_data,
-                'discount': 0  # Add discount to context
+                'compare_discount': compare_discount,
+                'coupon_discount': coupon_discount,
+                'discount': compare_discount + float(coupon_discount),
+                'subtotal': cart.get_total_price()
             })
 
-        # Create order
-        order = Order.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            address=address,
-            city=city,
-            state=state,
-            zipcode=zipcode,
-            total_amount=cart.get_total_price()
-        )
-        order_id = str(order.id)
+        # Shiprocket pincode serviceability check (after all fields are extracted and validated)
+        if zipcode:
+            from .shiprocket_api import check_pincode_serviceability
+            
+            is_cod = payment_method == 'cod' or payment_method == 'cashOnDelivery'
+            payment_type = 'cod' if is_cod else 'prepaid'
+            print(f"DEBUG: is_cod: {is_cod}, payment_type: {payment_type}")
+            
+            serviceable = check_pincode_serviceability(zipcode, payment_type)
+            print(f"DEBUG: Serviceability result: {serviceable}")
+            
+            if not serviceable:
+                messages.error(request, f'Shipping is not available for pincode {zipcode} with the selected payment method.')
+                initial_data = {
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'address': address,
+                    'city': city,
+                    'state': state,
+                    'zipcode': zipcode,
+                }
+                return render(request, 'orders/checkout.html', {
+                    'cart': cart,
+                    'initial_data': initial_data,
+                    'compare_discount': compare_discount,
+                    'coupon_discount': coupon_discount,
+                    'discount': compare_discount + float(coupon_discount),
+                    'subtotal': cart.get_total_price()
+                })
 
-        # Create order items and update stock
+        # Validate all products before creating order
         for item in cart:
             product = item['product']
             quantity = item['quantity']
+            # Refresh product from database to get latest stock
+            product.refresh_from_db()
+            if not product.available or not product.approved:
+                messages.error(request, f'Product "{product.name}" is no longer available. (Available: {product.available}, Approved: {product.approved})')
+                return redirect('cart:cart_detail')
             if product.stock < quantity:
                 messages.error(request, f'Insufficient stock for {product.name}. Only {product.stock} available.')
                 return redirect('cart:cart_detail')
-            OrderItem.objects.create(
-                order=order,
-                product=product,
-                price=item['price'],
-                quantity=quantity
-            )
-            product.stock -= quantity
-            product.save()
 
-        # Check if Razorpay is enabled
-        if settings.RAZORPAY_ENABLED:
+        # Create order and order items atomically
+        with transaction.atomic():
+            # Calculate final amount properly
+            # cart.get_total_price() already includes discounted prices
+            # Only apply coupon discount, not both discounts
+            cart_total = cart.get_total_price()
+            final_amount = max(1.00, cart_total - float(coupon_discount))  # Ensure minimum ₹1 for Razorpay
+            
+            order = Order.objects.create(
+                user=request.user if request.user.is_authenticated else None,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                address=address,
+                city=city,
+                state=state,
+                zipcode=zipcode,
+                payment_method=payment_method,
+                total_amount=final_amount
+            )
+            order_id = str(order.id)
+
+            # Create order items and update stock (all validated)
+            for item in cart:
+                product = item['product']
+                quantity = item['quantity']
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    price=item['price'],
+                    quantity=quantity
+                )
+                # Update stock atomically
+                product.stock -= quantity
+                product.save(update_fields=['stock'])
+
+        # Handle payment method
+        print(f"DEBUG: About to check payment method. payment_method='{payment_method}', RAZORPAY_ENABLED={getattr(settings, 'RAZORPAY_ENABLED', None)}")
+        if payment_method == 'razorpay' and settings.RAZORPAY_ENABLED:
+            print("DEBUG: Creating Razorpay order")
             # Razorpay order creation
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             amount = int(float(order.total_amount) * 100)  # Razorpay expects paise
+
+            # Debug logging
+            print(f"DEBUG: Order total_amount: {order.total_amount}")
+            print(f"DEBUG: Amount in paise: {amount}")
+
+            if amount < 100:  # Less than ₹1
+                messages.error(request, f'Order amount (₹{order.total_amount}) is too low. Minimum amount is ₹1.')
+                order.delete()  # Remove the invalid order
+                return redirect('cart:cart_detail')
+
             data = {
                 "amount": amount,
                 "currency": "INR",
                 "receipt": order_id,
-                "payment_capture": 1
+                "payment_capture": 1,
+                "notes": {
+                    "order_type": "ecommerce",
+                    "customer_name": f"{first_name} {last_name}"
+                }
             }
             razorpay_order = client.order.create(data=data)
             razorpay_order_id = razorpay_order['id']
@@ -197,11 +314,16 @@ def checkout(request):
                 'razorpay_key_id': settings.RAZORPAY_KEY_ID,
                 'amount': amount,
                 'order_id': order_id,
-                'discount': 0  # Add discount to context
+                'mrp_total': mrp_total,
+                'compare_discount': compare_discount,
+                'coupon_discount': coupon_discount,
+                'discount': compare_discount + float(coupon_discount),
+                'cart_total': final_amount,  # Use the same amount as order
+                'subtotal': cart.get_total_price()
             })
         else:
-            # Payment disabled - mark order as paid and complete
-            order.paid = True
+            print("DEBUG: Processing COD order - NOT marking as paid, redirecting")
+            # Cash on Delivery - do not mark as paid (COD should remain unpaid until delivery)
             order.save()
             cart.clear()
             messages.success(request, f'Order {order.id} placed successfully!')
@@ -223,104 +345,24 @@ def checkout(request):
         }
 
     subtotal = cart.get_total_price()
-    discount = 0  # You can update this logic for real discounts
-    cart_total = subtotal - discount
+    total_discount = compare_discount + float(coupon_discount)
+    cart_total = max(1.00, subtotal - float(coupon_discount))  # Final amount (actual price minus coupon), minimum ₹1
     return render(request, 'orders/checkout.html', {
         'cart': cart,
         'initial_data': initial_data,
-        'discount': discount,
+        'mrp_total': mrp_total,  # Price shown as "Price (X items)"
+        'compare_discount': compare_discount,
+        'coupon_discount': coupon_discount,
+        'discount': total_discount,
         'cart_total': cart_total,
         'subtotal': subtotal
     })
 
-    # --- Confirmation view should be outside checkout ---
-    def confirmation(request, order_id):
-        order = get_object_or_404(Order, id=order_id)
-        return render(request, 'orders/confirmation.html', {'order': order})
-        order_id = str(order.id)
 
-        # Create order items and update stock
-        for item in cart:
-            product = item['product']
-            quantity = item['quantity']
-            if product.stock < quantity:
-                messages.error(request, f'Insufficient stock for {product.name}. Only {product.stock} available.')
-                return redirect('cart:cart_detail')
-            OrderItem.objects.create(
-                order=order,
-                product=product,
-                price=item['price'],
-                quantity=quantity
-            )
-            product.stock -= quantity
-            product.save()
-
-        # Check if Razorpay is enabled
-        if settings.RAZORPAY_ENABLED:
-            # Razorpay order creation
-            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-            amount = int(float(order.total_amount) * 100)  # Razorpay expects paise
-            data = {
-                "amount": amount,
-                "currency": "INR",
-                "receipt": order_id,
-                
-                "payment_capture": 1
-            }
-            razorpay_order = client.order.create(data=data)
-            razorpay_order_id = razorpay_order['id']
-
-            # Do not clear cart yet; wait for payment verification
-
-            initial_data = {
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-                'address': address,
-                'city': city,
-                'state': state,
-                'zipcode': zipcode,
-            }
-            return render(request, 'orders/checkout.html', {
-                'cart': cart,
-                'initial_data': initial_data,
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_key_id': settings.RAZORPAY_KEY_ID,
-                'amount': amount,
-                'order_id': order_id,
-                'discount': 0  # Add discount to context
-            })
-        else:
-            # Payment disabled - mark order as paid and complete
-            order.paid = True
-            order.save()
-            cart.clear()
-            messages.success(request, f'Order {order.id} placed successfully!')
-            return redirect('orders:confirmation', order_id=order.id)
 def confirmation(request, order_id):
+    """Order confirmation page"""
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/confirmation.html', {'order': order})
-
-    # Pre-fill form data for authenticated users
-    initial_data = {}
-    if request.user.is_authenticated:
-        user = request.user
-        profile = user.profile
-        initial_data = {
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,
-            'address': profile.address,
-            'city': profile.city,
-            'state': profile.state,
-            'zipcode': profile.zipcode,
-        }
-
-    return render(request, 'orders/checkout.html', {
-        'cart': cart,
-        'initial_data': initial_data,
-        'discount': 0  # Add discount to context, default to 0 for now
-    })
 
 
 # Razorpay payment verification view
@@ -332,25 +374,45 @@ def razorpay_verify(request):
         signature = request.POST.get('razorpay_signature')
         order_id = request.POST.get('order_id')
 
-        # Verify signature
-        generated_signature = hmac.new(
-            bytes(settings.RAZORPAY_KEY_SECRET, 'utf-8'),
-            bytes(razorpay_order_id + '|' + payment_id, 'utf-8'),
-            hashlib.sha256
-        ).hexdigest()
-        if generated_signature == signature:
-            # Mark order as paid
-            order = get_object_or_404(Order, id=order_id)
-            order.paid = True
-            order.save()
-            # Clear cart for this session
-            cart = Cart(request)
-            cart.clear()
-            messages.success(request, f'Payment successful! Order {order.id} placed.')
-            return redirect('orders:order_detail', order_id=order.id)
-        else:
-            messages.error(request, 'Payment verification failed. Please contact support.')
-            return redirect('orders:checkout')
+        print(f"DEBUG: Payment verification data:")
+        print(f"  Payment ID: {payment_id}")
+        print(f"  Razorpay Order ID: {razorpay_order_id}")
+        print(f"  Signature: {signature}")
+        print(f"  Order ID: {order_id}")
+
+        if not all([payment_id, razorpay_order_id, signature, order_id]):
+            messages.error(request, 'Missing payment verification data.')
+            return redirect('cart:cart_detail')
+
+        try:
+            # Verify signature
+            generated_signature = hmac.new(
+                bytes(settings.RAZORPAY_KEY_SECRET, 'utf-8'),
+                bytes(razorpay_order_id + '|' + payment_id, 'utf-8'),
+                hashlib.sha256
+            ).hexdigest()
+            
+            print(f"DEBUG: Generated signature: {generated_signature}")
+            print(f"DEBUG: Received signature: {signature}")
+            
+            if generated_signature == signature:
+                # Mark order as paid
+                order = get_object_or_404(Order, id=order_id)
+                order.paid = True
+                order.save()
+                # Clear cart for this session
+                cart = Cart(request)
+                cart.clear()
+                messages.success(request, f'Payment successful! Order {order.id} placed.')
+                return redirect('orders:order_detail', order_id=order.id)
+            else:
+                print(f"DEBUG: Signature mismatch!")
+                messages.error(request, 'Payment verification failed. Signature mismatch.')
+                return redirect('cart:cart_detail')
+        except Exception as e:
+            print(f"DEBUG: Exception during verification: {e}")
+            messages.error(request, f'Payment verification error: {str(e)}')
+            return redirect('cart:cart_detail')
     return redirect('store:home')
 
 def order_detail(request, order_id):
@@ -391,7 +453,7 @@ def create_shiprocket_order(request, order_id):
         messages.warning(request, 'Shiprocket order already created for this order.')
         return redirect('orders:seller_orders')
     
-    # Create Shiprocket order
+    # Do not mark as paid for COD orders; Shiprocket will receive correct payment method
     shiprocket = ShiprocketAPI()
     result = shiprocket.create_order(order)
     

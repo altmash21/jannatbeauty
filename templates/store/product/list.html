@@ -1,4 +1,4 @@
-{% extends "base_plain.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block title %}Products{% endblock %}
 {% block extra_css %}
@@ -228,6 +228,168 @@
         .product-buy-actions {
             padding: 0 15px;
         }
+
+        /* Modernized filter sidebar styles */
+        .filter-sidebar {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(140, 144, 126, 0.07);
+            padding: 2rem 1.5rem;
+        }
+
+        .filter-widget h5 {
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            color: #06402B;
+            font-weight: 700;
+        }
+
+        .filter-widget a {
+            font-size: 1rem;
+            color: #222;
+            font-weight: 500;
+        }
+
+        .filter-widget a:hover {
+            color: #8C907E;
+        }
+
+        .price-range a {
+            font-size: 0.95rem;
+            color: #176a3a;
+            font-weight: 500;
+        }
+
+        /* Pagination visibility */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .page-item.active .page-link {
+            background-color: #8C907E;
+            border-color: #8C907E;
+            color: white;
+        }
+
+        .page-link {
+            border: 1px solid #8C907E;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            margin: 0 0.125rem;
+            color: #8C907E;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .page-link:hover {
+            background-color: #8C907E;
+            color: white;
+        }
+
+        /* Mobile Filter/Sort Bottom Bar */
+        .mobile-filter-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #e0e0e0;
+            z-index: 1040;
+            height: 60px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-mobile-filter,
+        .btn-mobile-sort {
+            background: #fff;
+            border: none;
+            border-radius: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            height: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-mobile-filter {
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .btn-mobile-filter:hover,
+        .btn-mobile-sort:hover {
+            background: #f8f9fa;
+            color: #8C907E;
+        }
+
+        /* Mobile Filter Offcanvas */
+        .offcanvas {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(140, 144, 126, 0.07);
+        }
+
+        .offcanvas-header {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .offcanvas-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #06402B;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .btn-add-to-cart,
+            .btn-add-to-wishlist {
+                width: 35px;
+                height: 35px;
+            }
+
+            .btn-buy-now {
+                padding: 8px 14px;
+                font-size: 11px;
+                max-width: 120px;
+            }
+
+            .mobile-filter-bar {
+                height: 50px;
+            }
+
+            .btn-mobile-filter,
+            .btn-mobile-sort {
+                height: 50px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .btn-buy-now {
+                padding: 6px 10px;
+                font-size: 10px;
+                max-width: 90px;
+            }
+
+            .mobile-filter-bar {
+                height: 45px;
+            }
+
+            .btn-mobile-filter,
+            .btn-mobile-sort {
+                height: 45px;
+                font-size: 12px;
+            }
+        }
     </style>
 {% endblock %}
 
@@ -240,7 +402,7 @@
                     {% comment %} <h1 class="display-4 mb-3">Our Shop</h1> {% endcomment %}
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center">
-                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Shop</li>
                         </ol>
                     </nav>
@@ -259,17 +421,28 @@
                         <!-- Categories -->
                         <div class="filter-widget mb-4">
                             <h5 class="text-uppercase mb-3">Categories</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-2">
+                            <ul class="list-unstyled" style="margin-bottom: 2rem;">
+                                <li class="mb-2 {% if not request.GET.category %}active{% endif %}" style="border-bottom: 1px solid #f2f2f2; padding-bottom: 0.5rem;">
                                     <a href="{% url 'store:product_list' %}" class="text-decoration-none d-flex justify-content-between">
-                                        <span>All Products</span>
+                                        <span><svg width="18" height="18" style="margin-right: 6px; vertical-align: middle;"><use xlink:href="#grid"></use></svg>All Products</span>
                                         <span class="text-muted">({{ products.paginator.count }})</span>
                                     </a>
                                 </li>
                                 {% for cat in categories %}
-                                <li class="mb-2">
-                                    <a href="{{ cat.get_absolute_url }}" class="text-decoration-none d-flex justify-content-between">
-                                        <span>{{ cat.name }}</span>
+                                <li class="mb-2 {% if cat.products.count == 0 %}text-muted disabled{% endif %} {% if request.GET.category == cat.slug %}active{% endif %}" style="border-bottom: 1px solid #f2f2f2; padding-bottom: 0.5rem;">
+                                    <a href="{{ cat.get_absolute_url }}" class="text-decoration-none d-flex justify-content-between {% if cat.products.count == 0 %}pointer-events-none{% endif %}">
+                                        <span>
+                                            {% if cat.name|lower == 'dua & islamic decor' %}
+                                                <svg width="18" height="18" style="margin-right: 6px; vertical-align: middle;"><use xlink:href="#image"></use></svg>
+                                            {% elif cat.name|lower == 'prayer essentials' %}
+                                                <svg width="18" height="18" style="margin-right: 6px; vertical-align: middle;"><use xlink:href="#pray"></use></svg>
+                                            {% elif cat.name|lower == 'quran' %}
+                                                <svg width="18" height="18" style="margin-right: 6px; vertical-align: middle;"><use xlink:href="#book"></use></svg>
+                                            {% else %}
+                                                <svg width="18" height="18" style="margin-right: 6px; vertical-align: middle;"><use xlink:href="#tag"></use></svg>
+                                            {% endif %}
+                                            {{ cat.name }}
+                                        </span>
                                         <span class="text-muted">({{ cat.products.count }})</span>
                                     </a>
                                 </li>
@@ -282,18 +455,10 @@
                             <h5 class="text-uppercase mb-3">Price Range</h5>
                             <div class="price-range">
                                 <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <a href="?min_price=0&max_price=50" class="text-decoration-none">Under ₹50</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="?min_price=50&max_price=100" class="text-decoration-none">₹50 - ₹100</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="?min_price=100&max_price=200" class="text-decoration-none">₹100 - ₹200</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="?min_price=200" class="text-decoration-none">Above ₹200</a>
-                                    </li>
+                                    <li class="mb-2"><a href="?min_price=0&max_price=50" class="text-decoration-none">Under ₹50</a></li>
+                                    <li class="mb-2"><a href="?min_price=50&max_price=100" class="text-decoration-none">₹50 - ₹100</a></li>
+                                    <li class="mb-2"><a href="?min_price=100&max_price=200" class="text-decoration-none">₹100 - ₹200</a></li>
+                                    <li class="mb-2"><a href="?min_price=200" class="text-decoration-none">Above ₹200</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -302,6 +467,8 @@
 
                 <!-- Products Grid -->
                 <div class="col-lg-9">
+                    <!-- Payment Option Section -->
+                   
                     <!-- Toolbar -->
                     <div class="d-none d-lg-flex justify-content-between align-items-center mb-4">
                         <p class="text-muted mb-0">Showing 1-12 of 48 results</p>
@@ -337,7 +504,7 @@
                                     <div class="modern-product-actions">
                                         <form method="post" action="{% url 'cart:cart_add' product.id %}">
                                             {% csrf_token %}
-                                            <button class="btn-add-to-cart" title="Add to Cart">
+                                            <button class="btn-add-to-cart" title="{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}" {% if product.stock == 0 %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}>
                                                 <svg width="16" height="16">
                                                     <use xlink:href="#cart"></use>
                                                 </svg>
@@ -375,6 +542,7 @@
         
 
                     <!-- Pagination -->
+                    {% if products.paginator.num_pages > 1 and products.paginator.count > products.paginator.per_page %}
                     <nav aria-label="Page navigation" class="mt-5">
                         <ul class="pagination justify-content-center">
                             <li class="page-item disabled">
@@ -389,6 +557,7 @@
                             </li>
                         </ul>
                     </nav>
+                    {% endif %}
                 </div>
             </div>
         </div>

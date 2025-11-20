@@ -1,0 +1,269 @@
+@font-face {
+    font-family: "Poppins-Regular";
+    src: url("fonts/poppins/Poppins-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Poppins-SemiBold";
+    src: url("fonts/poppins/Poppins-SemiBold.ttf");
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 0;
+}
+
+input,
+textarea,
+select,
+button {
+    font-family: "Poppins-Regular";
+    color: #333;
+    font-size: 13px;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul {
+    margin: 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+ul {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+:focus {
+    outline: none;
+}
+
+.wrapper {
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inner {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    max-width: 700px;
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.inner .image-holder {
+    width: 40%;
+    background: linear-gradient(135deg, #06402B 0%, #0a5a3f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0;
+}
+
+.inner .image-holder img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 0 0 0 14px;
+}
+
+.inner form {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 18px;
+    min-height: 80vh;
+}
+
+.inner h3 {
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #06402B;
+    letter-spacing: 0.5px;
+}
+
+.form-group {
+    display: flex;
+}
+
+.form-group input {
+    width: 50%;
+}
+
+.form-group input:first-child {
+    margin-right: 25px;
+}
+
+.form-wrapper {
+    width: 100%;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.form-wrapper i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 32px 8px 10px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f8fafc;
+    color: #222;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: #06402B;
+    background: #fff;
+}
+
+label {
+    font-size: 12px;
+    color: #64748b;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 14px;
+    background: #06402B;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+button[type="submit"]:hover {
+    background: #0a5a3f;
+}
+
+.alert {
+    width: 100%;
+    font-size: 12px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.mb-3 {
+    margin-bottom: 12px;
+}
+
+/* Links */
+form a {
+    font-size: 12px;
+    color: #06402B;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 8px;
+    display: inline-block;
+}
+
+form a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .inner {
+        max-width: 98vw;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .image-holder {
+        width: 100%;
+        height: 180px;
+        border-radius: 14px 14px 0 0;
+    }
+
+    .image-holder img {
+        border-radius: 14px 14px 0 0;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    form {
+        width: 100%;
+        min-height: 0;
+        padding: 18px 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .inner {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+    }
+
+    .image-holder {
+        height: 120px;
+        padding: 0;
+    }
+
+    h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .form-control {
+        font-size: 12px;
+        padding: 7px 28px 7px 8px;
+    }
+
+    button[type="submit"] {
+        font-size: 13px;
+        padding: 8px 0;
+    }
+}
+
+/*# sourceMappingURL=style.css.map */

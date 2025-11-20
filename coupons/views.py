@@ -4,6 +4,10 @@ from django.contrib import messages
 from django.http import JsonResponse
 from .models import Coupon
 from cart.cart import Cart
+import random
+import string
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 @login_required
 def apply_coupon(request):
@@ -53,3 +57,63 @@ def remove_coupon(request):
         messages.success(request, 'Coupon removed.')
     
     return redirect('cart:cart_detail')
+
+@csrf_exempt
+def get_discount_popup(request):
+    """Handle discount popup form submission"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name = data.get('name', '').strip()
+            phone = data.get('phone', '').strip()
+            
+            if not name or not phone:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Please provide both name and phone number.'
+                })
+            
+            # Check if phone already used (optional - remove if you want to allow multiple uses)
+            existing_coupon = Coupon.objects.filter(
+                code__icontains=phone[-4:],  # Check last 4 digits of phone
+                active=True
+            ).first()
+            
+            if existing_coupon:
+                return JsonResponse({
+                    'success': True,
+                    'coupon_code': existing_coupon.code,
+                    'message': f'Welcome back {name}! Use your existing coupon code.'
+                })
+            
+            # Generate unique coupon code
+            code = f"WELCOME{phone[-4:]}{''.join(random.choices(string.ascii_uppercase, k=2))}"
+            
+            # Create coupon
+            coupon = Coupon.objects.create(
+                code=code,
+                discount_type='percentage',
+                discount=10,
+                min_purchase_amount=100,  # Minimum ₹100 purchase
+                usage_limit=1,
+                active=True,
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'coupon_code': coupon.code,
+                'message': f'Congratulations {name}! You got 10% off coupon: {coupon.code}'
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid data format.'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': 'Something went wrong. Please try again.'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})

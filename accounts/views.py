@@ -85,13 +85,20 @@ def user_logout(request):
 
 @login_required
 def customer_dashboard(request):
-    """Main customer dashboard with accordion sections"""
+    """Main customer dashboard with Myntra-style layout"""
     if request.user.profile.is_seller:
         messages.error(request, 'Access denied. This is a customer-only area.')
         return redirect('accounts:seller_dashboard')
     
     # Get customer data
-    orders = Order.objects.filter(user=request.user).order_by('-created')[:10]
+    orders = Order.objects.filter(user=request.user).order_by('-created')
+    recent_orders = orders[:5]  # Last 5 orders for overview
+    
+    # Calculate statistics
+    total_orders = orders.count()
+    total_spent = sum(order.get_total_cost() for order in orders)
+    wishlist_count = 0  # You can add wishlist model later
+    address_count = 0   # You can add address model later
     
     # Get notifications
     notifications = []
@@ -106,10 +113,15 @@ def customer_dashboard(request):
     
     context = {
         'orders': orders,
+        'recent_orders': recent_orders,
         'notifications': notifications,
         'profile': request.user.profile,
+        'total_orders': total_orders,
+        'total_spent': total_spent,
+        'wishlist_count': wishlist_count,
+        'address_count': address_count,
     }
-    return render(request, 'accounts/customer_dashboard.html', context)
+    return render(request, 'accounts/customer_dashboard_myntra.html', context)
 
 
 @login_required

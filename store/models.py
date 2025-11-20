@@ -59,6 +59,13 @@ class SubCategory(models.Model):
 class Product(models.Model):
     seller = models.ForeignKey(User, related_name='products', on_delete=models.CASCADE, default=1)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
+    MAJOR_CATEGORY_CHOICES = [
+        ('new_arrivals', 'New Arrivals'),
+        ('featured', 'Featured'),
+        ('best_selling', 'Best Selling'),
+        ('none', 'None'),
+    ]
+    major_category = models.CharField(max_length=20, choices=MAJOR_CATEGORY_CHOICES, default='new_arrivals', blank=True)
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     description = models.TextField()
@@ -151,5 +158,22 @@ class ProductImage(models.Model):
         if not self.alt_text:
             self.alt_text = f"Image of {self.product.name}"
         super().save(*args, **kwargs)
+
+
+class Lead(models.Model):
+    """Model to store lead information from discount popup"""
+    name = models.CharField(max_length=100)
+    mobile = models.CharField(max_length=15)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    email_sent = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-created']
+        verbose_name = 'Lead'
+        verbose_name_plural = 'Leads'
+    
+    def __str__(self):
+        return f"{self.name} - {self.mobile}"
 
 

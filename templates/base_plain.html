@@ -1,45 +1,23 @@
-  <!-- Mobile Bottom Navbar -->
-  <nav class="mobile-bottom-navbar d-md-none d-lg-none d-xl-none fixed-bottom bg-white border-top shadow-sm">
-    <div class="container-fluid px-0">
-      <div class="d-flex justify-content-around align-items-center" style="height: 56px;">
-          <a href="{% url 'store:home' %}" class="text-center text-dark text-decoration-none flex-fill">
-            <i class="fa-solid fa-house fa-lg mb-1"></i>
-            <div style="font-size: 0.8rem;">Home</div>
-          </a>
-          <a href="{% url 'store:product_list' %}" class="text-center text-dark text-decoration-none flex-fill">
-            <i class="fa-solid fa-store fa-lg mb-1"></i>
-            <div style="font-size: 0.8rem;">Shop</div>
-          </a>
-          <a href="{% url 'cart:cart_detail' %}" class="text-center text-dark text-decoration-none flex-fill">
-            <i class="fa-solid fa-cart-shopping fa-lg mb-1"></i>
-            <div style="font-size: 0.8rem;">Cart</div>
-          </a>
-          <a href="{% url 'accounts:login' %}" class="text-center text-dark text-decoration-none flex-fill">
-            <i class="fa-solid fa-user fa-lg mb-1"></i>
-            <div style="font-size: 0.8rem;">Sign In</div>
-          </a>
-      </div>
-    </div>
-  </nav>
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>{% block title %}Kaira - Bootstrap 5 Fashion Store HTML CSS Template{% endblock %}</title>
+  <title>{% block title %}Jannat Beauty | jannatbeauty.in{% endblock %}</title>
+  <meta name="description" content="Jannat Beauty - Shop authentic Islamic products at jannatbeauty.in. Premium quality, fast shipping, secure payments.">
+  <meta property="og:site_name" content="Jannat Beauty">
+  <meta property="og:url" content="https://jannatbeauty.in/">
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="format-detection" content="telephone=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="author" content="TemplatesJungle">
+  <meta name="author" content="Jannat Beauty - jannatbeauty.in">
   <meta name="keywords" content="ecommerce,fashion,store">
-  <meta name="description" content="Bootstrap 5 Fashion Store HTML CSS Template">
+  <meta name="description" content="Bootstrap 5">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{% static 'css/vendor.css' %}">
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papm8z+Yd1Q6Xo8XzYkFQ6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q6l0e6Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
   <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 
@@ -48,8 +26,79 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap"
     rel="stylesheet">
+  <style>
+    @media (max-width: 575px) {
+      footer {
+        padding-bottom: 70px !important;
+      }
+    }
+    /* Remove outline from hamburger menu button on all screens */
+    .navbar-toggler,
+    .navbar-toggler:focus,
+    .navbar-toggler:active,
+    .navbar-toggler:focus-visible,
+    .navbar-toggler:hover,
+    .navbar-toggler:not(:disabled):not(.disabled):active,
+    .navbar-toggler:not(:disabled):not(.disabled):active:focus {
+      outline: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+    /* Force navbar background color to stay constant */
+    .navbar,
+    .navbar.fixed-top,
+    .navbar.bg-light,
+    .navbar.bg-white {
+      background-color: #fff !important;
+      transition: none !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
     
+    /* Desktop Navbar Layout */
+    @media (min-width: 768px) {
+      .navbar .d-none.d-md-flex {
+        padding: 0;
+      }
+      
+      .navbar .d-none.d-md-flex .row {
+        margin: 0;
+        padding: 12px 0;
+      }
+    }
     
+    /* Category Bar Below Navbar */
+    .category-bar-below-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      margin-top: 0;
+    }
+    
+    @media (min-width: 768px) {
+      .category-bar-below-nav {
+        top: 76px; /* Height of fixed navbar */
+      }
+    }
+    
+    .category-bar-below-nav a:hover {
+      color: #06402B !important;
+      text-decoration: underline !important;
+    }
+    
+    /* Adjust main content padding for category bar */
+    @media (min-width: 768px) {
+      main {
+        padding-top: 20px;
+      }
+    }
+    
+    /* Hide search popup on desktop */
+    @media (min-width: 768px) {
+      .search-popup {
+        display: none !important;
+      }
+    }
+  </style>
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -177,51 +226,17 @@
         <path fill="currentColor"
           d="M7.953 3.788a.5.5 0 0 0-.906 0L6.08 5.85l-2.154.33a.5.5 0 0 0-.283.843l1.574 1.613l-.373 2.284a.5.5 0 0 0 .736.518l1.92-1.063l1.921 1.063a.5.5 0 0 0 .736-.519l-.373-2.283l1.574-1.613a.5.5 0 0 0-.283-.844L8.921 5.85l-.968-2.062Z" />
       </symbol>
+      <symbol xmlns="http://www.w3.org/2000/svg" id="home" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M3 12l9-9 9 9h-3v9h-12v-9h-3z"/>
+      </symbol>
+      <symbol xmlns="http://www.w3.org/2000/svg" id="shop" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M7 18c-1.104 0-2-.896-2-2v-7h14v7c0 1.104-.896 2-2 2h-10zm10-9v-2c0-1.104-.896-2-2-2h-6c-1.104 0-2 .896-2 2v2h10zm-2-2h-6v2h6v-2z"/>
+      </symbol>
     </defs>
   </svg>
 
   <div class="preloader text-white fs-6 text-uppercase overflow-hidden"></div>
 
-  <div class="search-popup">
-    <div class="search-popup-container">
-
-      <form role="search" method="get" class="form-group" action="{% url 'store:product_list' %}">
-        <input type="search" id="search-form" class="form-control border-0 border-bottom"
-          placeholder="Type and press enter" value="" name="q" />
-        <button type="submit" class="search-submit border-0 position-absolute bg-white"
-          style="top: 15px;right: 15px;"><svg class="search" width="24" height="24">
-            <use xlink:href="#search"></use>
-          </svg></button>
-      </form>
-
-      <h5 class="cat-list-title">Browse Categories</h5>
-
-      <ul class="cat-list">
-        <li class="cat-list-item">
-          <a href="#" title="Jackets">Jackets</a>
-        </li>
-        <li class="cat-list-item">
-          <a href="#" title="T-shirts">T-shirts</a>
-        </li>
-        <li class="cat-list-item">
-          <a href="#" title="Handbags">Handbags</a>
-        </li>
-        <li class="cat-list-item">
-          <a href="#" title="Accessories">Accessories</a>
-        </li>
-        <li class="cat-list-item">
-          <a href="#" title="Cosmetics">Cosmetics</a>
-        </li>
-        <li class="cat-list-item">
-          <a href="#" title="Dresses">Dresses</a>
-        </li>
-        <li class="cat-list-item">
-          <a href="#" title="Jumpsuits">Jumpsuits</a>
-        </li>
-      </ul>
-
-    </div>
-  </div>
 
   <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasCart" aria-labelledby="My Cart">
     <div class="offcanvas-header justify-content-center">
@@ -256,113 +271,18 @@
   </div>
 
   <!-- Banner Section -->
-  <div id="topBanner" class="banner bg-success text-white text-center py-2 position-relative">
+  <div id="topBanner" class="banner bg-success text-white text-center py-2 position-relative ">
     <p class="mb-0">Welcome to Jannat Beauty! Enjoy exclusive offers on our products.</p>
     <button type="button" class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3" onclick="closeBanner()" aria-label="Close banner"></button>
   </div>
 
-  <nav class="navbar navbar-expand-lg bg-light text-uppercase fs-6 p-3 border-bottom align-items-center">
+  <nav class="navbar navbar-expand-lg text-uppercase fs-6 border-bottom align-items-center fixed-top" style="z-index:1040; background-color: #fff;">
     <div class="container-fluid">
-      <!-- Desktop Navbar -->
-      <div class="d-none d-md-flex row justify-content-between align-items-center w-100">
-        <div class="col-auto">
-          <a class="navbar-brand text-white" href="{% url 'store:home' %}">
-            <span style="font-family:Marcellus,serif; color:#111;">JANNAT BEAUTY</span>
-          </a>
-        </div>
-        <div class="col-auto">
-          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
-            aria-labelledby="offcanvasNavbarLabel">
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
-              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-end flex-grow-1 gap-1 gap-md-5 pe-3">
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'store:home' %}">Home</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="dropdownShop" data-bs-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">Shop</a>
-                  <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdownShop">
-                    <li>
-                      <a href="{% url 'store:product_list' %}" class="dropdown-item item-anchor">All Products</a>
-                    </li>
-                    {% comment %} Add categories dynamically if available {% endcomment %}
-                    <li>
-                      <a href="{% url 'store:product_list' %}" class="dropdown-item item-anchor">Quran</a>
-                    </li>
-                    <li>
-                      <a href="{% url 'store:product_list' %}" class="dropdown-item item-anchor">Dua & Islamic Decor</a>
-                    </li>
-                    <li>
-                      <a href="{% url 'store:product_list' %}" class="dropdown-item item-anchor">Prayer Essentials</a>
-                    </li>
-                  </ul>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#contact">Contact</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#about">About Us</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-3 col-lg-auto">
-          <ul class="list-unstyled d-flex m-0 align-items-center navbar-icons-wrap">
-            <li>
-              <a href="#" class="mx-1 position-relative navbar-icon-link" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
-                <svg width="24" height="24" viewBox="0 0 24 24">
-                  <use xlink:href="#cart"></use>
-                </svg>
-                <span class="cart-badge badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" style="font-size:0.75em;">0</span>
-              </a>
-            </li>
-            <li>
-              {% if user.is_authenticated %}
-                <div class="dropdown d-inline-block user-profile-dropdown">
-                  <a href="#" class="mx-1 user-btn dropdown-toggle p-0 navbar-icon-link" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Profile" style="background:none; border:none;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#111">
-                      <use xlink:href="#user"></use>
-                    </svg>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li><a class="dropdown-item" href="{% url 'accounts:customer_dashboard' %}">Dashboard</a></li>
-                    {% if user.profile.is_seller %}
-                      <li><a class="dropdown-item" href="{% url 'orders:seller_orders' %}">Orders</a></li>
-                    {% else %}
-                      <li><a class="dropdown-item" href="{% url 'accounts:customer_dashboard' %}">Orders</a></li>
-                    {% endif %}
-                    <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
-                  </ul>
-                </div>
-              {% else %}
-                <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark mx-1">Sign In</a>
-              {% endif %}
-            </li>
-            <li class="search-box mx-1">
-              <a href="#search" class="search-button navbar-icon-link">
-                <svg width="22" height="22" viewBox="0 0 24 24">
-                  <use xlink:href="#search"></use>
-                </svg>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
       <!-- Mobile Navbar -->
       <div class="d-flex d-md-none flex-column w-100">
         <div class="d-flex justify-content-between align-items-center w-100">
           <a class="navbar-brand ms-2" href="{% url 'store:home' %}" style="font-family:Marcellus,serif; color:#111; font-size:1.3rem;">JANNAT BEAUTY</a>
-          <button class="navbar-toggler me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarMobile" aria-controls="offcanvasNavbarMobile">
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarMobile" aria-controls="offcanvasNavbarMobile">
             <span class="navbar-toggler-icon"></span>
           </button>
               <!-- Offcanvas Navbar for Mobile -->
@@ -395,18 +315,95 @@
                       </ul>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#contact">Contact</a>
+                      <a class="nav-link" href="{% url 'store:about' %}">Contact</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#about">About Us</a>
+                      <a class="nav-link" href="{% url 'store:about' %}">About Us</a>
                     </li>
                   </ul>
                 </div>
               </div>
         </div>
       </div>
+
+      <!-- Desktop Navbar - Two Rows -->
+      <div class="d-none d-md-flex flex-column w-100">
+        <!-- Top Row: Logo, Search, Icons -->
+        <div class="row align-items-center py-2 w-100">
+          <div class="col-auto">
+            <a class="navbar-brand" href="{% url 'store:home' %}">
+              <span style="font-family:Marcellus,serif; color:#111; font-size:1.3rem;">JANNAT BEAUTY <span style="font-size:0.85em; color:#176a3a; font-weight:500;">jannatbeauty.in</span></span>
+            </a>
+          </div>
+          <div class="col">
+            <form role="search" method="get" action="{% url 'store:product_list' %}" class="d-flex align-items-center justify-content-center">
+              <div class="position-relative w-100" style="max-width: 500px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" class="position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none;">
+                  <use xlink:href="#search"></use>
+                </svg>
+                <input type="search" name="q" class="form-control" placeholder="Search For... Eg: Quran" style="border-radius: 25px; padding: 10px 20px 10px 45px; border: 1px solid #ddd; width: 100%;">
+              </div>
+            </form>
+          </div>
+          <div class="col-auto">
+            <ul class="list-unstyled d-flex m-0 align-items-center navbar-icons-wrap">
+              <li>
+                {% if user.is_authenticated %}
+                  <div class="dropdown d-inline-block user-profile-dropdown">
+                    <a href="#" class="mx-2 user-btn dropdown-toggle p-0 navbar-icon-link d-flex align-items-center" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Profile" style="background:none; border:none; text-decoration: none;">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="#111" class="me-1">
+                        <use xlink:href="#user"></use>
+                      </svg>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                      <li><a class="dropdown-item" href="{% url 'accounts:customer_dashboard' %}">Dashboard</a></li>
+                      {% if user.profile.is_seller %}
+                        <li><a class="dropdown-item" href="{% url 'orders:seller_orders' %}">Orders</a></li>
+                      {% else %}
+                        <li><a class="dropdown-item" href="{% url 'accounts:customer_dashboard' %}">Orders</a></li>
+                      {% endif %}
+                      <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+                    </ul>
+                  </div>
+                {% else %}
+                  <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark mx-2">Sign In</a>
+                {% endif %}
+              </li>
+              <li>
+                <a href="{% url 'cart:cart_detail' %}" class="mx-2 position-relative navbar-icon-link">
+                  <svg width="24" height="24" viewBox="0 0 24 24">
+                    <use xlink:href="#cart"></use>
+                  </svg>
+                  <span class="cart-badge badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" style="font-size:0.75em;">{{ cart.get_total_quantity }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
+  
+  <!-- Category Bar Below Navbar (Desktop Only) -->
+  <div class="d-none d-md-block category-bar-below-nav" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6; padding: 12px 0; ">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center justify-content-center flex-wrap gap-3">
+        <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.85rem; letter-spacing: 1px;">Browse Categories:</span>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          {% for category in all_categories %}
+            <a href="{{ category.get_absolute_url }}" class="text-decoration-none text-dark fw-normal" style="font-size: 0.9rem; transition: color 0.2s;">
+              {{ category.name }}
+            </a>
+            {% if not forloop.last %}
+              <span class="text-muted" style="font-size: 0.8rem;">/</span>
+            {% endif %}
+          {% empty %}
+            <span class="text-muted">No categories available</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 
    
     <!-- Main Content -->
@@ -415,13 +412,17 @@
     </main>
 
     <!-- Footer -->
+    <div style="text-align:center; font-size:1.05em; color:#184c37; background:#fff; padding:12px 0; border-top:1px solid #e6f4ee;">
+      <strong>Jannat Beauty</strong> &mdash; <a href="https://jannatbeauty.in" style="color:#176a3a; text-decoration:underline;">jannatbeauty.in</a><br>
+      Premium Islamic Products &amp; Gifts
+    </div>
    <footer id="footer" class="mt-5" style="background-color:#06402B; color: white;">
     <div class="container">
       <div class="row d-flex flex-wrap justify-content-between py-5">
         <div class="col-md-3 col-sm-6">
           <div class="footer-menu footer-menu-001">
             <div class="footer-intro mb-4">
-              <a href="index.html">
+              <a href="{% url 'store:home' %}">
                 <img src="{% static 'images/main-logo.png' %}" alt="logo">
               </a>
             </div>
@@ -470,22 +471,22 @@
         </div>
         <div class="col-md-3 col-sm-6">
           <div class="footer-menu footer-menu-002">
-            <h5 class="widget-title text-uppercase mb-4" style="color: var(--color-accent-gold);">Quick Links</h5>
+            <h6 class="widget-title text-uppercase mb-4" style="color: var(--color-accent-gold);">Quick Links</h6>
             <ul class="menu-list list-unstyled text-uppercase border-animation-left fs-6">
               <li class="menu-item">
-                <a href="index.html" class="item-anchor" style="color: white;">Home</a>
+                <a href="{% url 'store:home' %}" class="item-anchor" style="color: white;">Home</a>
               </li>
               <li class="menu-item">
-                <a href="index.html" class="item-anchor" style="color: white;">About</a>
+                <a href="{% url 'store:about' %}" class="item-anchor" style="color: white;">About</a>
               </li>
               <li class="menu-item">
-                <a href="blog.html" class="item-anchor" style="color: white;">Services</a>
+                <a href="{% url 'blog:blog_list' %}" class="item-anchor" style="color: white;">Services</a>
               </li>
               <li class="menu-item">
-                <a href="styles.html" class="item-anchor" style="color: white;">Single item</a>
+                <a href="{% url 'store:product_list' %}" class="item-anchor" style="color: white;">Single item</a>
               </li>
               <li class="menu-item">
-                <a href="#" class="item-anchor" style="color: white;">Contact</a>
+                <a href="{% url 'store:about' %}" class="item-anchor" style="color: white;">Contact</a>
               </li>
             </ul>
           </div>
@@ -510,7 +511,7 @@
                 <a href="#" class="item-anchor" style="color: white;">Find us easy</a>
               </li>
               <li class="menu-item">
-                <a href="index.html" class="item-anchor" style="color: white;">Faqs</a>
+                <a href="{% url 'store:about' %}" class="item-anchor" style="color: white;">Faqs</a>
               </li>
             </ul>
           </div>
@@ -531,16 +532,48 @@
       <div class="container">
         <div class="row">
           <div class="col-md-6 d-flex flex-wrap">
-            <div class="shipping">
+            {% comment %} <div class="shipping">
               <span style="color: white;">We ship with:</span>
               <img src="{% static 'images/arct-icon.png' %}" alt="icon">
               <img src="{% static 'images/dhl-logo.png' %}" alt="icon">
-            </div>
+            </div> {% endcomment %}
             <div class="payment-option">
-              <span style="color: white;">Payment Option:</span>
-              <img src="{% static 'images/visa-card.png' %}" alt="card">
-              <img src="{% static 'images/paypal-card.png' %}" alt="card">
-              <img src="{% static 'images/master-card.png' %}" alt="card">
+              <span>Payment Option:</span>
+              <img src="{% static 'images/essentials/upi-icon.png' %}" alt="UPI">
+              <img src="{% static 'images/essentials/visa-icon.png' %}" alt="Visa">
+              <img src="{% static 'images/essentials/discover.png' %}" alt="Discover">
+              <style>
+                .payment-option span {
+                  color: #fff;
+                  font-size: 1.1rem;
+                  margin-right: 8px;
+                  min-width: 120px;
+                }
+                .payment-option img {
+                  height: 40px;
+                  width: auto;
+                  border-radius: 8px;
+                  background: #fff;
+                  padding: 2px 6px;
+                  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+                }
+                @media (max-width: 600px) {
+                  .payment-option {
+                    gap: 8px;
+                  }
+                  .payment-option span {
+                    font-size: 1rem;
+                    min-width: 100px;
+                  }
+                  .payment-option img {
+                    height: 28px;
+                    padding: 2px 3px;
+                  }
+                  footer {
+                    padding-bottom: 70px !important;
+                  }
+                }
+              </style>
             </div>
           </div>
         </div>
@@ -551,54 +584,99 @@
 
     <!-- Custom Scripts -->
     <script>
-        // Toggle User Dropdown
-        function toggleUserDropdown() {
-            const dropdown = document.getElementById('userDropdown');
-            dropdown.classList.toggle('open');
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const userBtn = document.querySelector('.user-btn');
-            const dropdown = document.getElementById('userDropdown');
-            if (dropdown && userBtn && !userBtn.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.remove('open');
+        // Profile Dropdown Hover Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileDropdown = document.getElementById('profileDropdown');
+            if (!profileDropdown) return;
+            
+            const dropdownMenu = profileDropdown.nextElementSibling;
+            const dropdownContainer = profileDropdown.closest('.dropdown');
+            
+            if (!dropdownMenu || !dropdownContainer) return;
+            
+            let hoverTimeout;
+            let bsDropdownInstance = null;
+            
+            // Initialize Bootstrap dropdown
+            function getDropdownInstance() {
+                if (!bsDropdownInstance) {
+                    bsDropdownInstance = new bootstrap.Dropdown(profileDropdown, {
+                        autoClose: true
+                    });
+                }
+                return bsDropdownInstance;
             }
+            
+            // Show dropdown on hover
+            dropdownContainer.addEventListener('mouseenter', function() {
+                clearTimeout(hoverTimeout);
+                const dropdown = getDropdownInstance();
+                dropdown.show();
+            });
+            
+            // Hide dropdown when mouse leaves container
+            dropdownContainer.addEventListener('mouseleave', function() {
+                hoverTimeout = setTimeout(function() {
+                    const dropdown = bootstrap.Dropdown.getInstance(profileDropdown);
+                    if (dropdown) {
+                        dropdown.hide();
+                    }
+                }, 150); // Small delay to allow moving to dropdown menu
+            });
+            
+            // Keep dropdown open when hovering over menu
+            dropdownMenu.addEventListener('mouseenter', function() {
+                clearTimeout(hoverTimeout);
+            });
+            
+            dropdownMenu.addEventListener('mouseleave', function() {
+                const dropdown = bootstrap.Dropdown.getInstance(profileDropdown);
+                if (dropdown) {
+                    dropdown.hide();
+                }
+            });
+            
+            // Also work on click (Bootstrap default)
+            profileDropdown.addEventListener('click', function(e) {
+                e.preventDefault();
+                const dropdown = getDropdownInstance();
+                dropdown.toggle();
+            });
         });
 
         // Update Cart Count
         function updateCartCount() {
             fetch('/cart/count/')
                 .then(response => response.json())
-                .then data => {
-                    const badge = document.querySelector('.cart-badge');
-                    if (badge) badge.textContent = data.count || 0;
+                .then(data => {
+                    updateCartCountDisplay(data.count || 0);
                 })
-                .catch(error => console.log('Cart count update error:', error));
+                .catch(error => {
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        console.log('Cart count update error:', error);
+                    }
+                });
         }
 
-        // Get CSRF token from cookie
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+        // Function to update cart count display
+        function updateCartCountDisplay(count) {
+            const cartBadges = document.querySelectorAll('.cart-badge, .cart-badge-mobile');
+            cartBadges.forEach(badge => {
+                if (badge) {
+                    badge.textContent = count;
+                    // Always show the badge, even when count is 0
+                    badge.style.display = 'inline';
                 }
-            }
-            return cookieValue;
+            });
         }
+
 
         // Add to Cart functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Update cart count on page load
             updateCartCount();
 
-            // Add to cart button handlers
+            // Handle .btn-add-cart class buttons (existing AJAX implementation)
             document.querySelectorAll('.btn-add-cart').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -612,6 +690,22 @@
                     const originalText = btn.textContent;
                     btn.textContent = 'Adding...';
                     btn.disabled = true;
+                    
+                    // Get CSRF token from cookie
+                    function getCookie(name) {
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                            const cookies = document.cookie.split(';');
+                            for (let i = 0; i < cookies.length; i++) {
+                                const cookie = cookies[i].trim();
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
                     
                     fetch(`/cart/add/${productId}/`, {
                         method: 'POST',
@@ -664,6 +758,7 @@
                 }, 300);
             }
         }
+
     </script>
 
      <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -677,5 +772,88 @@
 
     {% block scripts %}{% endblock %}
 </body>
+  <!-- Mobile Bottom Navbar -->
+  <nav class="mobile-bottom-navbar d-md-none d-lg-none d-xl-none fixed-bottom bg-white border-top shadow-sm">
+    <style>
+      .mobile-bottom-navbar a {
+        transition: all 0.2s ease;
+        padding: 4px 0;
+      }
+      .mobile-bottom-navbar a:hover {
+        transform: translateY(-2px);
+      }
+      .mobile-bottom-navbar a.active {
+        color: #06402B;
+      }
+      .mobile-bottom-navbar svg {
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+      }
+    </style>
+    <div class="container-fluid px-0">
+      <div class="d-flex justify-content-around align-items-center" style="height: 56px;">
+        <a href="{% url 'store:home' %}" class="text-center text-dark text-decoration-none flex-fill">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Home</div>
+        </a>
+        <a href="{% url 'store:product_list' %}" class="text-center text-dark text-decoration-none flex-fill">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Shop</div>
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:customer_orders' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              <path d="M9 12h6M9 16h6"/>
+            </svg>
+            <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Orders</div>
+          </a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              <path d="M9 12h6M9 16h6"/>
+            </svg>
+            <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Orders</div>
+          </a>
+        {% endif %}
+        <a href="{% url 'cart:cart_detail' %}" class="text-center text-dark text-decoration-none flex-fill position-relative">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <span class="cart-badge-mobile badge bg-danger position-absolute rounded-circle d-flex align-items-center justify-content-center" style="font-size: 0.55rem; font-weight: 600; top: -4px; right: 20%; width: 18px; height: 18px; line-height: 1; padding: 0; border: 1.5px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">{{ cart.get_total_quantity }}</span>
+          <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Cart</div>
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:customer_dashboard' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Profile</div>
+          </a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="text-center text-dark text-decoration-none flex-fill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1" style="opacity: 0.85;">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <div style="font-size: 0.7rem; font-weight: 500; letter-spacing: 0.3px;">Sign In</div>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
 
 </html>
