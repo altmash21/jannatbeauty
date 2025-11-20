@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from store.views import HealthCheckView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('health/', HealthCheckView.as_view(), name='health_check'),
     path('', include('store.urls')),
     path('cart/', include('cart.urls')),
     path('accounts/', include('accounts.urls')),
