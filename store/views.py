@@ -6,9 +6,67 @@ from django.contrib import messages
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
+from django.http import JsonResponse
+from django.views import View
+from django.db import connection
+from django.conf import settings
 from .models import Category, Product
 from .forms import ProductForm
 from accounts.models import SellerProfile
+
+
+class HealthCheckView(View):
+    """
+    Health check endpoint for monitoring deployment status
+    Returns JSON with system status information
+    """
+    
+    def get(self, request):
+        health_status = {
+            'status': 'healthy',
+            'database': self.check_database(),
+            'cache': self.check_cache(),
+            'debug': settings.DEBUG,
+            'environment': 'production' if not settings.DEBUG else 'development'
+        }
+        
+        # Determine overall status
+        if not health_status['database']['healthy']:
+            health_status['status'] = 'unhealthy'
+        
+        status_code = 200 if health_status['status'] == 'healthy' else 503
+        return JsonResponse(health_status, status=status_code)
+    
+    def check_database(self):
+        """Check database connectivity"""
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+                cursor.fetchone()
+            return {'healthy': True, 'message': 'Database connection successful'}
+        except Exception as e:
+            return {'healthy': False, 'message': f'Database error: {str(e)}'}
+    
+    def check_cache(self):
+        """Check cache connectivity (Redis or local memory)"""
+        try:
+            # Test cache set/get
+            test_key = 'health_check_test'
+            test_value = 'test_value'
+            cache.set(test_key, test_value, timeout=60)
+            retrieved = cache.get(test_key)
+            
+            if retrieved == test_value:
+                cache.delete(test_key)  # Cleanup
+                cache_backend = settings.CACHES['default']['BACKEND']
+                return {
+                    'healthy': True, 
+                    'message': f'Cache working: {cache_backend.split(".")[-1]}'
+                }
+            else:
+                return {'healthy': False, 'message': 'Cache set/get failed'}
+        except Exception as e:
+            return {'healthy': False, 'message': f'Cache error: {str(e)}'}
 
 
 def about_page(request):

@@ -10,11 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from decouple import Config, Csv
+from decouple import config, Csv
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-config = Config(repository=str(BASE_DIR))
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -87,12 +87,28 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': config('DJANGO_DB_NAME', default=str(BASE_DIR / 'db.sqlite3')),
+# Use PostgreSQL for production, SQLite for local development
+if config('USE_POSTGRES', default=False, cast=bool):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('POSTGRES_DB'),
+            'USER': config('POSTGRES_USER'),
+            'PASSWORD': config('POSTGRES_PASSWORD'),
+            'HOST': config('POSTGRES_HOST', default='localhost'),
+            'PORT': config('POSTGRES_PORT', default='5432'),
+            'OPTIONS': {
+                'connect_timeout': 60,
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': config('DJANGO_DB_NAME', default=str(BASE_DIR / 'db.sqlite3')),
+        }
+    }
 
 
 # Password validation

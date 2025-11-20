@@ -8,3 +8,5 @@ redis>=5.0.0
 cloudinary>=1.36.0
 django-cloudinary-storage>=0.3.0
 django-cors-headers
+psycopg2-binary>=2.9.0
+gunicorn>=21.2.0
