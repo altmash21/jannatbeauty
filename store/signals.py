@@ -66,10 +66,23 @@ def _invalidate_product_cache(product_slug=None, category_id=None):
 
 @receiver(post_save, sender=Product)
 def auto_approve_admin_products(sender, instance, created, **kwargs):
-    """Automatically approve products created by superusers"""
-    if created and instance.seller and instance.seller.is_superuser:
-        instance.approved = True
-        Product.objects.filter(pk=instance.pk).update(approved=True)
+    """Automatically approve products created by superusers or approved sellers"""
+    if created and instance.seller:
+        is_superuser = instance.seller.is_superuser
+        is_seller_approved = False
+        
+        # Check if seller is approved
+        if not is_superuser and hasattr(instance.seller, 'seller_profile'):
+            try:
+                is_seller_approved = instance.seller.seller_profile.is_approved
+            except Exception:
+                pass
+        
+        # Auto-approve products from approved sellers or superusers
+        if is_superuser or is_seller_approved:
+            if not instance.approved:
+                instance.approved = True
+                Product.objects.filter(pk=instance.pk).update(approved=True)
     
     # Invalidate cache when product is saved/updated
     _invalidate_product_cache(product_slug=instance.slug, category_id=instance.category_id)

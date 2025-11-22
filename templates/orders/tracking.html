@@ -1,6 +1,6 @@
 {% extends 'base_simple.html' %}
 
-{% block title %}Track Order {{ order.id }}{% endblock %}
+{% block title %}Track Order {{ order.order_number|default:order.id }}{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width:900px; padding:2rem 1rem;">
@@ -11,7 +11,7 @@
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
                 <div>
                     <strong>Order ID:</strong><br>
-                    <span>{{ order.id }}</span>
+                    <span>{% if order.order_number %}#{{ order.order_number }}{% else %}#{{ order.id|slice:":8"|upper }}{% endif %}</span>
                 </div>
                 <div>
                     <strong>Order Date:</strong><br>

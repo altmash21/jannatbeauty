@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Production Deployment Script for Jannat Beauty E-commerce Site
+# Production Deployment Script for Jannat Library E-commerce Site
 
 set -e  # Exit on any error
 
-echo "🚀 Starting Jannat Beauty E-commerce Deployment..."
+echo "🚀 Starting Jannat Library E-commerce Deployment..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -64,7 +64,7 @@ sudo -u jannatbeauty /var/www/jannatbeauty/venv/bin/python manage.py migrate
 print_status "8. Creating systemd service..."
 sudo tee /etc/systemd/system/jannatbeauty.service > /dev/null << 'EOF'
 [Unit]
-Description=Jannat Beauty E-commerce Application
+Description=Jannat Library E-commerce Application
 After=network.target
 
 [Service]

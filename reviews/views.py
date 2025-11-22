@@ -47,6 +47,15 @@ def add_review(request, product_id):
             verified_purchase=has_purchased
         )
         
+        # Send review notification email to seller
+        try:
+            from store.utils import send_review_notification_email
+            send_review_notification_email(review)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f'Failed to send review notification email: {str(e)}')
+        
         messages.success(request, 'Thank you for your review!')
         return redirect('store:product_detail', slug=product.slug)
     

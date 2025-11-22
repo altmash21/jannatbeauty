@@ -3,63 +3,514 @@
 
 {% block title %}Orders - Seller Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .orders-page {
+        padding: 0 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        margin-bottom: 0.625rem;
+        padding: 0 0.25rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.125rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .page-header p {
+        font-size: 0.6875rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    .orders-card {
+        background: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.75rem;
+    }
+    
+    .orders-table thead {
+        background: #f8f9fa;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .orders-table th {
+        padding: 0.375rem 0.375rem;
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: #495057;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border-bottom: 2px solid #dee2e6;
+        white-space: nowrap;
+        height: 32px;
+        box-sizing: border-box;
+    }
+    
+    .orders-table td {
+        padding: 0.375rem 0.375rem;
+        font-size: 0.75rem;
+        color: #212529;
+        border-bottom: 1px solid #f1f3f5;
+        vertical-align: middle;
+        line-height: 1.25;
+        height: auto;
+        min-height: 42px;
+        box-sizing: border-box;
+    }
+    
+    .orders-table tbody tr {
+        min-height: 42px;
+    }
+    
+    .orders-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .orders-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .orders-table-wrapper {
+        overflow-x: auto;
+        max-height: calc(100vh - 180px);
+        overflow-y: auto;
+    }
+    
+    .order-id {
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: #495057;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .order-date {
+        font-size: 0.75rem;
+        color: #6c757d;
+        white-space: nowrap;
+    }
+    
+    .product-name {
+        font-size: 0.75rem;
+        color: #212529;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .quantity-cell,
+    .price-cell,
+    .total-cell {
+        font-size: 0.75rem;
+        color: #212529;
+        font-weight: 500;
+        text-align: right;
+        white-space: nowrap;
+    }
+    
+    .status-select {
+        padding: 0.1875rem 0.3125rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.6875rem;
+        background: white;
+        color: #212529;
+        cursor: pointer;
+        min-width: 85px;
+        height: 24px;
+        line-height: 1;
+    }
+    
+    .status-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    
+    .update-btn {
+        padding: 0.1875rem 0.4375rem;
+        border-radius: 4px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: 0.25rem;
+        transition: background 0.2s;
+        height: 24px;
+        line-height: 1;
+    }
+    
+    .update-btn:hover {
+        background: #2563eb;
+    }
+    
+    .status-form {
+        display: flex;
+        align-items: center;
+        gap: 0.1875rem;
+        flex-wrap: wrap;
+    }
+    
+    .shipment-status {
+        font-size: 0.6875rem;
+        color: #28a745;
+    }
+    
+    .shipment-link {
+        font-size: 0.6875rem;
+        color: #0066cc;
+        text-decoration: none;
+    }
+    
+    .shipment-link:hover {
+        text-decoration: underline;
+    }
+    
+    .create-shipment-btn {
+        padding: 0.3125rem 0.5rem;
+        background: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+    
+    .create-shipment-btn:hover {
+        background: #218838;
+    }
+    
+    .order-status-badge {
+        display: inline-block;
+        padding: 0.1875rem 0.375rem;
+        border-radius: 4px;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    
+    .order-status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .order-status-badge.processing {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .order-status-badge.shipped {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .order-status-badge.delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .order-status-badge.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .payment-badge {
+        display: inline-block;
+        padding: 0.1875rem 0.375rem;
+        border-radius: 4px;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .payment-badge.paid {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .payment-badge.cod {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .payment-cell {
+        font-size: 0.75rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.3;
+        color: #ccc;
+    }
+    
+    .empty-state h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+    
+    .empty-state p {
+        font-size: 0.8125rem;
+        margin: 0;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .orders-page {
+            padding: 0 0.5rem;
+        }
+        
+        .page-header {
+            margin-bottom: 0.625rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.125rem;
+        }
+        
+        .page-header p {
+            font-size: 0.6875rem;
+        }
+        
+        .orders-card {
+            padding: 0.5rem;
+        }
+        
+        .orders-table {
+            font-size: 0.6875rem;
+        }
+        
+        .orders-table th {
+            padding: 0.3125rem 0.25rem;
+            font-size: 0.625rem;
+            height: 28px;
+        }
+        
+        .orders-table td {
+            padding: 0.3125rem 0.25rem;
+            font-size: 0.6875rem;
+            min-height: 38px;
+        }
+        
+        .orders-table tbody tr {
+            min-height: 38px;
+        }
+        
+        .order-id {
+            font-size: 0.6875rem;
+            max-width: 120px;
+        }
+        
+        .product-name {
+            max-width: 150px;
+            font-size: 0.6875rem;
+        }
+        
+        .status-select {
+            font-size: 0.625rem;
+            padding: 0.1875rem 0.25rem;
+            min-width: 80px;
+        }
+        
+        .update-btn {
+            font-size: 0.625rem;
+            padding: 0.1875rem 0.375rem;
+            margin-left: 0.25rem;
+        }
+        
+        .create-shipment-btn {
+            font-size: 0.625rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .shipment-status,
+        .shipment-link {
+            font-size: 0.625rem;
+        }
+        
+        .payment-badge {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.3125rem;
+        }
+        
+        .payment-cell {
+            font-size: 0.6875rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .orders-page {
+            padding: 0 0.375rem;
+        }
+        
+        .orders-card {
+            padding: 0.375rem;
+        }
+        
+        .orders-table th {
+            padding: 0.25rem 0.1875rem;
+            font-size: 0.5625rem;
+            height: 26px;
+        }
+        
+        .orders-table td {
+            padding: 0.25rem 0.1875rem;
+            font-size: 0.625rem;
+            min-height: 36px;
+        }
+        
+        .orders-table tbody tr {
+            min-height: 36px;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem;
+        }
+        
+        .status-select {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.25rem;
+            height: 22px;
+            min-width: 75px;
+        }
+        
+        .update-btn {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.3125rem;
+            height: 22px;
+            margin-left: 0.1875rem;
+        }
+        
+        .create-shipment-btn {
+            font-size: 0.625rem;
+            padding: 0.25rem 0.4375rem;
+        }
+        
+        .payment-badge {
+            font-size: 0.5625rem;
+            padding: 0.125rem 0.25rem;
+        }
+        
+        .payment-cell {
+            font-size: 0.625rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="margin-bottom: 2rem;">
-    <h1><i class="fas fa-clipboard-list"></i> Customer Orders</h1>
-    <p style="color: #7f8c8d;">Track and manage your orders</p>
+<div class="orders-page">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-clipboard-list"></i> Customer Orders
+        </h1>
+        <p>Track and manage your orders</p>
 </div>
 
     {% if order_items %}
-    <div class="card" style="padding: 1.5rem;">
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
+    <div class="orders-card">
+        <div class="orders-table-wrapper">
+            <table class="orders-table">
                 <thead>
-                    <tr style="border-bottom: 2px solid #eee;">
-                        <th style="padding: 1rem; text-align: left;">Order ID</th>
-                        <th style="padding: 1rem; text-align: left;">Date</th>
-                        <th style="padding: 1rem; text-align: left;">Product</th>
-                        <th style="padding: 1rem; text-align: left;">Quantity</th>
-                        <th style="padding: 1rem; text-align: left;">Price</th>
-                        <th style="padding: 1rem; text-align: left;">Total</th>
-                        <th style="padding: 1rem; text-align: left;">Status</th>
-                        <th style="padding: 1rem; text-align: left;">Shipping</th>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Shipping</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in order_items %}
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 1rem;">#{{ item.order.id }}</td>
-                        <td style="padding: 1rem;">{{ item.order.created|date:"M d, Y" }}</td>
-                        <td style="padding: 1rem;">{{ item.product.name }}</td>
-                        <td style="padding: 1rem;">{{ item.quantity }}</td>
-                        <td style="padding: 1rem;">₹{{ item.price }}</td>
-                        <td style="padding: 1rem;">₹{{ item.get_cost }}</td>
-                        <td style="padding: 1rem;">
-                            <form method="post" action="{% url 'orders:update_order_status' item.order.id item.id %}">
+                    <tr>
+                        <td class="order-id">
+                            {% if item.order.order_number %}
+                                #{{ item.order.order_number }}
+                            {% else %}
+                                #{{ item.order.id|slice:":8"|upper }}
+                            {% endif %}
+                        </td>
+                        <td class="order-date">{{ item.order.created|date:"M d, Y" }}</td>
+                        <td class="product-name" title="{{ item.product.name }}">{{ item.product.name|truncatechars:30 }}</td>
+                        <td class="quantity-cell">{{ item.quantity }}</td>
+                        <td class="price-cell">₹{{ item.price }}</td>
+                        <td class="total-cell">₹{{ item.get_cost }}</td>
+                        <td class="payment-cell">
+                            {% if item.order.paid %}
+                                <span class="payment-badge paid">
+                                    <i class="fas fa-check-circle"></i> Paid
+                                </span>
+                            {% else %}
+                                <span class="payment-badge cod">
+                                    <i class="fas fa-money-bill-wave"></i> COD
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'orders:update_order_status' item.order.id item.id %}" class="status-form">
                                 {% csrf_token %}
-                                <select name="status" style="padding:0.25rem 0.5rem; border-radius:6px;">
+                                <select name="status" class="status-select">
                                     <option value="pending" {% if item.status == 'pending' %}selected{% endif %}>Pending</option>
                                     <option value="processing" {% if item.status == 'processing' %}selected{% endif %}>Processing</option>
                                     <option value="shipped" {% if item.status == 'shipped' %}selected{% endif %}>Shipped</option>
                                     <option value="delivered" {% if item.status == 'delivered' %}selected{% endif %}>Delivered</option>
                                     <option value="cancelled" {% if item.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
                                 </select>
-                                <button type="submit" style="margin-left:0.5rem; padding:0.25rem 0.6rem; border-radius:6px; background:#6c5ce7; color:#fff; border:none; cursor:pointer;">Update</button>
+                                <button type="submit" class="update-btn">Update</button>
                             </form>
                         </td>
-                        <td style="padding: 1rem;">
+                        <td>
                             {% if item.order.shiprocket_order_id %}
-                                <div style="font-size:0.85rem; color:#28a745;">
-                                    ✓ Shiprocket Order: {{ item.order.shiprocket_order_id }}
+                                <div class="shipment-status">
+                                    <i class="fas fa-check-circle"></i> Created
                                     {% if item.order.awb_code %}
-                                    <br>AWB: {{ item.order.awb_code }}
-                                    <br><a href="{% url 'orders:track_shipment' item.order.id %}" style="color:#007bff;">Track</a>
+                                    <br><span style="font-size: 0.625rem;">AWB: {{ item.order.awb_code|truncatechars:15 }}</span>
+                                    <br><a href="{% url 'orders:track_shipment' item.order.id %}" class="shipment-link">Track</a>
                                     {% endif %}
                                 </div>
                             {% elif not item.order.shiprocket_order_id %}
-                                <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" 
-                                   style="padding:0.4rem 0.8rem; background:#28a745; color:#fff; text-decoration:none; border-radius:6px; font-size:0.85rem;">
-                                    Create Shipment {% if not item.order.paid %}(COD){% endif %}
+                                <a href="{% url 'orders:create_shiprocket_order' item.order.id %}" class="create-shipment-btn">
+                                    Create Shipment {% if not item.order.paid %}<span style="font-size: 0.625rem;">(COD)</span>{% endif %}
                                 </a>
                             {% endif %}
                         </td>
@@ -70,10 +521,13 @@
         </div>
     </div>
     {% else %}
-    <div class="card" style="text-align: center; padding: 3rem;">
-        <i class="fas fa-inbox" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+    <div class="orders-card">
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
         <h3>No Orders Yet</h3>
-        <p style="color: #888;">Orders will appear here when customers buy your products</p>
+            <p>Orders will appear here when customers buy your products</p>
+        </div>
     </div>
     {% endif %}
+</div>
 {% endblock %}

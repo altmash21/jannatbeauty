@@ -6,7 +6,7 @@ class ProductForm(forms.ModelForm):
     
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'compare_price', 'stock', 'category', 'image', 'available']
+        fields = ['name', 'description', 'price', 'compare_price', 'stock', 'category', 'major_category', 'image', 'available']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -37,6 +37,9 @@ class ProductForm(forms.ModelForm):
             'category': forms.Select(attrs={
                 'class': 'form-control'
             }),
+            'major_category': forms.Select(attrs={
+                'class': 'form-control'
+            }),
             'image': forms.ClearableFileInput(attrs={
                 'class': 'form-control'
             }),
@@ -45,8 +48,9 @@ class ProductForm(forms.ModelForm):
             }),
         }
         
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.user = user
         
         # Add help text
         self.fields['compare_price'].help_text = 'Original price if this product is on sale (optional)'
@@ -55,6 +59,31 @@ class ProductForm(forms.ModelForm):
         
         # Make category field more user-friendly
         self.fields['category'].empty_label = "Select a category"
+        self.fields['major_category'].empty_label = "Select a major category (optional)"
+        
+        # Filter major categories based on seller permissions
+        if user and not user.is_superuser:
+            if hasattr(user, 'seller_profile'):
+                try:
+                    seller_profile = user.seller_profile
+                    allowed_categories = seller_profile.get_manageable_major_categories()
+                    # Only show allowed major categories
+                    choices = [choice for choice in Product.MAJOR_CATEGORY_CHOICES if choice[0] in allowed_categories]
+                    if choices:
+                        self.fields['major_category'].choices = choices
+                    else:
+                        # If no categories allowed, hide the field
+                        del self.fields['major_category']
+                except:
+                    # If seller profile doesn't exist, hide major_category field
+                    if 'major_category' in self.fields:
+                        del self.fields['major_category']
+        elif user and user.is_superuser:
+            # Superusers can manage all categories
+            self.fields['major_category'].choices = Product.MAJOR_CATEGORY_CHOICES
+        else:
+            # If no user provided, show all categories
+            self.fields['major_category'].choices = Product.MAJOR_CATEGORY_CHOICES
         
         # Set initial values for new products
         if not self.instance.pk:

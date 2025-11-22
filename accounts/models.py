@@ -72,6 +72,11 @@ class SellerProfile(models.Model):
     bank_account = models.CharField(max_length=50, blank=True)
     approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS, default='pending')
     commission_rate = models.DecimalField(max_digits=5, decimal_places=2, default=10.00)  # Percentage
+    allowed_major_categories = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='List of major categories this seller can manage (e.g., ["new_arrivals", "featured", "best_selling"]). Empty list means all categories.'
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
@@ -85,6 +90,23 @@ class SellerProfile(models.Model):
     @property
     def can_sell(self):
         return self.approval_status == 'approved'
+    
+    def can_manage_major_category(self, category):
+        """Check if seller can manage a specific major category"""
+        # Only allow if admin has explicitly granted permission (non-empty list)
+        if not self.allowed_major_categories or len(self.allowed_major_categories) == 0:
+            return False
+        return category in self.allowed_major_categories
+    
+    def get_manageable_major_categories(self):
+        """Get list of major categories seller can manage"""
+        # Only return categories if admin has explicitly granted permission
+        if not self.allowed_major_categories or len(self.allowed_major_categories) == 0:
+            return []  # No categories if not explicitly allowed by admin
+        
+        from store.models import Product
+        all_categories = [choice[0] for choice in Product.MAJOR_CATEGORY_CHOICES]
+        return [cat for cat in all_categories if cat in self.allowed_major_categories]
 
 
 # Signal to create profile when user is created

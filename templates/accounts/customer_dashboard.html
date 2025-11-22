@@ -1,6 +1,6 @@
 {% extends 'base_plain.html' %}
 {% load static %}
-{% block title %}Dashboard - Jannat Beauty{% endblock %}
+{% block title %}Dashboard - Jannat Library{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -1373,7 +1373,9 @@
                         <div class="order-detail-card" style="width:100%;border:1px solid #e9ecef;border-radius:8px;overflow:hidden;">
                             <div class="order-detail-header" style="background:#f8f9fa;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e9ecef;">
                                 <div class="order-detail-header-left">
-                                    <h3 class="order-detail-id" style="font-size:14px;font-weight:600;margin-bottom:2px;color:#212529;">Order #{{ order.id|truncatechars:15 }}</h3>
+                                    <h3 class="order-detail-id" style="font-size:14px;font-weight:600;margin-bottom:2px;color:#212529;">
+                                        Order {% if order.order_number %}#{{ order.order_number }}{% else %}#{{ order.id|slice:":8"|upper }}{% endif %}
+                                    </h3>
                                     <p class="order-detail-date" style="font-size:11px;color:#6c757d;margin:0;">{{ order.created|date:"b d, Y" }}</p>
                                 </div>
                                 <div class="order-detail-header-right">
