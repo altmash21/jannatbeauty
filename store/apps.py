@@ -11,3 +11,6 @@ class StoreConfig(AppConfig):
 
         # Connect signal to create seller group and permissions after migration
         post_migrate.connect(create_seller_group_and_permissions, sender=self)
+        
+        # Import email signals to ensure they are registered
+        from . import signals_email  # noqa

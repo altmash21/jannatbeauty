@@ -85,6 +85,7 @@ def product_list(request, category_slug=None):
     max_price = request.GET.get('max_price', '')
     featured = request.GET.get('featured', '')
     in_stock = request.GET.get('in_stock', '')
+    major_category = request.GET.get('major_category', '')
     sort_by = request.GET.get('sort', 'name')
     page = request.GET.get('page', '1')
     
@@ -129,6 +130,12 @@ def product_list(request, category_slug=None):
     if in_stock == 'true':
         products = products.filter(stock__gt=0)
     
+    # Major category filter (new_arrivals, featured, best_selling)
+    if major_category:
+        valid_major_categories = ['new_arrivals', 'featured', 'best_selling']
+        if major_category in valid_major_categories:
+            products = products.filter(major_category=major_category)
+    
     # Sorting
     valid_sorts = ['name', '-name', 'price', '-price', 'created', '-created']
     if sort_by in valid_sorts:
@@ -154,6 +161,7 @@ def product_list(request, category_slug=None):
         'max_price': max_price,
         'featured': featured,
         'in_stock': in_stock,
+        'major_category': major_category,
         'sort_by': sort_by,
     }
     
@@ -371,16 +379,49 @@ def add_product(request):
             return redirect('accounts:customer_profile')
 
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
+        form = ProductForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             product = form.save(commit=False)
             product.seller = request.user
-            # Products created by sellers need approval (unless they're admins)
-            product.approved = request.user.is_superuser
+            
+            # Check if seller is approved or is superuser
+            is_seller_approved = False
+            if not request.user.is_superuser:
+                try:
+                    seller_profile = request.user.seller_profile
+                    is_seller_approved = seller_profile.is_approved
+                except SellerProfile.DoesNotExist:
+                    is_seller_approved = False
+            
+            # Validate major category permission if seller is adding
+            if not request.user.is_superuser and hasattr(request.user, 'seller_profile'):
+                try:
+                    seller_profile = request.user.seller_profile
+                    major_category = form.cleaned_data.get('major_category', 'none')
+                    if major_category and not seller_profile.can_manage_major_category(major_category):
+                        messages.error(request, f'You do not have permission to use the "{dict(Product.MAJOR_CATEGORY_CHOICES).get(major_category, major_category)}" major category.')
+                        form = ProductForm(user=request.user)
+                        context = {
+                            'form': form,
+                            'is_admin': request.user.is_superuser,
+                            'product': None,
+                        }
+                        return render(request, 'store/add_product.html', context)
+                except Exception as e:
+                    pass
+            
+            # Auto-approve products from approved sellers or superusers
+            product.approved = request.user.is_superuser or is_seller_approved
             product.save()
             
-            if request.user.is_superuser:
-                messages.success(request, f'Product "{product.name}" added successfully!')
+            # Handle extra images upload
+            from .models import ProductImage
+            extra_images = request.FILES.getlist('extra_images')
+            for img_file in extra_images:
+                ProductImage.objects.create(product=product, image=img_file)
+            
+            if request.user.is_superuser or is_seller_approved:
+                messages.success(request, f'Product "{product.name}" added successfully and is now live!')
             else:
                 messages.success(request, f'Product "{product.name}" added successfully! It will be visible after admin approval.')
             
@@ -388,11 +429,12 @@ def add_product(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = ProductForm()
+        form = ProductForm(user=request.user)
 
     context = {
         'form': form,
         'is_admin': request.user.is_superuser,
+        'product': None,
     }
     return render(request, 'store/add_product.html', context)
 
@@ -423,15 +465,34 @@ def edit_product(request, product_id):
             return redirect('accounts:customer_profile')
 
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product, user=request.user)
         if form.is_valid():
+            # Validate major category permission if seller is editing
+            if not request.user.is_superuser and hasattr(request.user, 'seller_profile'):
+                try:
+                    seller_profile = request.user.seller_profile
+                    major_category = form.cleaned_data.get('major_category', 'none')
+                    if major_category and not seller_profile.can_manage_major_category(major_category):
+                        messages.error(request, f'You do not have permission to use the "{dict(Product.MAJOR_CATEGORY_CHOICES).get(major_category, major_category)}" major category.')
+                        form = ProductForm(instance=product, user=request.user)
+                        return render(request, 'store/edit_product.html', {'form': form, 'product': product})
+                except Exception as e:
+                    pass
+            
             form.save()
+            
+            # Handle extra images upload
+            from .models import ProductImage
+            extra_images = request.FILES.getlist('extra_images')
+            for img_file in extra_images:
+                ProductImage.objects.create(product=product, image=img_file)
+            
             messages.success(request, 'Product updated successfully!')
             if request.user.is_superuser:
                 return redirect('admin:store_product_changelist')
             return redirect('accounts:seller_dashboard')
     else:
-        form = ProductForm(instance=product)
+        form = ProductForm(instance=product, user=request.user)
 
     return render(request, 'store/edit_product.html', {'form': form, 'product': product})
 
@@ -463,6 +524,27 @@ def delete_product(request, product_id):
         return redirect('accounts:seller_dashboard')
 
     return render(request, 'store/delete_product.html', {'product': product})
+
+
+@login_required
+def delete_product_image(request, product_id, image_id):
+    """View for sellers to delete product images"""
+    product = get_object_or_404(Product, id=product_id)
+    
+    # Check if user owns this product or is superuser
+    if product.seller != request.user and not request.user.is_superuser:
+        messages.error(request, 'Access denied. You can only delete images from your own products.')
+        return redirect('accounts:seller_dashboard')
+    
+    # Get the product image
+    from .models import ProductImage
+    product_image = get_object_or_404(ProductImage, id=image_id, product=product)
+    
+    if request.method == 'POST':
+        product_image.delete()
+        messages.success(request, 'Image deleted successfully!')
+    
+    return redirect('store:edit_product', product_id=product.id)
 
 
 @login_required
@@ -635,10 +717,26 @@ def approve_product(request, product_id):
         if action == 'approve':
             product.approved = True
             product.save()
+            # Send approval email to seller
+            try:
+                from .utils import send_product_approval_email
+                send_product_approval_email(product, True)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Failed to send product approval email: {str(e)}')
             messages.success(request, f'Product "{product.name}" has been approved!')
         elif action == 'disapprove':
             product.approved = False
             product.save()
+            # Send disapproval email to seller
+            try:
+                from .utils import send_product_approval_email
+                send_product_approval_email(product, False)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Failed to send product disapproval email: {str(e)}')
             messages.success(request, f'Product "{product.name}" has been disapproved!')
     
     return redirect('store:admin_manage_products')

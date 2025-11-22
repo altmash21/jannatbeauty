@@ -1,6 +1,6 @@
 ﻿{% extends 'base_plain.html' %}
 {% load static %}
-{% block title %}Become a Seller - Jannat Beauty{% endblock %}
+{% block title %}Become a Seller - Jannat Library{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/material-design-iconic-font.min.css' %}">
 <style>
@@ -95,14 +95,6 @@
 		font-size: 0.9rem;
 		transition: all 0.3s ease;
 	}
-	.form-wrapper i {
-		position: absolute;
-		top: 50%;
-		right: 14px;
-		transform: translateY(-50%);
-		color: #06402B;
-		font-size: 1.1rem;
-	}
 	.btn-login {
 		width: 100%;
 		padding: 12px;
@@ -161,7 +153,7 @@
 <div class="login-container">
 	<div class="login-card">
 		<div class="login-image d-none d-md-flex">
-			<img src="{% static 'images/login.webp' %}" alt="Jannat Beauty Seller Registration">
+			<img src="{% static 'images/login.webp' %}" alt="Jannat Library Seller Registration">
 		</div>
 		<div class="login-form-section">
 			{% if messages %}
@@ -172,7 +164,7 @@
 			</div>
 			{% endif %}
 			<div class="brand-logo">
-				<h1>JANNAT BEAUTY</h1>
+				<h1>JANNAT LIBRARY</h1>
 			</div>
 			<div class="login-header">
 				<h2>Become a seller</h2>
@@ -186,25 +178,20 @@
 				</div>
 				<div class="form-wrapper">
 					<input type="email" name="email" placeholder="Email address" required>
-					<i class="zmdi zmdi-email"></i>
 				</div>
 				<div class="form-wrapper">
 					<input type="text" name="phone" placeholder="Phone number" required>
-					<i class="zmdi zmdi-phone"></i>
 				</div>
 				<div class="form-wrapper">
 					<input type="text" name="business_name" placeholder="Business name" required>
-					<i class="zmdi zmdi-store"></i>
 				</div>
 				<div class="form-wrapper">
 					<input type="password" name="password1" placeholder="Password" required>
-					<i class="zmdi zmdi-lock"></i>
 				</div>
 				<div class="form-wrapper">
 					<input type="password" name="password2" placeholder="Confirm password" required>
-					<i class="zmdi zmdi-lock"></i>
 				</div>
-				<button type="submit" class="btn-login">Sign up <i class="zmdi zmdi-arrow-right"></i></button>
+				<button type="submit" class="btn-login">Sign up</button>
 				<div class="signup-link">
 					Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>
 				</div>

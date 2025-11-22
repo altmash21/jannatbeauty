@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Jannat Beauty{% endblock %}
+{% block title %}Jannat Library{% endblock %}
 {% block extra_css %}
 <style>
     /* Responsive font size for collection section */
@@ -183,7 +183,7 @@
           <div class="col-lg-3 col-md-6 col-6 mb-4">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
-                <a href="index.html">
+                <a href="{% url 'store:product_list_by_category' 'quran' %}">
                   <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
                     <source src="{% static 'videos/quran-loop.mp4' %}" type="video/mp4">
                   </video>
@@ -191,7 +191,7 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none;font-weight: 400; texts">QURAN</a>
+                  <a href="{% url 'store:product_list_by_category' 'quran' %}" style="background-color: white; color: black; border: none;font-weight: 400; texts">QURAN</a>
                 </div>
               </div>
             </div>
@@ -199,7 +199,7 @@
           <div class="col-lg-3 col-md-6 col-6 mb-4">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
-                <a href="index.html">
+                <a href="{% url 'store:product_list' %}">
                   <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
                     <source src="{% static 'videos/quranbg.mp4'%}" type="video/mp4">
                   </video>
@@ -207,7 +207,7 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="{% url 'store:product_list' %}"style="background-color: white; color: black; border: none; font-weight: 400;">FOR KIDS</a>
+                  <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; font-weight: 400;">FOR KIDS</a>
                 </div>
               </div>
             </div>
@@ -215,7 +215,7 @@
           <div class="col-lg-3 col-md-6 col-6 mb-4">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
-                <a href="index.html">
+                <a href="{% url 'store:product_list' %}">
                   <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
                     <source src="{% static 'videos/gifts-loop.mp4'%}" type="video/mp4">
                   </video>
@@ -231,7 +231,7 @@
           <div class="col-lg-3 col-md-6 col-6 mb-4">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
-                <a href="index.html">
+                <a href="{% url 'store:product_list' %}?major_category=new_arrivals">
                   <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
                     <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
                   </video>
@@ -239,7 +239,7 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="{% url 'store:product_list' %}"style="background-colo r: white; color: black; border: none; font-weight: 400;">NEW ARRIVALS</a>
+                  <a href="{% url 'store:product_list' %}?major_category=new_arrivals" style="background-color: white; color: black; border: none; font-weight: 400;">NEW ARRIVALS</a>
                 </div>
               </div>
             </div>
@@ -479,15 +479,15 @@
         <div class="swiper-slide">
           <div class="testimonial-item text-center">
             <blockquote>
-              <p>“Beautiful Quran, fast delivery, and excellent quality. Jannat Beauty truly cares about its customers.”</p>
-              <div class="review-title text-uppercase">JANNATBEAUTY.IN CUSTOMER</div>
+              <p>“Beautiful Quran, fast delivery, and excellent quality. Jannat Library truly cares about its customers.”</p>
+              <div class="review-title text-uppercase">JANNATLIBRARY.COM CUSTOMER</div>
             </blockquote>
           </div>
         </div>
         <div class="swiper-slide">
           <div class="testimonial-item text-center">
             <blockquote>
-              <p>“The prayer mat and tasbih I ordered were perfect for gifting. Highly recommend Jannat Beauty!”</p>
+              <p>“The prayer mat and tasbih I ordered were perfect for gifting. Highly recommend Jannat Library!”</p>
               <div class="review-title text-uppercase">Verified Buyer</div>
             </blockquote>
           </div>
@@ -503,7 +503,7 @@
         <div class="swiper-slide">
           <div class="testimonial-item text-center">
             <blockquote>
-              <p>“Jannat Beauty’s customer support is amazing. They helped me choose the right Quran for my parents.”</p>
+              <p>“Jannat Library's customer support is amazing. They helped me choose the right Quran for my parents.”</p>
               <div class="review-title text-uppercase">Satisfied Customer</div>
             </blockquote>
           </div>
@@ -657,74 +657,307 @@
 
   <!-- Discount Popup Modal -->
   <div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
-        <div class="modal-header bg-gradient text-white text-center border-0" style="background: linear-gradient(135deg, #06402B, #0a5d3a);">
+    <div class="modal-dialog modal-dialog-centered discount-modal-dialog">
+      <div class="modal-content border-0 shadow-lg discount-modal-content">
+        <div class="modal-header bg-gradient text-white text-center border-0 discount-modal-header position-relative">
+          <button type="button" data-bs-dismiss="modal" aria-label="Close" class="discount-close-btn" id="discountCloseBtn" style="position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1060; background: white !important; border: 2px solid white !important; cursor: pointer !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 32px !important; width: 32px !important; border-radius: 50% !important; transition: all 0.2s !important; box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important; color: #000000 !important; pointer-events: auto !important;">
+            <span style="font-size: 1.25rem !important; color: #000000 !important; font-weight: bold !important; line-height: 1 !important; display: inline-block !important;">&times;</span>
+          </button>
           <div class="w-100">
-            <h4 class="modal-title fw-bold mb-1" id="discountModalLabel">
-              <i class="fas fa-gift me-2"></i>Get 10% OFF!
-            </h4>
-            <p class="mb-0 small">Limited time offer for new customers</p>
+            <h5 class="modal-title fw-bold mb-0 discount-modal-title" id="discountModalLabel" style="color: #06402B;">
+              <i class="fas fa-gift me-1"></i>Get 10% OFF!
+            </h5>
+            <p class="mb-0 discount-modal-subtitle">Fill the form below to get your 10% discount coupon</p>
           </div>
         </div>
-        <div class="modal-body p-4">
-          <div class="text-center mb-4">
-            <div class="discount-badge d-inline-block px-4 py-2 rounded-pill mb-3" style="background: #06402B; color: white; font-size: 1.2rem; font-weight: bold;">
+        <div class="modal-body discount-modal-body">
+          <div class="text-center mb-3">
+            <div class="discount-badge d-inline-block px-3 py-1 rounded-pill mb-2" style="background: #06402B; color: white; font-size: 0.875rem; font-weight: bold;">
               Save 10%
             </div>
-            <p class="text-muted mb-0">Enter your details below to claim your discount</p>
+            <p class="text-muted mb-0 discount-modal-text" style="font-size: 0.8125rem; color: black;">Get 10% off on orders above ₹100</p>
           </div>
           
           <form id="discountForm" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="customerName" class="form-label fw-semibold">Full Name</label>
-                <input type="text" class="form-control form-control-lg" id="customerName" name="name" placeholder="Enter your name" required style="border-radius: 10px;">
-                <div class="invalid-feedback">Please provide your name.</div>
+            <div class="row g-2">
+              <div class="col-12">
+                <label for="customerName" class="form-label discount-form-label">Name</label>
+                <input type="text" class="form-control discount-form-input" id="customerName" name="name" placeholder="Enter your name" required>
+                <div class="invalid-feedback" style="font-size: 0.75rem;">Please provide your name.</div>
               </div>
-              <div class="col-md-6">
-                <label for="customerPhone" class="form-label fw-semibold">Phone Number</label>
-                <input type="tel" class="form-control form-control-lg" id="customerPhone" name="phone" placeholder="Enter phone number" required pattern="[0-9]{10}" style="border-radius: 10px;">
-                <div class="invalid-feedback">Please provide a valid 10-digit phone number.</div>
+              <div class="col-12">
+                <label for="customerPhone" class="form-label discount-form-label">Phone Number</label>
+                <input type="tel" class="form-control discount-form-input" id="customerPhone" name="phone" placeholder="Enter 10-digit phone number" required pattern="[0-9]{10}" maxlength="10">
+                <div class="invalid-feedback" style="font-size: 0.75rem;">Please provide a valid 10-digit phone number.</div>
               </div>
             </div>
             
-            <div class="d-grid gap-2 mt-4">
-              <button type="submit" class="btn btn-lg fw-semibold text-white" style="background: #06402B; border: none; border-radius: 10px; padding: 12px;">
-                <i class="fas fa-tag me-2"></i>Claim My 10% Discount
+            <div class="d-grid gap-2 mt-3">
+              <button type="submit" class="btn discount-submit-btn text-white">
+                <i class="fas fa-gift me-1"></i>Claim 10% Discount
               </button>
             </div>
           </form>
           
+          <!-- Skip Button -->
+          <div class="text-center mt-3">
+            <button type="button" class="btn discount-skip-btn" data-bs-dismiss="modal" style="background: transparent; border: none; color: #6c757d; font-size: 0.8125rem; text-decoration: underline; padding: 0.25rem 0.5rem; cursor: pointer;">
+              Skip for now
+            </button>
+          </div>
+          
           <!-- Success Message -->
-          <div id="successMessage" class="alert alert-success d-none mt-3" style="border-radius: 10px;">
-            <div class="d-flex align-items-center">
-              <i class="fas fa-check-circle me-2"></i>
-              <div>
-                <strong>Congratulations!</strong><br>
-                <span id="couponCode" class="fw-bold"></span>
-                <div class="mt-2">
-                  <small>Use this code at checkout to get 10% off on orders above ₹100</small>
+          <div id="successMessage" class="alert alert-success d-none mt-3 discount-alert">
+            <div class="d-flex align-items-start">
+              <i class="fas fa-check-circle me-2 mt-1" style="font-size: 0.875rem;"></i>
+              <div style="font-size: 0.8125rem;">
+                <strong style="font-size: 0.875rem;">Congratulations!</strong><br>
+                <span id="couponCode" class="fw-bold" style="font-size: 0.875rem;"></span>
+                <div class="mt-1">
+                  <small style="font-size: 0.75rem;">Use this code at checkout to get 10% off on orders above ₹100</small>
                 </div>
               </div>
             </div>
           </div>
           
           <!-- Error Message -->
-          <div id="errorMessage" class="alert alert-danger d-none mt-3" style="border-radius: 10px;">
+          <div id="errorMessage" class="alert alert-danger d-none mt-3 discount-alert" style="font-size: 0.8125rem;">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <span id="errorText"></span>
           </div>
         </div>
-        <div class="modal-footer border-0 pt-0">
-          <button type="button" class="btn btn-link text-muted fw-semibold" data-bs-dismiss="modal" style="text-decoration: none;">
-            <i class="fas fa-times me-1"></i>Skip for now
-          </button>
-        </div>
       </div>
     </div>
   </div>
+
+  <style>
+    /* Compact Discount Modal Styles - Perfectly Centered */
+    .modal.show#discountModal {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding-right: 0 !important;
+    }
+
+    .modal-dialog-centered.discount-modal-dialog {
+      margin: 0 auto !important;
+      max-width: 420px !important;
+      width: 100% !important;
+    }
+
+    .discount-modal-content {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .discount-modal-header {
+      background: linear-gradient(135deg, #06402B, #0a5d3a);
+      padding: 0.75rem 1rem;
+      position: relative;
+    }
+
+    /* Override any global button styles */
+    #discountModal .discount-close-btn,
+    #discountModal button.discount-close-btn,
+    .modal#discountModal .discount-close-btn {
+      position: absolute !important;
+      top: 0.5rem !important;
+      right: 0.5rem !important;
+      z-index: 1060 !important;
+      background: white !important;
+      border: 2px solid white !important;
+      cursor: pointer !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 32px !important;
+      width: 32px !important;
+      border-radius: 50% !important;
+      transition: all 0.2s !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+      color: #000000 !important;
+      /* Override global btn styles */
+      background-color: white !important;
+      border-color: white !important;
+      font-size: inherit !important;
+      font-weight: inherit !important;
+      text-decoration: none !important;
+      pointer-events: auto !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    #discountModal .discount-close-btn:hover,
+    #discountModal button.discount-close-btn:hover,
+    .modal#discountModal .discount-close-btn:hover {
+      background: #f8f9fa !important;
+      background-color: #f8f9fa !important;
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+      color: #000 !important;
+    }
+
+    #discountModal .discount-close-btn i,
+    #discountModal button.discount-close-btn i,
+    .modal#discountModal .discount-close-btn i,
+    #discountModal .discount-close-btn .fas,
+    #discountModal .discount-close-btn .fa-times,
+    #discountModal .discount-close-btn i.fa-times,
+    #discountModal .discount-close-btn i.fas {
+      color: #000000 !important;
+      font-size: 1rem !important;
+      font-weight: bold !important;
+      line-height: 1 !important;
+      /* Ensure icon inherits black color */
+      display: inline-block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      /* Force black color with all possible methods */
+      fill: #000000 !important;
+      stroke: #000000 !important;
+    }
+
+    .discount-skip-btn {
+      background: transparent !important;
+      border: none !important;
+      color: #6c757d !important;
+      font-size: 0.8125rem !important;
+      text-decoration: underline !important;
+      padding: 0.25rem 0.5rem !important;
+      cursor: pointer !important;
+      transition: color 0.2s !important;
+    }
+
+    .discount-skip-btn:hover {
+      color: #06402B !important;
+    }
+
+    .discount-modal-title {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .discount-modal-subtitle {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .discount-modal-body {
+      padding: 1rem;
+    }
+
+    .discount-modal-text {
+      font-size: 0.8125rem;
+    }
+
+    .discount-form-label {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      margin-bottom: 0.375rem;
+      color: #495057;
+    }
+
+    .discount-form-input {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+    }
+
+    .discount-form-input:focus {
+      border-color: #06402B;
+      box-shadow: 0 0 0 0.2rem rgba(6, 64, 43, 0.25);
+    }
+
+    .discount-submit-btn {
+      background: #06402B;
+      border: none;
+      border-radius: 6px;
+      padding: 0.625rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .discount-submit-btn:hover {
+      background: #0a5d3a;
+    }
+
+    .discount-alert {
+      font-size: 0.8125rem;
+      padding: 0.625rem 0.75rem;
+      border-radius: 6px;
+    }
+
+
+    /* Mobile Responsive */
+    @media (max-width: 576px) {
+      .modal-dialog-centered.discount-modal-dialog {
+        max-width: calc(100% - 2rem) !important;
+        margin: 1rem auto !important;
+      }
+
+      .discount-modal-header {
+        padding: 0.625rem 0.875rem;
+      }
+
+      .discount-modal-title {
+        font-size: 0.9375rem;
+      }
+
+      .discount-modal-subtitle {
+        font-size: 0.6875rem;
+      }
+
+      .discount-modal-body {
+        padding: 0.875rem;
+      }
+
+      .discount-form-label {
+        font-size: 0.75rem;
+      }
+
+      .discount-form-input {
+        font-size: 0.8125rem;
+        padding: 0.4375rem 0.625rem;
+      }
+
+      .discount-submit-btn {
+        font-size: 0.8125rem;
+        padding: 0.5625rem;
+      }
+
+      .discount-badge {
+        font-size: 0.8125rem !important;
+        padding: 0.375rem 0.75rem !important;
+      }
+
+      .discount-alert {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.625rem;
+      }
+
+    }
+
+    @media (max-width: 360px) {
+      .discount-modal-title {
+        font-size: 0.875rem;
+      }
+
+      .discount-modal-subtitle {
+        font-size: 0.625rem;
+      }
+
+      .discount-form-input {
+        font-size: 0.75rem;
+      }
+
+      .discount-submit-btn {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
 
   <script src="{% static 'js/buy_now.js' %}"></script>
     <!-- Ensure Bootstrap JS is loaded for modal functionality -->
@@ -733,15 +966,32 @@
   <!-- Discount Popup Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Always show popup after 3 seconds on page load
+      // Check if popup was already shown in this session
+      if (sessionStorage.getItem('discountPopupShown') === 'true') {
+        return; // Don't show popup if already shown in this session
+      }
+      
+      // Show popup after 3 seconds on page load
       setTimeout(function() {
         try {
           const discountModal = new bootstrap.Modal(document.getElementById('discountModal'));
           discountModal.show();
+          
+          // Mark as shown in sessionStorage when modal is displayed
+          sessionStorage.setItem('discountPopupShown', 'true');
+          
+          // Also mark when modal is closed/clicked
+          document.getElementById('discountModal').addEventListener('hidden.bs.modal', function() {
+            sessionStorage.setItem('discountPopupShown', 'true');
+          });
         } catch (e) {
           // Fallback: force show modal if Bootstrap JS is not loaded yet
-          document.getElementById('discountModal').classList.add('show');
-          document.getElementById('discountModal').style.display = 'block';
+          const modalElement = document.getElementById('discountModal');
+          modalElement.classList.add('show');
+          modalElement.style.display = 'flex';
+          modalElement.style.alignItems = 'center';
+          modalElement.style.justifyContent = 'center';
+          sessionStorage.setItem('discountPopupShown', 'true');
         }
       }, 3000);
       
@@ -790,6 +1040,9 @@
             successMessage.classList.remove('d-none');
             couponCodeSpan.textContent = `Your coupon code: ${data.coupon_code}`;
             
+            // Mark as shown in sessionStorage
+            sessionStorage.setItem('discountPopupShown', 'true');
+            
             // Auto close modal after 10 seconds
             setTimeout(function() {
               bootstrap.Modal.getInstance(document.getElementById('discountModal')).hide();
@@ -810,8 +1063,43 @@
           submitBtn.disabled = false;
         });
       });
-      // No localStorage logic, always show popup on refresh
-    });
+      
+      // Mark as shown when close button or skip button is clicked
+      document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          sessionStorage.setItem('discountPopupShown', 'true');
+        });
+      });
+      
+      // Explicitly handle close button click
+      const closeBtn = document.querySelector('#discountModal .discount-close-btn');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const modalInstance = bootstrap.Modal.getInstance(document.getElementById('discountModal'));
+          if (modalInstance) {
+            modalInstance.hide();
+          } else {
+            const modalElement = document.getElementById('discountModal');
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+              backdrop.remove();
+            }
+          }
+          sessionStorage.setItem('discountPopupShown', 'true');
+        });
+        
+        // Force icon to be black
+        const icon = closeBtn.querySelector('i');
+        if (icon) {
+          icon.style.color = '#000000';
+          icon.style.setProperty('color', '#000000', 'important');
+        }
+      }
     });
   </script>
 

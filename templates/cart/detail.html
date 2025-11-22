@@ -91,19 +91,34 @@
         color: #222;
     }
     .cart-summary-mobile {
-        font-size: 1.1rem;
-        padding: 16px 8px;
+        font-size: 1rem;
+        padding: 16px;
         border-radius: 10px;
         box-shadow: 0 1px 6px rgba(0,0,0,0.06);
         margin-bottom: 16px;
+        background: #f8f9fa;
     }
-    .cart-summary-mobile h5 {
+    .cart-summary-mobile h4 {
         font-size: 1.2rem;
-        margin-bottom: 10px;
+        font-weight: 600;
+        margin-bottom: 16px;
     }
     .cart-summary-mobile .d-flex {
-        font-size: 1rem;
-        margin-bottom: 8px;
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+    }
+    .cart-summary-mobile .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.1rem;
+        background-color: #06402B;
+        border-color: #06402B;
+        color: #fff;
+        border-radius: 6px;
+    }
+    .cart-summary-mobile .text-primary {
+        font-size: 1.3rem;
+        font-weight: 700;
     }
 }
 </style>
@@ -141,9 +156,9 @@
                                     <h6 class="mb-1"><a href="{% url 'store:product_detail' item.product.slug %}" style="color: inherit; text-decoration: none;">{{ item.product.name }}</a></h6>
                                     <p class="text-muted mb-0" style="font-size: 12px;">{{ item.product.category.name }}</p>
                                 </div>
-                                <form method="post" action="{% url 'cart:cart_remove' item.product.id %}">
+                                <form method="post" action="{% url 'cart:cart_remove' item.product.id %}" class="remove-item-form">
                                     {% csrf_token %}
-                                    <button class="mobile-remove-btn" type="submit">Remove</button>
+                                    <button class="mobile-remove-btn remove-item-btn" type="submit" data-product-id="{{ item.product.id }}">Remove</button>
                                 </form>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
@@ -177,7 +192,41 @@
                     </div>
                 </div>
 
-                <!-- Cart Summary Mobile and Trust Badges are already present in desktop layout below. Removed duplicate. -->
+                <!-- Cart Summary Mobile -->
+                <div class="cart-summary-mobile bg-light p-4 mb-4">
+                    <h4 class="text-uppercase mb-4">Cart Total</h4>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Price ({{ cart|length }} item{{ cart|length|pluralize }})</span>
+                        <span class="fw-bold">₹{{ mrp_total|floatformat:2 }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Discount on MRP</span>
+                        <span class="fw-bold text-success">-₹{{ discount|floatformat:2 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                        <span>Convenience Fee</span>
+                        <span class="fw-bold text-success">₹0</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="text-uppercase fw-bold">Total Amount</span>
+                        <span class="text-primary fw-bold">₹{{ total|floatformat:2 }}</span>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg w-100 mb-3"
+                        onclick="window.location.href='{% url 'orders:checkout' %}'">Proceed to Checkout</button>
+
+                    <div class="text-center">
+                        <p class="text-muted mb-2">We Accept:</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <img src="{% static 'images/essentials/upi-icon.png' %}" alt="UPI" height="30">
+                            <img src="{% static 'images/essentials/visa-icon.png' %}" alt="Visa" height="30">
+                            <img src="{% static 'images/essentials/discover.png' %}" alt="Discover" height="30">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Desktop Cart Layout (existing) -->
@@ -245,9 +294,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <span class="fw-bold">₹{{ item.total_price }}</span>
                                             </td>
                                             <td class="align-middle">
-                                                <form method="post" action="{% url 'cart:cart_remove' item.product.id %}">
+                                                <form method="post" action="{% url 'cart:cart_remove' item.product.id %}" class="remove-item-form">
                                                     {% csrf_token %}
-                                                    <button class="btn btn-link text-danger p-0" type="submit">
+                                                    <button class="btn btn-link text-danger p-0 remove-item-btn" type="submit" data-product-id="{{ item.product.id }}">
                                                         <svg width="20" height="20">
                                                             <use xlink:href="#trash"></use>
                                                         </svg>
@@ -313,33 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span>Convenience Fee</span>
                             <span class="fw-bold text-success">₹0</span>
                         </div>
-{% comment %} 
-                        <div class="mb-3 pb-3 border-bottom">
-                            <h6 class="text-uppercase mb-3">Shipping</h6>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="shipping" id="freeShipping" checked>
-                                <label class="form-check-label d-flex justify-content-between w-100" for="freeShipping">
-                                    <span>Free Shipping</span>
-                                    <span>₹0.00</span>
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="shipping" id="flatRate">
-                                <label class="form-check-label d-flex justify-content-between w-100" for="flatRate">
-                                    <span>Flat Rate</span>
-                                    <span>₹15.00</span>
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="shipping" id="express">
-                                <label class="form-check-label d-flex justify-content-between w-100" for="express">
-                                    <span>Express Shipping</span>
-                                    <span>₹30.00</span>
-                                </label>
-                            </div>
-                            <a href="#" class="text-primary text-decoration-none mt-2 d-block">Calculate
-                                Shipping</a>
-                        </div> {% endcomment %}
 
                         <div class="d-flex justify-content-between mb-4">
                             <span class="text-uppercase fw-bold">Total Amount</span>
@@ -372,4 +394,69 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </section>
-    {%endblock %}
+    <script>
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.remove-item-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const form = this.form;
+                const url = form.getAttribute('action');
+                let csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+                if (!csrfToken) {
+                    csrfToken = getCookie('csrftoken');
+                }
+                btn.disabled = true;
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the row from the DOM without refreshing
+                        const row = btn.closest('tr');
+                        if (row) row.remove();
+                        // Optionally update cart totals here (production best practice)
+                        if (data.cart_total_items !== undefined) {
+                            const cartCountEls = document.querySelectorAll('.cart-count');
+                            cartCountEls.forEach(el => el.textContent = data.cart_total_items);
+                        }
+                        if (data.cart_total_price !== undefined) {
+                            const cartTotalEls = document.querySelectorAll('.cart-total');
+                            cartTotalEls.forEach(el => el.textContent = '₹' + data.cart_total_price.toFixed(2));
+                        }
+                    } else {
+                        alert(data.message || 'Failed to remove item from cart');
+                        btn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while removing the item');
+                    btn.disabled = false;
+                });
+            });
+        });
+    });
+    </script>
+{% endblock %}

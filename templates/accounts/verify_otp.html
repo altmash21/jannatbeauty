@@ -1,6 +1,6 @@
 ﻿{% extends 'base_plain.html' %}
 {% load static %}
-{% block title %}Verify OTP - Jannat Beauty{% endblock %}
+{% block title %}Verify OTP - Jannat Library{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/material-design-iconic-font.min.css' %}">
 <style>
@@ -158,7 +158,7 @@
 <div class="login-container">
 	<div class="login-card">
 		<div class="brand-logo">
-			<h1>JANNAT BEAUTY</h1>
+			<h1>JANNAT LIBRARY</h1>
 		</div>
 		<div class="login-header">
 			<h2>Verify OTP</h2>
@@ -180,9 +180,8 @@
 			{% endif %}
 			<div class="form-wrapper">
 				<input type="text" name="otp" placeholder="Enter OTP code" maxlength="6" required>
-				<i class="zmdi zmdi-key"></i>
 			</div>
-			<button type="submit" class="btn-login">Verify code <i class="zmdi zmdi-arrow-right"></i></button>
+			<button type="submit" class="btn-login">Verify code</button>
 			<div class="signup-link">
 				<a href="#" id="resend-otp-link">Resend OTP</a>
 				<span id="resend-otp-msg" style="display:none; margin-left:8px;"></span>

@@ -1,16 +1,451 @@
-{% extends 'base.html' %}
+{% extends 'seller_base.html' %}
+{% load static %}
 
 {% block title %}Add Product{% endblock %}
 
+{% block extra_css %}
+<style>
+    .product-form {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .section-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+    
+    .section-header i {
+        color: #3b82f6;
+        font-size: 1.25rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .form-group label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+    
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group select,
+    .form-group textarea,
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        color: #1f2937;
+        background: #ffffff;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+    
+    .form-group input[type="text"]:focus,
+    .form-group input[type="number"]:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    .form-group select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 2.5rem;
+    }
+    
+    .form-group input[type="file"] {
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .form-group input[type="file"]::file-selector-button {
+        padding: 0.5rem 1rem;
+        margin-right: 1rem;
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .form-group input[type="file"]::file-selector-button:hover {
+        background: #e5e7eb;
+    }
+    
+    .form-group .help-text {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.8125rem;
+        color: #6b7280;
+    }
+    
+    .form-group .error-list {
+        margin-top: 0.5rem;
+        color: #ef4444;
+        font-size: 0.875rem;
+    }
+    
+    .form-group .error-list li {
+        list-style: none;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #374151;
+        border: 1.5px solid #d1d5db;
+    }
+    
+    .btn-secondary:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+    
+    .current-image {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .current-image img {
+        max-width: 200px;
+        height: auto;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #3b82f6;
+    }
+    
+    .checkbox-group label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    @media (max-width: 768px) {
+        .product-form {
+            padding: 0.5rem;
+        }
+        
+        .form-section {
+            padding: 1.5rem;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container" style="max-width:720px;">
-    <div class="card">
-        <h3 style="margin:0 0 0.5rem 0;">Add Product</h3>
-        <form method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:0.6rem;">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div style="margin-top:0.5rem;"><button type="submit" class="btn">Add Product</button></div>
-        </form>
+<div class="product-form">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-plus-circle" style="color: #3b82f6;"></i> Add New Product
+        </h1>
+        <p style="color: #6b7280; font-size: 0.9375rem;">Create a new product listing for your store</p>
     </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Product Information Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <i class="fas fa-info-circle"></i>
+                <h3>Product Information</h3>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">
+                    Product Name <span class="required">*</span>
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <ul class="error-list">
+                        {% for error in form.name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">
+                    Description <span class="required">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <ul class="error-list">
+                        {% for error in form.description.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.category.id_for_label }}">
+                        Category <span class="required">*</span>
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <ul class="error-list">
+                            {% for error in form.category.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                {% if form.major_category %}
+                <div class="form-group">
+                    <label for="{{ form.major_category.id_for_label }}">
+                        Major Category
+                    </label>
+                    {{ form.major_category }}
+                    {% if form.major_category.errors %}
+                        <ul class="error-list">
+                            {% for error in form.major_category.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <span class="help-text">Select a special category for homepage display</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Pricing & Inventory Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <i class="fas fa-dollar-sign"></i>
+                <h3>Pricing & Inventory</h3>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.price.id_for_label }}">
+                        Price <span class="required">*</span>
+                    </label>
+                    {{ form.price }}
+                    {% if form.price.errors %}
+                        <ul class="error-list">
+                            {% for error in form.price.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.compare_price.id_for_label }}">
+                        Compare Price
+                    </label>
+                    {{ form.compare_price }}
+                    {% if form.compare_price.errors %}
+                        <ul class="error-list">
+                            {% for error in form.compare_price.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <span class="help-text">Original price for discount display</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.stock.id_for_label }}">
+                        Stock <span class="required">*</span>
+                    </label>
+                    {{ form.stock }}
+                    {% if form.stock.errors %}
+                        <ul class="error-list">
+                            {% for error in form.stock.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Images Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <i class="fas fa-images"></i>
+                <h3>Product Images</h3>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.image.id_for_label }}">
+                    Main Product Image <span class="required">*</span>
+                </label>
+                {{ form.image }}
+                {% if form.image.errors %}
+                    <ul class="error-list">
+                        {% for error in form.image.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <span class="help-text">Recommended size: 500x500 pixels. Image will be automatically resized.</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="extra_images">
+                    Additional Images
+                </label>
+                <input type="file" name="extra_images" id="extra_images" multiple accept="image/*" class="form-control">
+                <span class="help-text">Upload multiple images to showcase your product from different angles (optional)</span>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <i class="fas fa-cog"></i>
+                <h3>Settings</h3>
+            </div>
+            
+            <div class="checkbox-group">
+                {{ form.available }}
+                <label for="{{ form.available.id_for_label }}">
+                    Product is available for purchase
+                </label>
+            </div>
+            {% if form.available.errors %}
+                <ul class="error-list">
+                    {% for error in form.available.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'accounts:seller_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Add Product
+            </button>
+        </div>
+    </form>
 </div>
 {% endblock %}

@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from store.models import Product
 from .cart import Cart
 import logging
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
@@ -75,13 +76,17 @@ def cart_add(request, product_id):
 
 @require_POST
 def cart_remove(request, product_id):
+    logger.info(f"Cart remove called with product_id={product_id}")
+    cart = Cart(request)
+    logger.info(f"Cart contents before removal: {cart.cart}")
     try:
-        cart = Cart(request)
         product = get_object_or_404(Product, id=product_id)
         cart.remove(product)
+        logger.info(f"Product {product_id} removed from cart.")
         success = True
         message = f'{product.name} removed from cart!'
     except Exception as e:
+        logger.error(f"Error removing product: {e}")
         success = False
         message = f'Error removing product: {str(e)}'
 
@@ -212,8 +217,6 @@ def cart_count(request):
     from django.http import JsonResponse
     return JsonResponse({'count': cart.get_total_quantity()})
 
-
-from django.views.decorators.http import require_POST
 
 @require_POST
 def clear_cart(request):

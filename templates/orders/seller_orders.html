@@ -15,7 +15,7 @@
             <tbody>
             {% for order in orders %}
                 <tr>
-                    <td>{{ order.id }}</td>
+                    <td>{% if order.order_number %}#{{ order.order_number }}{% else %}#{{ order.id|slice:":8"|upper }}{% endif %}</td>
                     <td>{{ order.date }}</td>
                     <td>{{ order.get_order_status_display }}</td>
                 </tr>

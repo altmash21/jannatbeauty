@@ -20,7 +20,7 @@ class Command(BaseCommand):
         environment = options['environment']
         
         self.stdout.write(
-            self.style.SUCCESS(f'🚀 Setting up Jannat Beauty for {environment} environment...')
+            self.style.SUCCESS(f'🚀 Setting up Jannat Library for {environment} environment...')
         )
 
         if environment == 'production':

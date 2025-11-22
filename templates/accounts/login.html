@@ -1,6 +1,6 @@
 {% extends 'base_plain.html' %}
 {% load static %}
-{% block title %}Sign In - Jannat Beauty{% endblock %}
+{% block title %}Sign In - Jannat Library{% endblock %}
 {% block extra_css %}
 <style>
   .login-container {
@@ -189,11 +189,11 @@
 <div class="login-container">
   <div class="login-card">
     <div class="login-image d-none d-md-flex">
-      <img src="{% static 'images/login.webp' %}" alt="Jannat Beauty" onerror="this.src='{% static 'images/main-logo.png' %}'">
+      <img src="{% static 'images/login.webp' %}" alt="Jannat Library" onerror="this.src='{% static 'images/main-logo.png' %}'">
     </div>
     <div class="login-form-section">
       <div class="brand-logo">
-        <h1>JANNAT BEAUTY</h1>
+        <h1>JANNAT LIBRARY</h1>
       </div>
       
       <div class="login-header">
@@ -202,9 +202,14 @@
       </div>
       
       {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
-        {% endfor %}
+        <div class="messages-container">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert" data-message-id="{{ forloop.counter }}">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
       
       <form method="post" action="{% url 'accounts:login' %}">
@@ -244,4 +249,47 @@
     </div>
   </div>
 </div>
+
+<script>
+// Auto-dismiss messages after 5 seconds and prevent accumulation
+document.addEventListener('DOMContentLoaded', function() {
+    const messages = document.querySelectorAll('.alert');
+    
+    messages.forEach(function(message, index) {
+        // Auto-dismiss after 5 seconds
+        setTimeout(function() {
+            if (message && message.parentElement) {
+                message.style.transition = 'opacity 0.5s, transform 0.5s';
+                message.style.opacity = '0';
+                message.style.transform = 'translateY(-10px)';
+                setTimeout(function() {
+                    if (message.parentElement) {
+                        message.remove();
+                    }
+                }, 500);
+            }
+        }, 5000 + (index * 200)); // Stagger messages slightly
+        
+        // Add click to dismiss functionality
+        const closeBtn = message.querySelector('.btn-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                message.style.transition = 'opacity 0.5s, transform 0.5s';
+                message.style.opacity = '0';
+                message.style.transform = 'translateY(-10px)';
+                setTimeout(function() {
+                    if (message.parentElement) {
+                        message.remove();
+                    }
+                }, 500);
+            });
+        }
+    });
+    
+    // Clear all messages when navigating away to prevent accumulation
+    window.addEventListener('beforeunload', function() {
+        // Messages will be consumed by Django after being displayed
+    });
+});
+</script>
 {% endblock %}

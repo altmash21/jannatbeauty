@@ -19,17 +19,17 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'seller', 'category', 'major_category', 'price', 'stock', 'available', 'approved', 'created']
+    list_display = ['name', 'sku', 'seller', 'category', 'major_category', 'price', 'stock', 'available', 'approved', 'created']
     list_filter = ['available', 'approved', 'featured', 'created', 'updated', 'category', 'major_category', 'seller']
     list_editable = ['price', 'stock', 'available', 'approved']
-    search_fields = ['name', 'description', 'seller__username', 'seller__seller_profile__business_name']
+    search_fields = ['name', 'sku', 'description', 'seller__username', 'seller__seller_profile__business_name']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ['created', 'updated']
     inlines = [ProductImageInline]
     
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'seller', 'category', 'major_category', 'description')
+            'fields': ('name', 'sku', 'slug', 'seller', 'category', 'major_category', 'description')
         }),
         ('Pricing', {
             'fields': ('price', 'compare_price')
@@ -49,6 +49,24 @@ class ProductAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.seller:
             obj.seller = request.user
+        
+        # Track previous approval status to detect changes
+        if change:
+            old_obj = Product.objects.get(pk=obj.pk)
+            old_approved = old_obj.approved
+            new_approved = obj.approved
+            
+            # If approval status changed, send email
+            if old_approved != new_approved:
+                super().save_model(request, obj, form, change)
+                try:
+                    send_product_approval_email(obj, new_approved)
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f'Failed to send product approval email for product {obj.id}: {str(e)}')
+                return
+        
         super().save_model(request, obj, form, change)
 
 
@@ -70,8 +88,8 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
-    list_display = ['name', 'mobile', 'email_sent', 'created']
+    list_display = ['name', 'mobile', 'coupon_code', 'email_sent', 'created']
     list_filter = ['email_sent', 'created']
-    search_fields = ['name', 'mobile']
+    search_fields = ['name', 'mobile', 'coupon_code']
     readonly_fields = ['created', 'updated']
     list_editable = ['email_sent']

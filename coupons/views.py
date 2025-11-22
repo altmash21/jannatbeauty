@@ -7,7 +7,17 @@ from cart.cart import Cart
 import random
 import string
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from datetime import timedelta
+from django.core.mail import send_mail
+from django.conf import settings
 import json
+
+# Import Lead model
+try:
+    from store.models import Lead
+except ImportError:
+    Lead = None
 
 @login_required
 def apply_coupon(request):
@@ -73,36 +83,116 @@ def get_discount_popup(request):
                     'message': 'Please provide both name and phone number.'
                 })
             
-            # Check if phone already used (optional - remove if you want to allow multiple uses)
-            existing_coupon = Coupon.objects.filter(
-                code__icontains=phone[-4:],  # Check last 4 digits of phone
-                active=True
-            ).first()
-            
-            if existing_coupon:
+            # Validate phone number (10 digits)
+            if not phone.isdigit() or len(phone) != 10:
                 return JsonResponse({
-                    'success': True,
-                    'coupon_code': existing_coupon.code,
-                    'message': f'Welcome back {name}! Use your existing coupon code.'
+                    'success': False,
+                    'message': 'Please provide a valid 10-digit phone number.'
                 })
             
-            # Generate unique coupon code
-            code = f"WELCOME{phone[-4:]}{''.join(random.choices(string.ascii_uppercase, k=2))}"
+            # Use a single shared coupon code for all visitors
+            # Check if the shared coupon already exists
+            shared_coupon_code = "WELCOME10"
+            coupon = None
             
-            # Create coupon
-            coupon = Coupon.objects.create(
-                code=code,
-                discount_type='percentage',
-                discount=10,
-                min_purchase_amount=100,  # Minimum ₹100 purchase
-                usage_limit=1,
-                active=True,
-            )
+            try:
+                # Try to get existing shared coupon
+                coupon = Coupon.objects.get(code=shared_coupon_code, active=True)
+                # Check if it's still valid
+                if not coupon.is_valid():
+                    # If expired, create a new one with same code (after deactivating old one)
+                    coupon.active = False
+                    coupon.save()
+                    coupon = None
+            except Coupon.DoesNotExist:
+                pass  # Coupon doesn't exist, create new one
+            
+            # Create new shared coupon if it doesn't exist or is expired
+            if not coupon:
+                # Set coupon validity (30 days from now)
+                now = timezone.now()
+                valid_from = now
+                valid_to = now + timedelta(days=30)
+                
+                # Create the shared coupon
+                coupon = Coupon.objects.create(
+                    code=shared_coupon_code,
+                    discount_type='percentage',
+                    discount_value=10,  # 10% discount
+                    min_purchase_amount=100,  # Minimum ₹100 purchase
+                    usage_limit=None,  # Unlimited uses (shared coupon)
+                    valid_from=valid_from,
+                    valid_to=valid_to,
+                    active=True,
+                )
+            
+            code = coupon.code
+            
+            # Save lead information
+            email_sent = False
+            if Lead:
+                lead = Lead.objects.create(
+                    name=name,
+                    mobile=phone,
+                    coupon_code=code,
+                    email_sent=False
+                )
+                
+                # Send email to admin
+                try:
+                    # Get admin email - try ADMIN_EMAIL setting first, then ADMINS setting, then DEFAULT_FROM_EMAIL
+                    admin_email = getattr(settings, 'ADMIN_EMAIL', None)
+                    if not admin_email:
+                        # Try ADMINS setting (list of tuples: [('Name', 'email@example.com'), ...])
+                        admins = getattr(settings, 'ADMINS', [])
+                        if admins:
+                            admin_email = admins[0][1]  # Get email from first admin tuple
+                        else:
+                            admin_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'admin@jannatlibrary.com')
+                    
+                    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
+                    
+                    subject = f'New Discount Popup Lead - {name}'
+                    message = f'''A new visitor has claimed a 10% discount coupon!
+
+Name: {name}
+Phone: {phone}
+Coupon Code: {code}
+Valid Until: {valid_to.strftime('%Y-%m-%d %H:%M:%S')}
+Minimum Purchase: ₹100
+
+This coupon gives 10% discount on orders above ₹100.
+
+View all leads in admin panel:
+{request.build_absolute_uri('/admin/store/lead/')}
+
+Best regards,
+Jannat Library System
+'''
+                    
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=from_email,
+                        recipient_list=[admin_email],
+                        fail_silently=False,
+                    )
+                    
+                    email_sent = True
+                    # Update lead email_sent status
+                    lead.email_sent = True
+                    lead.save(update_fields=['email_sent'])
+                    
+                except Exception as email_error:
+                    # Log error but don't fail the request
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f'Failed to send admin email for lead {name}: {str(email_error)}')
             
             return JsonResponse({
                 'success': True,
                 'coupon_code': coupon.code,
-                'message': f'Congratulations {name}! You got 10% off coupon: {coupon.code}'
+                'message': f'Congratulations {name}! Your 10% discount coupon: {coupon.code} is ready. Use it at checkout!'
             })
             
         except json.JSONDecodeError:
@@ -111,9 +201,12 @@ def get_discount_popup(request):
                 'message': 'Invalid data format.'
             })
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f'Error in get_discount_popup: {str(e)}')
             return JsonResponse({
                 'success': False,
-                'message': 'Something went wrong. Please try again.'
+                'message': f'Something went wrong. Please try again. Error: {str(e)}'
             })
     
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})

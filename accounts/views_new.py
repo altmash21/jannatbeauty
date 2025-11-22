@@ -72,10 +72,10 @@ def register_customer(request):
                 print(f"{'='*70}\n")
             
             # Send email
-            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatbeauty.com')
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
             send_mail(
-                subject='Verify Your Email - Jannat Beauty',
-                message=f'''Hello,\n\nYour verification code is: {otp_instance.otp_code}\n\nThis code will expire in 10 minutes.\n\nBest regards,\nJannat Beauty Team''',
+                subject='Verify Your Email - Jannat Library',
+                message=f'''Hello,\n\nYour verification code is: {otp_instance.otp_code}\n\nThis code will expire in 10 minutes.\n\nBest regards,\nJannat Library Team''',
                 from_email=from_email,
                 recipient_list=[email],
                 fail_silently=False,
@@ -118,10 +118,10 @@ def resend_registration_otp(request):
             print(f"Expires at: {otp_instance.expires_at}")
             print(f"{'='*70}\n")
         # Send email
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatbeauty.com')
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
         send_mail(
-            subject='Verify Your Email - Jannat Beauty',
-            message=f'''Hello,\n\nYour new verification code is: {otp_instance.otp_code}\n\nThis code will expire in 10 minutes.\n\nBest regards,\nJannat Beauty Team''',
+            subject='Verify Your Email - Jannat Library',
+            message=f'''Hello,\n\nYour new verification code is: {otp_instance.otp_code}\n\nThis code will expire in 10 minutes.\n\nBest regards,\nJannat Library Team''',
             from_email=from_email,
             recipient_list=[email],
             fail_silently=False,
@@ -159,10 +159,10 @@ def resend_passwordreset_otp(request):
             print(f"Expires at: {otp_instance.expires_at}")
             print(f"{'='*70}\n")
         # Send email
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatbeauty.com')
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
         send_mail(
-            subject='Password Reset OTP - Jannat Beauty',
-            message=f'''Hello,\n\nYour new OTP is: {otp_instance.otp_code}\n\nThis OTP will expire in 10 minutes.\n\nBest regards,\nJannat Beauty Team''',
+            subject='Password Reset OTP - Jannat Library',
+            message=f'''Hello,\n\nYour new OTP is: {otp_instance.otp_code}\n\nThis OTP will expire in 10 minutes.\n\nBest regards,\nJannat Library Team''',
             from_email=from_email,
             recipient_list=[email],
             fail_silently=False,
@@ -278,7 +278,16 @@ def verify_registration_otp(request):
                 # Log the user in
                 login(request, user)
                 
-                messages.success(request, 'Account created successfully! Welcome to Jannat Beauty.')
+                # Send welcome email
+                try:
+                    from .utils import send_welcome_email
+                    send_welcome_email(user)
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f'Failed to send welcome email to user {user.id}: {str(e)}')
+                
+                messages.success(request, 'Account created successfully! Welcome to Jannat Library.')
                 return redirect('accounts:customer_dashboard')
             else:
                 messages.error(request, 'Invalid or expired OTP.')
@@ -770,12 +779,12 @@ def forgot_password(request):
             
             # Send email with OTP
             try:
-                from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatbeauty.com')
+                from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
                 if settings.DEBUG:
                     print(f"Sending email from: {from_email}")
                 
                 send_mail(
-                    subject='Password Reset OTP - Jannat Beauty',
+                    subject='Password Reset OTP - Jannat Library',
                     message=f'''Hello {user.first_name or user.username},
 
 You requested a password reset for your account.
@@ -787,7 +796,7 @@ This OTP will expire in 10 minutes.
 If you didn't request this, please ignore this email.
 
 Best regards,
-Jannat Beauty Team''',
+Jannat Library Team''',
                     from_email=from_email,
                     recipient_list=[email],
                     fail_silently=False,
@@ -934,6 +943,15 @@ def reset_password(request):
                 user = User.objects.get(id=user_id)
                 user.set_password(password1)
                 user.save()
+                
+                # Send password change confirmation email
+                try:
+                    from .utils import send_password_change_confirmation_email
+                    send_password_change_confirmation_email(user)
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f'Failed to send password change confirmation email to user {user.id}: {str(e)}')
                 
                 # Clear session data
                 request.session.pop('otp_verified', None)
