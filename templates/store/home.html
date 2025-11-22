@@ -142,12 +142,43 @@
     color: #495057;
     text-decoration: underline;
   }
+
+  .discount-modal-content {
+    background: url('{% static 'images/essentials/modalbg.webp' %}') center center/cover no-repeat !important;
+    background-color: transparent !important;
+    box-shadow: 0 2px 16px rgba(6, 64, 43, 0.08);
+    position: relative;
+}
+.discount-modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 0;
+    border-radius: 20px;
+}
+.discount-modal-content > * {
+    position: relative;
+    z-index: 1;
+}
+.discount-modal-content, .discount-modal-content * {
+    color: #fff !important;
+}
+.discount-modal-content input,
+.discount-modal-content textarea {
+    color: #222 !important;
+    background: #fff !important;
+}
+.discount-modal-content .btn,
+.discount-modal-content button {
+    color: #fff !important;
+}
 </style>
 {% endblock %}
 {% block content %}
   <section id="hero" class="hero-section position-relative overflow-hidden">
     <!-- Video Background -->
-    <video class="hero-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover" autoplay muted loop>
+    <video class="hero-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover" autoplay muted loop playsinline>
       <source src="{% static 'videos/background3.mp4' %}" type="video/mp4">
       <source src="{% static 'videos/hero-video.webm' %}" type="video/webm">
       <!-- Fallback for browsers that don't support video -->
@@ -658,7 +689,7 @@
   <!-- Discount Popup Modal -->
   <div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered discount-modal-dialog">
-      <div class="modal-content border-0 shadow-lg discount-modal-content">
+      <div class="modal-content border-0 shadow-lg discount-modal-content" style="background: url('{% static 'images/modalbg.webp' %}') center center/cover no-repeat;">
         <div class="modal-header bg-gradient text-white text-center border-0 discount-modal-header position-relative">
           <button type="button" data-bs-dismiss="modal" aria-label="Close" class="discount-close-btn" id="discountCloseBtn" style="position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1060; background: white !important; border: 2px solid white !important; cursor: pointer !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 32px !important; width: 32px !important; border-radius: 50% !important; transition: all 0.2s !important; box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important; color: #000000 !important; pointer-events: auto !important;">
             <span style="font-size: 1.25rem !important; color: #000000 !important; font-weight: bold !important; line-height: 1 !important; display: inline-block !important;">&times;</span>
@@ -671,12 +702,6 @@
           </div>
         </div>
         <div class="modal-body discount-modal-body">
-          <div class="text-center mb-3">
-            <div class="discount-badge d-inline-block px-3 py-1 rounded-pill mb-2" style="background: #06402B; color: white; font-size: 0.875rem; font-weight: bold;">
-              Save 10%
-            </div>
-            <p class="text-muted mb-0 discount-modal-text" style="font-size: 0.8125rem; color: black;">Get 10% off on orders above ₹100</p>
-          </div>
           
           <form id="discountForm" class="needs-validation" novalidate>
             {% csrf_token %}

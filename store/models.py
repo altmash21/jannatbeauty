@@ -110,18 +110,16 @@ class Product(models.Model):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
-        
-        # Resize image to fixed dimensions if image is provided
-        # Check if image has been changed (new upload or update)
-        if self.image and hasattr(self.image, 'file'):
-            # Fixed dimensions for product images (square format)
-            IMAGE_WIDTH = 500
-            IMAGE_HEIGHT = 500
-            
+
+        # Only process image if it exists, is not None, and has a valid file object
+        image_field = self.image
+        import logging
+        logger = logging.getLogger(__name__)
+        # Only process and assign if a new file is uploaded (file is not None and _file is not None)
+        if image_field and hasattr(image_field, 'file') and image_field.file and getattr(image_field, '_file', None):
+            logger.debug(f"Processing image for product {self.name}: image_field.name={image_field.name}, image_field.file={image_field.file}, image_field._file={getattr(image_field, '_file', None)}")
             try:
-                # Open the image
-                img = Image.open(self.image)
-                
+                img = Image.open(image_field)
                 # Convert RGBA to RGB if necessary (for PNGs with transparency)
                 if img.mode in ('RGBA', 'LA', 'P'):
                     background = Image.new('RGB', img.size, (255, 255, 255))
@@ -129,39 +127,42 @@ class Product(models.Model):
                         img = img.convert('RGBA')
                     background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
                     img = background
-                
-                # Resize and crop to fixed dimensions (maintain aspect ratio, center crop)
-                img.thumbnail((IMAGE_WIDTH, IMAGE_HEIGHT), Image.Resampling.LANCZOS)
-                
-                # Create a new image with fixed dimensions and paste the resized image centered
-                new_img = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), (255, 255, 255))
-                img_width, img_height = img.size
-                paste_x = (IMAGE_WIDTH - img_width) // 2
-                paste_y = (IMAGE_HEIGHT - img_height) // 2
-                new_img.paste(img, (paste_x, paste_y))
-                
-                # Save the resized image
+                # Make image square by cropping to center
+                min_side = min(img.width, img.height)
+                left = (img.width - min_side) // 2
+                top = (img.height - min_side) // 2
+                right = left + min_side
+                bottom = top + min_side
+                img = img.crop((left, top, right, bottom))
+                # Optionally, resize to a max size (e.g., 1000x1000) to save space
+                max_size = 1000
+                if img.width > max_size:
+                    img = img.resize((max_size, max_size), Image.Resampling.LANCZOS)
                 output = BytesIO()
-                new_img.save(output, format='JPEG', quality=95, optimize=True)
+                img.save(output, format='JPEG', quality=95, optimize=True)
                 output.seek(0)
-                
-                # Update the image field
-                filename = os.path.basename(self.image.name) if self.image.name else f"product_{self.pk or 'new'}.jpg"
+                filename = os.path.basename(image_field.name) if image_field.name else f"product_{self.pk or 'new'}.jpg"
                 name, ext = os.path.splitext(filename)
                 if not name:
                     name = f"product_{self.pk or 'new'}"
-                self.image.save(f"{name}.jpg", ContentFile(output.read()), save=False)
+                # Assign processed image to self.image as ContentFile, let Django handle saving
+                from django.conf import settings
+                from django.core.files.storage import default_storage
+                content_file = ContentFile(output.read(), name=f"{name}.jpg")
+                # Use the configured default storage explicitly
+                if hasattr(default_storage, 'save'):
+                    self.image = content_file
+                else:
+                    self.image = content_file
                 img.close()
             except Exception as e:
-                # If image processing fails, log the error but continue saving
-                import logging
-                logger = logging.getLogger(__name__)
                 logger.error(f"Error processing image for product {self.name}: {str(e)}")
-                # Continue with original image if processing fails
-        
+        else:
+            logger.debug(f"Skipping image processing for product {self.name}: image_field={image_field}, image_field.name={getattr(image_field, 'name', None)}, image_field.file={getattr(image_field, 'file', None)}, image_field._file={getattr(image_field, '_file', None)}")
+
         # Save first to get an ID for SKU generation (if new product)
         super().save(*args, **kwargs)
-        
+
         # Auto-generate SKU if not provided
         if not self.sku:
             # Generate SKU in format: PROD-00001
@@ -221,17 +222,11 @@ class ProductImage(models.Model):
         if not self.alt_text:
             self.alt_text = f"Image of {self.product.name}"
         
-        # Resize image to fixed dimensions if image is provided
+        # Resize image to 1:1 aspect ratio (square) if image is provided
         # Check if image has been changed (new upload or update)
         if self.image and hasattr(self.image, 'file'):
-            # Fixed dimensions for product images (square format)
-            IMAGE_WIDTH = 500
-            IMAGE_HEIGHT = 500
-            
             try:
-                # Open the image
                 img = Image.open(self.image)
-                
                 # Convert RGBA to RGB if necessary (for PNGs with transparency)
                 if img.mode in ('RGBA', 'LA', 'P'):
                     background = Image.new('RGB', img.size, (255, 255, 255))
@@ -239,23 +234,20 @@ class ProductImage(models.Model):
                         img = img.convert('RGBA')
                     background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
                     img = background
-                
-                # Resize and crop to fixed dimensions (maintain aspect ratio, center crop)
-                img.thumbnail((IMAGE_WIDTH, IMAGE_HEIGHT), Image.Resampling.LANCZOS)
-                
-                # Create a new image with fixed dimensions and paste the resized image centered
-                new_img = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), (255, 255, 255))
-                img_width, img_height = img.size
-                paste_x = (IMAGE_WIDTH - img_width) // 2
-                paste_y = (IMAGE_HEIGHT - img_height) // 2
-                new_img.paste(img, (paste_x, paste_y))
-                
-                # Save the resized image
+                # Make image square by cropping to center
+                min_side = min(img.width, img.height)
+                left = (img.width - min_side) // 2
+                top = (img.height - min_side) // 2
+                right = left + min_side
+                bottom = top + min_side
+                img = img.crop((left, top, right, bottom))
+                # Optionally, resize to a max size (e.g., 1000x1000) to save space
+                max_size = 1000
+                if img.width > max_size:
+                    img = img.resize((max_size, max_size), Image.Resampling.LANCZOS)
                 output = BytesIO()
-                new_img.save(output, format='JPEG', quality=95, optimize=True)
+                img.save(output, format='JPEG', quality=95, optimize=True)
                 output.seek(0)
-                
-                # Update the image field
                 filename = os.path.basename(self.image.name) if self.image.name else f"product_image_{self.pk or 'new'}.jpg"
                 name, ext = os.path.splitext(filename)
                 if not name:

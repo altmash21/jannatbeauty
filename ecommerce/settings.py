@@ -168,7 +168,7 @@ if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDI
     # Use Cloudinary for media files
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'  # Cloudinary will handle the actual URL
-    MEDIA_ROOT = None  # Not needed when using Cloudinary
+    MEDIA_ROOT = BASE_DIR / 'media'  # Keep valid path to prevent FileSystemStorage errors
     CLOUDINARY_AVAILABLE = True
 else:
     # Fallback to local storage if Cloudinary is not configured
