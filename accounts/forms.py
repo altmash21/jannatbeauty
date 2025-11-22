@@ -108,47 +108,42 @@ class SellerRegistrationForm(forms.Form):
         help_text='Enter the same password as above, for verification.'
     )
     business_name = forms.CharField(
-        required=True,
+        required=False,
         max_length=200,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Business Name',
-            'required': True
         })
     )
     business_description = forms.CharField(
-        required=True,
+        required=False,
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 4,
             'placeholder': 'Describe your business',
-            'required': True
         })
     )
     business_address = forms.CharField(
-        required=True,
+        required=False,
         max_length=255,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Business Address',
-            'required': True
         })
     )
     business_phone = forms.CharField(
-        required=True,
+        required=False,
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Business Phone',
-            'required': True
         })
     )
     business_email = forms.EmailField(
-        required=True,
+        required=False,
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
             'placeholder': 'Business Email',
-            'required': True
         })
     )
     tax_id = forms.CharField(
@@ -184,38 +179,35 @@ class SellerRegistrationForm(forms.Form):
     def save(self, commit=True):
         email = self.cleaned_data['email']
         password = self.cleaned_data['password1']
-        business_name = self.cleaned_data['business_name']
-        business_description = self.cleaned_data['business_description']
-        business_address = self.cleaned_data['business_address']
-        business_phone = self.cleaned_data['business_phone']
-        business_email = self.cleaned_data['business_email']
+        business_name = self.cleaned_data.get('business_name', '')
+        business_description = self.cleaned_data.get('business_description', '')
+        business_address = self.cleaned_data.get('business_address', '')
+        business_phone = self.cleaned_data.get('business_phone', '')
+        business_email = self.cleaned_data.get('business_email', '')
         tax_id = self.cleaned_data.get('tax_id', '')
         bank_account = self.cleaned_data.get('bank_account', '')
-        
+
         # Generate username from email
         username = email.split('@')[0]
         username = ''.join(c for c in username if c.isalnum() or c in ['_', '-'])
         if not username:
             username = 'seller'
-        
+
         # Ensure username is unique
         base_username = username
         counter = 1
         while User.objects.filter(username=username).exists():
             username = f"{base_username}{counter}"
             counter += 1
-        
+
         # Create user
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
-        
-        # Create profile with seller role
-        profile = Profile.objects.create(user=user, role='seller')
-        
-        # Create seller profile
+
+        # Only create a seller profile, not a duplicate Profile
         SellerProfile.objects.create(
             user=user,
             business_name=business_name,
@@ -227,7 +219,7 @@ class SellerRegistrationForm(forms.Form):
             bank_account=bank_account,
             approval_status='pending'
         )
-        
+
         return user
 
 
