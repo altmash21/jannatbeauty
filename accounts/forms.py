@@ -207,18 +207,24 @@ class SellerRegistrationForm(forms.Form):
             password=password
         )
 
-        # Only create a seller profile, not a duplicate Profile
-        SellerProfile.objects.create(
-            user=user,
-            business_name=business_name,
-            business_description=business_description,
-            business_address=business_address,
-            business_phone=business_phone,
-            business_email=business_email,
-            tax_id=tax_id,
-            bank_account=bank_account,
-            approval_status='pending'
-        )
+        # Update the auto-created Profile to be a seller
+        profile = Profile.objects.get(user=user)
+        profile.role = 'seller'
+        profile.save()
+
+        # Defensive: If a SellerProfile already exists for this user, do not create again
+        if not hasattr(user, 'seller_profile'):
+            SellerProfile.objects.create(
+                user=user,
+                business_name=business_name,
+                business_description=business_description,
+                business_address=business_address,
+                business_phone=business_phone,
+                business_email=business_email,
+                tax_id=tax_id,
+                bank_account=bank_account,
+                approval_status='pending'
+            )
 
         return user
 
