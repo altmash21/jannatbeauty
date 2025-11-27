@@ -27,11 +27,6 @@
     href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap"
     rel="stylesheet">
   <style>
-    @media (max-width: 575px) {
-      footer {
-        padding-bottom: 70px !important;
-      }
-    }
     /* Remove outline from hamburger menu button on all screens */
     .navbar-toggler,
     .navbar-toggler:focus,
@@ -248,38 +243,6 @@
   </script>
 
 
-  <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasCart" aria-labelledby="My Cart">
-    <div class="offcanvas-header justify-content-center">
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div class="order-md-last">
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-primary">Your cart</span>
-          <span class="badge bg-primary rounded-pill">{{ cart.get_total_quantity }}</span>
-        </h4>
-        <ul class="list-group mb-3">
-          {% for item in cart %}
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">{{ item.product.name }}</h6>
-              <small class="text-body-secondary">{{ item.product.category.name }}</small>
-            </div>
-            <span class="text-body-secondary">₹{{ item.total_price }}</span>
-          </li>
-          {% empty %}
-          <li class="list-group-item text-center text-muted">Your cart is empty.</li>
-          {% endfor %}
-          <li class="list-group-item d-flex justify-content-between">
-            <span>Total (INR)</span>
-            <strong>₹{{ total }}</strong>
-          </li>
-        </ul>
-        <a href="{% url 'orders:checkout' %}" class="w-100 btn btn-primary btn-lg">Continue to Checkout</a>
-      </div>
-    </div>
-  </div>
-
   <!-- Banner Section -->
   <div id="topBanner" class="banner bg-success text-white text-center py-2 position-relative ">
     <p class="mb-0">Welcome to Jannat Library! Enjoy exclusive offers on our products.</p>
@@ -291,7 +254,7 @@
       <!-- Mobile Navbar -->
       <div class="d-flex d-md-none flex-column w-100">
         <div class="d-flex justify-content-between align-items-center w-100">
-          <a class="navbar-brand ms-2" href="{% url 'store:home' %}" style="font-family:Marcellus,serif; color:#111; font-size:1.3rem;">JANNAT LIBRARY</a>
+          <a class="navbar-brand ms-2" href="{% url 'store:home' %}" style="font-family:Marcellus,serif; color:#111; font-size:1.3rem;">JANNAT LIBRARY </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarMobile" aria-controls="offcanvasNavbarMobile">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -334,6 +297,16 @@
                 </div>
               </div>
         </div>
+        <div class="w-100 px-2 pb-2 mt-1">
+          <form role="search" method="get" action="{% url 'store:product_list' %}" class="mobile-search-bar d-flex align-items-center w-100 position-relative" style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <input type="search" name="q" class="form-control" placeholder="Search products..." style="font-size:1em; border:1px solid #eee; border-radius:6px; padding:0.5em 3em 0.5em 1em; width:100%; background:#f9f9f9;" />
+            <button type="submit" class=" btn-link p-0 position-absolute" style="color:#111; right:12px; top:50%; transform:translateY(-50%); z-index:1; border:none; background:transparent;">
+              <svg width="22" height="22" viewBox="0 0 24 24">
+                <use xlink:href="#search"></use>
+              </svg>
+            </button>
+          </form>
+        </div>
       </div>
 
       <!-- Desktop Navbar - Two Rows -->
@@ -351,7 +324,47 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" class="position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none;">
                   <use xlink:href="#search"></use>
                 </svg>
-                <input type="search" name="q" class="form-control" placeholder="Search For... Eg: Quran" style="border-radius: 25px; padding: 10px 20px 10px 45px; border: 1px solid #ddd; width: 100%;">
+                <input id="typewriter-search" type="search" name="q" class="form-control" placeholder="Search for Quran" style="border-radius: 25px; padding: 10px 20px 10px 45px; border: 1px solid #ddd; width: 100%;">
+                  {% block extra_js %}
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                      var input = document.getElementById('typewriter-search');
+                      if (!input) return;
+                      // Get category names from the category bar if available, else fallback
+                      var categories = [];
+                      {% for category in all_categories %}
+                        categories.push(`{{ category.name|escapejs }}`);
+                      {% endfor %}
+                      if (categories.length === 0) categories = ["Quran", "Tasbi", "Topi", "Janamaz", "Dua Books", "Accessories"];
+                      var prefix = "Search for ";
+                      var i = 0, j = 0, typing = true;
+                      function typeLoop() {
+                        var current = categories[i];
+                        if (typing) {
+                          if (j < current.length) {
+                            input.setAttribute('placeholder', prefix + current.slice(0, j+1));
+                            j++;
+                            setTimeout(typeLoop, 90);
+                          } else {
+                            typing = false;
+                            setTimeout(typeLoop, 1200);
+                          }
+                        } else {
+                          if (j > 0) {
+                            input.setAttribute('placeholder', prefix + current.slice(0, j-1));
+                            j--;
+                            setTimeout(typeLoop, 40);
+                          } else {
+                            typing = true;
+                            i = (i + 1) % categories.length;
+                            setTimeout(typeLoop, 400);
+                          }
+                        }
+                      }
+                      typeLoop();
+                    });
+                  </script>
+                  {% endblock %}
               </div>
             </form>
           </div>
@@ -394,7 +407,8 @@
     </div>
   </nav>
   
-  <!-- Category Bar Below Navbar (Desktop Only) -->
+  {% if request.resolver_match.url_name == 'home' %}
+  <!-- Category Bar Below Navbar (Desktop Only, Home Only) -->
   <div class="d-none d-md-block category-bar-below-nav" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6; padding: 12px 0; ">
     <div class="container-fluid">
       <div class="d-flex align-items-center justify-content-center flex-wrap gap-3">
@@ -414,6 +428,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
 
    
     <!-- Main Content -->
@@ -422,10 +437,6 @@
     </main>
 
     <!-- Footer -->
-    <div style="text-align:center; font-size:1.05em; color:#184c37; background:#fff; padding:12px 0; border-top:1px solid #e6f4ee;">
-      <strong>Jannat Library</strong> &mdash; <a href="https://jannatlibrary.com" style="color:#176a3a; text-decoration:underline;">jannatlibrary.com</a><br>
-      Premium Islamic Products &amp; Gifts
-    </div>
     <style>
       /* Responsive footer font sizes for smaller screens */
       @media (max-width: 768px) {
@@ -447,6 +458,9 @@
         }
         #footer .footer-intro img {
           max-width: 120px;
+          width: 120px;
+          height: 120px;
+          object-fit: contain;
         }
       }
       @media (max-width: 576px) {
@@ -467,6 +481,9 @@
         }
         #footer .footer-intro img {
           max-width: 100px;
+          width: 100px;
+          height: 100px;
+          object-fit: contain;
         }
         #footer .py-5 {
           padding-top: 2rem !important;
@@ -475,13 +492,14 @@
       }
     </style>
    <footer id="footer" class="mt-5" style="background-color:#06402B; color: white;">
+
     <div class="container">
       <div class="row d-flex flex-wrap justify-content-between py-5">
         <div class="col-md-3 col-sm-6">
           <div class="footer-menu footer-menu-001">
             <div class="footer-intro mb-4">
               <a href="{% url 'store:home' %}">
-                <img src="{% static 'images/main-logo.png' %}" alt="logo">
+                <img src="{% static 'images/main-logo.png' %}" alt="JannatLibrary.com Logo" style="width:120px;height:120px;object-fit:contain;display:block;margin:auto;filter:brightness(0) invert(1);">
               </a>
             </div>
             <p style="color: white;">Jannat Library is your trusted destination for authentic Islamic products. We offer a curated collection of Qurans, Islamic books, prayer essentials, accessories, and thoughtful gifts to enrich your spiritual journey and home.</p>
@@ -495,7 +513,7 @@
                   </a>
                 </li>
                
-                
+              
                 <li>
                   <a href="#" style="color: var(--color-accent-gold);">
                     <svg width="24" height="24" viewBox="0 0 24 24">
@@ -518,7 +536,7 @@
                 <a href="{% url 'store:about' %}" class="item-anchor" style="color: white;">About</a>
               </li>
               <li class="menu-item">
-                <a href="{% url 'blog:blog_list' %}" class="item-anchor" style="color: white;">Services</a>
+                <a href="{% url 'blog:blog_list' %}" class="item-anchor" style="color: white;">Blog</a>
               </li>
               <li class="menu-item">
                 <a href="{% url 'store:product_list' %}" class="item-anchor" style="color: white;">Single item</a>
@@ -533,7 +551,7 @@
           <div class="footer-menu footer-menu-003">
             <h5 class="widget-title text-uppercase mb-4" style="color: var(--color-accent-gold);">Help & Info</h5>
             <ul class="menu-list list-unstyled text-uppercase border-animation-left fs-6">
-              <li class="menu-item">
+              {% comment %} <li class="menu-item">
                 <a href="#" class="item-anchor" style="color: white;">Track Your Order</a>
               </li>
               <li class="menu-item">
@@ -541,7 +559,7 @@
               </li>
               <li class="menu-item">
                 <a href="#" class="item-anchor" style="color: white;">Shipping + Delivery</a>
-              </li>
+              </li> {% endcomment %}
               <li class="menu-item">
                 <a href="#" class="item-anchor" style="color: white;">Contact Us</a>
               </li>
@@ -557,10 +575,9 @@
         <div class="col-md-3 col-sm-6">
           <div class="footer-menu footer-menu-004 border-animation-left">
             <h5 class="widget-title text-uppercase mb-4" style="color: var(--color-accent-gold);">Contact Us</h5>
-            <p style="color: white;">Do you have any questions or suggestions? <a href="mailto:contact@yourcompany.com"
-                class="item-anchor" style="color: var(--color-accent-gold);">contact@yourcompany.com</a></p>
-            <p style="color: white;">Do you need support? Give us a call. <a href="tel:+43 720 11 52 78" class="item-anchor" style="color: var(--color-accent-gold);">+43 720 11 52
-                78</a>
+            <p style="color: white;">Do you have any questions or suggestions? <a href="mailto:support@jannatlibrary.com"
+                class="item-anchor" style="color: var(--color-accent-gold);">support@jannatlibrary.com</a></p>
+            <p style="color: white;">Do you need support? Give us a call. <a href="tel:+91 8400043322" class="item-anchor" style="color: var(--color-accent-gold);">+91 8400043322</a>
             </p>
           </div>
         </div>
@@ -576,13 +593,15 @@
               <img src="{% static 'images/dhl-logo.png' %}" alt="icon">
             </div> {% endcomment %}
             <div class="payment-option">
-              <span>Payment Option:</span>
-              <img src="{% static 'images/essentials/upi-icon.png' %}" alt="UPI">
-              <img src="{% static 'images/essentials/visa-icon.png' %}" alt="Visa">
-              <img src="{% static 'images/essentials/discover.png' %}" alt="Discover">
               <style>
+                .payment-option {
+                  display: flex;
+                  flex-wrap: wrap;
+                  align-items: center;
+                  gap: 12px;
+                }
                 .payment-option span {
-                  color: #fff;
+                  color: white;
                   font-size: 1.1rem;
                   margin-right: 8px;
                   min-width: 120px;
@@ -612,6 +631,10 @@
                   }
                 }
               </style>
+              <span>Payment Option:</span>
+              <img src="{% static 'images/essentials/upi-icon.png' %}" alt="UPI">
+              <img src="{% static 'images/essentials/visa-icon.png' %}" alt="Visa">
+              <img src="{% static 'images/essentials/discover.png' %}" alt="Discover">
             </div>
           </div>
         </div>
@@ -729,7 +752,7 @@
                     btn.textContent = 'Adding...';
                     btn.disabled = true;
                     
-                    // Get CSRF token from cookie
+                    // Get CSRF token from meta tag or cookie
                     function getCookie(name) {
                         let cookieValue = null;
                         if (document.cookie && document.cookie !== '') {

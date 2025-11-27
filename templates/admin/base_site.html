@@ -1,1 +1,15 @@
 {% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | JannatLibrary.com Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'images/main-logo.png' %}" alt="Jannat Library" style="height: 40px; width: auto; object-fit: contain; vertical-align: middle; margin-right: 10px;">
+        Jannat Library Admin
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

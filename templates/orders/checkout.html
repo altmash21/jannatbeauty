@@ -58,26 +58,46 @@
                         {% endfor %}
                     </div>
                     {% endif %}
+
+                    {# Address selection dropdown for logged-in users with saved addresses #}
+                    {% if user.is_authenticated and saved_addresses and saved_addresses|length > 0 %}
+                    <div class="mb-3">
+                        <label for="selectAddress" class="form-label">Choose a saved address</label>
+                        <select id="selectAddress" class="form-select">
+                            <option value="">-- Select an address --</option>
+                            {% for address in saved_addresses %}
+                            <option value="{{ address.id }}"
+                                data-full_name="{{ address.full_name }}"
+                                data-phone="{{ address.phone }}"
+                                data-address_line1="{{ address.address_line1 }}"
+                                data-address_line2="{{ address.address_line2 }}"
+                                data-city="{{ address.city }}"
+                                data-state="{{ address.state }}"
+                                data-postal_code="{{ address.postal_code }}"
+                                data-country="{{ address.country }}"
+                                data-email="{{ user.email }}"
+                            >
+                                {{ address.full_name }}, {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif %}, {{ address.city }}, {{ address.state }} - {{ address.postal_code }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
                     <form method="post" action="{% url 'orders:checkout' %}">
                         {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="firstName" class="form-label">First Name *</label>
-                                <input type="text" class="form-control" id="firstName" name="first_name" value="{{ initial_data.first_name|default:'' }}" required>
+                                <label for="firstName" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="firstName" name="first_name" value="{{ initial_data.first_name|default_if_none:'' }}{% if initial_data.last_name %} {{ initial_data.last_name }}{% endif %}" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="lastName" class="form-label">Last Name *</label>
-                                <input type="text" class="form-control" id="lastName" name="last_name" value="{{ initial_data.last_name|default:'' }}" required>
+                                <label for="phone" class="form-label">Phone *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ initial_data.phone|default:'' }}" required>
                             </div>
-                            <div class="col-12">
-                                <label for="company" class="form-label">Company Name (optional)</label>
-                                <input type="text" class="form-control" id="company" name="company">
-                            </div>
-                           
                             <div class="col-12">
                                 <label for="address" class="form-label">Street Address *</label>
                                 <input type="text" class="form-control mb-2" id="address" name="address" value="{{ initial_data.address|default:'' }}" placeholder="House number and street name" required>
-                                <input type="text" class="form-control" name="address2" placeholder="Apartment, suite, unit, etc. (optional)">
+                                <input type="text" class="form-control" id="address2" name="address2" value="{{ initial_data.address2|default:'' }}" placeholder="Apartment, suite, unit, etc. (optional)">
                             </div>
                             <div class="col-md-6">
                                 <label for="city" class="form-label">Town / City *</label>
@@ -90,17 +110,23 @@
                             <div class="col-md-6">
                                 <label for="zip" class="form-label">ZIP Code *</label>
                                 <input type="text" class="form-control" id="zip" name="zipcode" value="{{ initial_data.zipcode|default:'' }}" required>
+                                <div id="pincode-result" class="small mt-1"></div>
                             </div>
                             <div class="col-md-6">
-                                <label for="phone" class="form-label">Phone *</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                                <label for="country" class="form-label">Country *</label>
+                                <input type="text" class="form-control" id="country" name="country" value="{{ initial_data.country|default:'India' }}" required>
                             </div>
                             <div class="col-12">
                                 <label for="email" class="form-label">Email Address *</label>
                                 <input type="email" class="form-control" id="email" name="email" value="{{ initial_data.email|default:'' }}" required>
                             </div>
                             <div class="col-12">
-                                    <!-- Removed create account checkbox -->
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="saveAddress" name="save_address">
+                                    <label class="form-check-label" for="saveAddress">
+                                        Save this address to my account
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         
@@ -108,10 +134,10 @@
                         <div class="payment-methods mt-4">
                             <h5 class="text-uppercase mb-3">Payment Method</h5>
                             <div class="form-check mb-3 p-3 border">
-                                <input class="form-check-input" type="radio" name="payment" id="razorpay" value="razorpay">
-                                <label class="form-check-label w-100" for="razorpay">
-                                    <strong>Razorpay (UPI, Card, Netbanking)</strong>
-                                    <p class="text-muted small mt-2 mb-0">Pay securely online using Razorpay.</p>
+                                <input class="form-check-input" type="radio" name="payment" id="cashfree" value="cashfree">
+                                <label class="form-check-label w-100" for="cashfree">
+                                    <strong>Cashfree (UPI, Card, Netbanking)</strong>
+                                    <p class="text-muted small mt-2 mb-0">Pay securely online using Cashfree.</p>
                                 </label>
                             </div>
                             <div class="form-check mb-3 p-3 border">
@@ -129,13 +155,16 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                            {% if razorpay_order_id %}
-                                Pay Now ₹{{ cart_total|floatformat:2 }}
-                            {% else %}
+                        {% if payment_session_id %}
+                            <!-- Payment will redirect to Cashfree -->
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                Complete Payment ₹{{ cart_total|floatformat:2 }}
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
                                 Place Order
-                            {% endif %}
-                        </button>
+                            </button>
+                        {% endif %}
                         </form>
                     </div>
                     <!-- Shipping Details, Order Notes, etc. can be added here as needed -->
@@ -177,7 +206,62 @@
     </div>
 </section>
 
+{% if payment_session_id %}
+<!-- Redirect-based payment - no JS SDK needed -->
+{% endif %}
+
 <script>
+// Shiprocket pincode check
+document.addEventListener('DOMContentLoaded', function() {
+    var zipInput = document.getElementById('zip');
+    var resultDiv = document.getElementById('pincode-result');
+    if (zipInput) {
+        zipInput.addEventListener('blur', function() {
+            var pincode = zipInput.value;
+            if (pincode.length === 6 && /^\d{6}$/.test(pincode)) {
+                fetch('/orders/ajax/check-pincode/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]')||{}).value
+                    },
+                    body: JSON.stringify({pincode: pincode})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.textContent = data.message;
+                })
+                .catch(() => { resultDiv.textContent = 'Could not check delivery.'; });
+            } else {
+                resultDiv.textContent = '';
+            }
+        });
+    }
+});
+{% if payment_session_id %}
+// Payment will redirect to Cashfree payment page
+{% endif %}
+
+// Address autofill from dropdown
+document.addEventListener('DOMContentLoaded', function() {
+    var select = document.getElementById('selectAddress');
+    if (select) {
+        select.addEventListener('change', function() {
+            var selected = select.options[select.selectedIndex];
+            if (selected.value) {
+                document.getElementById('firstName').value = selected.getAttribute('data-full_name') || '';
+                document.getElementById('phone').value = selected.getAttribute('data-phone') || '';
+                document.getElementById('address').value = selected.getAttribute('data-address_line1') || '';
+                document.getElementById('address2').value = selected.getAttribute('data-address_line2') || '';
+                document.getElementById('city').value = selected.getAttribute('data-city') || '';
+                document.getElementById('state').value = selected.getAttribute('data-state') || '';
+                document.getElementById('zip').value = selected.getAttribute('data-postal_code') || '';
+                document.getElementById('country').value = selected.getAttribute('data-country') || 'India';
+                document.getElementById('email').value = selected.getAttribute('data-email') || '';
+            }
+        });
+    }
+});
 // Handle payment method selection persistence
 document.addEventListener('DOMContentLoaded', function() {
     // Get stored payment method from localStorage

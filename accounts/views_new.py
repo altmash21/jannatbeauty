@@ -71,13 +71,34 @@ def register_customer(request):
                 print(f"Expires at: {otp_instance.expires_at}")
                 print(f"{'='*70}\n")
             
-            # Send email
+            # Send email with HTML template
             from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
+            
+            # Render HTML template
+            from django.template.loader import render_to_string
+            html_message = render_to_string('emails/otp_verification.html', {
+                'user_name': form.cleaned_data.get('first_name', ''),
+                'otp_code': otp_instance.otp_code,
+                'user_email': email,
+            })
+            
+            # Plain text fallback
+            plain_message = f'''Hello {form.cleaned_data.get('first_name', '')},
+
+Your verification code for JannatLibrary.com is: {otp_instance.otp_code}
+
+This code will expire in 10 minutes.
+
+Best regards,
+Jannat Library Team
+JannatLibrary.com'''
+            
             send_mail(
-                subject='Verify Your Email - Jannat Library',
-                message=f'''Hello,\n\nYour verification code is: {otp_instance.otp_code}\n\nThis code will expire in 10 minutes.\n\nBest regards,\nJannat Library Team''',
+                subject='Email Verification - JannatLibrary.com',
+                message=plain_message,
                 from_email=from_email,
                 recipient_list=[email],
+                html_message=html_message,
                 fail_silently=False,
             )
             
@@ -117,13 +138,34 @@ def resend_registration_otp(request):
             print(f"{'='*70}")
             print(f"Expires at: {otp_instance.expires_at}")
             print(f"{'='*70}\n")
-        # Send email
+        # Send email with HTML template
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
+        
+        # Render HTML template
+        from django.template.loader import render_to_string
+        html_message = render_to_string('emails/otp_verification.html', {
+            'user_name': '',  # We don't have user name in resend context
+            'otp_code': otp_instance.otp_code,
+            'user_email': email,
+        })
+        
+        # Plain text fallback
+        plain_message = f'''Hello,
+
+Your new verification code for JannatLibrary.com is: {otp_instance.otp_code}
+
+This code will expire in 10 minutes.
+
+Best regards,
+Jannat Library Team
+JannatLibrary.com'''
+        
         send_mail(
-            subject='Verify Your Email - Jannat Library',
-            message=f'''Hello,\n\nYour new verification code is: {otp_instance.otp_code}\n\nThis code will expire in 10 minutes.\n\nBest regards,\nJannat Library Team''',
+            subject='Email Verification - JannatLibrary.com',
+            message=plain_message,
             from_email=from_email,
             recipient_list=[email],
+            html_message=html_message,
             fail_silently=False,
         )
         return JsonResponse({'success': True, 'message': f'New OTP sent to {email}.'})
@@ -158,13 +200,34 @@ def resend_passwordreset_otp(request):
             print(f"{'='*70}")
             print(f"Expires at: {otp_instance.expires_at}")
             print(f"{'='*70}\n")
-        # Send email
+        # Send email with HTML template
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
+        
+        # Render HTML template  
+        from django.template.loader import render_to_string
+        html_message = render_to_string('emails/password_reset_otp.html', {
+            'user_name': '',  # We don't have user name in password reset context
+            'otp_code': otp_instance.otp_code,
+            'user_email': email,
+        })
+        
+        # Plain text fallback
+        plain_message = f'''Hello,
+
+Your password reset code for JannatLibrary.com is: {otp_instance.otp_code}
+
+This OTP will expire in 10 minutes.
+
+Best regards,
+Jannat Library Team
+JannatLibrary.com'''
+        
         send_mail(
-            subject='Password Reset OTP - Jannat Library',
-            message=f'''Hello,\n\nYour new OTP is: {otp_instance.otp_code}\n\nThis OTP will expire in 10 minutes.\n\nBest regards,\nJannat Library Team''',
+            subject='Password Reset - JannatLibrary.com',
+            message=plain_message,
             from_email=from_email,
             recipient_list=[email],
+            html_message=html_message,
             fail_silently=False,
         )
         return JsonResponse({'success': True, 'message': f'New OTP sent to {email}.'})
@@ -777,28 +840,41 @@ def forgot_password(request):
                 print(f"Expires at: {otp_instance.expires_at}")
                 print(f"{'='*70}\n")
             
-            # Send email with OTP
+            # Send email with HTML template
             try:
                 from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@jannatlibrary.com')
                 if settings.DEBUG:
                     print(f"Sending email from: {from_email}")
                 
-                send_mail(
-                    subject='Password Reset OTP - Jannat Library',
-                    message=f'''Hello {user.first_name or user.username},
+                # Render HTML template
+                from django.template.loader import render_to_string
+                html_message = render_to_string('emails/password_reset_otp.html', {
+                    'user_name': user.first_name or user.username,
+                    'otp_code': otp_instance.otp_code,
+                    'user_email': email,
+                })
+                
+                # Plain text fallback
+                plain_message = f'''Hello {user.first_name or user.username},
 
-You requested a password reset for your account.
+You requested a password reset for your JannatLibrary.com account.
 
-Your OTP is: {otp_instance.otp_code}
+Your password reset code is: {otp_instance.otp_code}
 
-This OTP will expire in 10 minutes.
+This code will expire in 10 minutes.
 
-If you didn't request this, please ignore this email.
+If you didn't request this, please ignore this email or contact our support team.
 
 Best regards,
-Jannat Library Team''',
+Jannat Library Team
+JannatLibrary.com'''
+                
+                send_mail(
+                    subject='Password Reset - JannatLibrary.com',
+                    message=plain_message,
                     from_email=from_email,
                     recipient_list=[email],
+                    html_message=html_message,
                     fail_silently=False,
                 )
                 

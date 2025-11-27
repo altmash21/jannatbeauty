@@ -27,7 +27,8 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
-    payment_method = models.CharField(max_length=20, choices=[('razorpay', 'Razorpay'), ('cod', 'Cash on Delivery')], default='cod', help_text='Payment method used for this order')
+    payment_method = models.CharField(max_length=20, choices=[('cashfree', 'Cashfree'), ('cod', 'Cash on Delivery')], default='cod', help_text='Payment method used for this order')
+    payment_id = models.CharField(max_length=100, blank=True, null=True, help_text='Payment gateway order/transaction ID')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     

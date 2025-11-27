@@ -173,6 +173,110 @@
 .discount-modal-content button {
     color: #fff !important;
 }
+
+.category-swiper .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: auto;
+    width: 220px !important; /* or adjust as needed */
+    max-width: 90vw;
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .cat-item {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+  .swiper.category-swiper {
+    padding-bottom: 40px;
+  }
+
+  /* Swiper for mobile only */
+  @media (min-width: 992px) {
+    .category-css-carousel { display: none !important; }
+    .category-static-row { display: flex !important; }
+  }
+  @media (max-width: 991.98px) {
+    .category-css-carousel { display: block !important; }
+    .category-static-row { display: none !important; }
+    .categories {
+      margin-top: 0.5rem !important;
+    }
+  }
+
+  /* Pure CSS infinite carousel styles */
+  .category-css-carousel {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+  .category-track {
+    display: flex;
+    width: max-content;
+    animation: scroll-categories 18s linear infinite;
+    gap: 1rem;
+  }
+  .category-css-carousel .cat-item {
+    min-width: 140px;
+    max-width: 160px;
+    width: 40vw;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+  @media (max-width: 576px) {
+    .category-css-carousel .cat-item {
+      min-width: 120px;
+      max-width: 140px;
+      width: 60vw;
+    }
+  }
+  @keyframes scroll-categories {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .category-static-row {
+    display: none;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+  .category-static-row .cat-item {
+    max-width: 220px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .category-swiper .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: auto;
+    width: 60vw !important; /* smaller cards on mobile */
+    max-width: 140px;
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  @media (min-width: 576px) {
+    .category-swiper .swiper-slide {
+      width: 140px !important;
+      max-width: 160px;
+    }
+  }
+  .cat-item {
+    width: 100%;
+    max-width: 140px;
+    margin: 0 auto;
+  }
+  .swiper.category-swiper {
+    padding-bottom: 40px;
+  }
+  .category-swiper .swiper-pagination,
+  .category-swiper .swiper-button-next,
+  .category-swiper .swiper-button-prev {
+    display: none !important;
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -210,8 +314,9 @@
   <section class="categories overflow-hidden" style="margin-top: 3rem;">
     <div class="container">
       <div class="open-up" data-aos="zoom-out">
-        <div class="row">
-          <div class="col-lg-3 col-md-6 col-6 mb-4">
+        <!-- Pure CSS Infinite Carousel for Mobile -->
+        <div class="category-css-carousel">
+          <div class="category-track">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{% url 'store:product_list_by_category' 'quran' %}">
@@ -222,12 +327,10 @@
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="{% url 'store:product_list_by_category' 'quran' %}" style="background-color: white; color: black; border: none;font-weight: 400; texts">QURAN</a>
+                  <a href="{% url 'store:product_list_by_category' 'quran' %}" style="background-color: white; color: black; border: none;font-weight: 400;">QURAN</a>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-6 mb-4">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{% url 'store:product_list' %}">
@@ -242,8 +345,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-6 mb-4">
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{% url 'store:product_list' %}">
@@ -258,8 +359,20 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-6 mb-4">
+            <div class="cat-item image-zoom-effect">
+              <div class="image-holder">
+                <a href="{% url 'store:product_list' %}?major_category=decor">
+                  <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                    <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+                  </video>
+                </a>
+              </div>
+              <div class="category-content">
+                <div class="product-button">
+                  <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">DECOR</a>
+                </div>
+              </div>
+            </div>
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{% url 'store:product_list' %}?major_category=new_arrivals">
@@ -273,6 +386,153 @@
                   <a href="{% url 'store:product_list' %}?major_category=new_arrivals" style="background-color: white; color: black; border: none; font-weight: 400;">NEW ARRIVALS</a>
                 </div>
               </div>
+            </div>
+            <!-- Duplicate for seamless infinite loop -->
+            <div class="cat-item image-zoom-effect">
+              <div class="image-holder">
+                <a href="{% url 'store:product_list_by_category' 'quran' %}">
+                  <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                    <source src="{% static 'videos/quran-loop.mp4' %}" type="video/mp4">
+                  </video>
+                </a>
+              </div>
+              <div class="category-content">
+                <div class="product-button">
+                  <a href="{% url 'store:product_list_by_category' 'quran' %}" style="background-color: white; color: black; border: none;font-weight: 400;">QURAN</a>
+                </div>
+              </div>
+            </div>
+            <div class="cat-item image-zoom-effect">
+              <div class="image-holder">
+                <a href="{% url 'store:product_list' %}">
+                  <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                    <source src="{% static 'videos/quranbg.mp4'%}" type="video/mp4">
+                  </video>
+                </a>
+              </div>
+              <div class="category-content">
+                <div class="product-button">
+                  <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; font-weight: 400;">FOR KIDS</a>
+                </div>
+              </div>
+            </div>
+            <div class="cat-item image-zoom-effect">
+              <div class="image-holder">
+                <a href="{% url 'store:product_list' %}">
+                  <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                    <source src="{% static 'videos/gifts-loop.mp4'%}" type="video/mp4">
+                  </video>
+                </a>
+              </div>
+              <div class="category-content">
+                <div class="product-button">
+                  <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; padding: 12px 24px; font-weight: 400;">ACCESSORIES</a>
+                </div>
+              </div>
+            </div>
+            <div class="cat-item image-zoom-effect">
+              <div class="image-holder">
+                <a href="{% url 'store:product_list' %}?major_category=decor">
+                  <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                    <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+                  </video>
+                </a>
+              </div>
+              <div class="category-content">
+                <div class="product-button">
+                  <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">DECOR</a>
+                </div>
+              </div>
+            </div>
+            <div class="cat-item image-zoom-effect">
+              <div class="image-holder">
+                <a href="{% url 'store:product_list' %}?major_category=new_arrivals">
+                  <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                    <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+                  </video>
+                </a>
+              </div>
+              <div class="category-content">
+                <div class="product-button">
+                  <a href="{% url 'store:product_list' %}?major_category=new_arrivals" style="background-color: white; color: black; border: none; font-weight: 400;">NEW ARRIVALS</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Static 5-category row for desktop -->
+    <div class="container">
+      <div class="category-static-row">
+        <div class="cat-item image-zoom-effect">
+          <div class="image-holder">
+            <a href="{% url 'store:product_list_by_category' 'quran' %}">
+              <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                <source src="{% static 'videos/quran-loop.mp4' %}" type="video/mp4">
+              </video>
+            </a>
+          </div>
+          <div class="category-content">
+            <div class="product-button">
+              <a href="{% url 'store:product_list_by_category' 'quran' %}" style="background-color: white; color: black; border: none;font-weight: 400;">QURAN</a>
+            </div>
+          </div>
+        </div>
+        <div class="cat-item image-zoom-effect">
+          <div class="image-holder">
+            <a href="{% url 'store:product_list' %}">
+              <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                <source src="{% static 'videos/quranbg.mp4'%}" type="video/mp4">
+              </video>
+            </a>
+          </div>
+          <div class="category-content">
+            <div class="product-button">
+              <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; font-weight: 400;">FOR KIDS</a>
+            </div>
+          </div>
+        </div>
+        <div class="cat-item image-zoom-effect">
+          <div class="image-holder">
+            <a href="{% url 'store:product_list' %}">
+              <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                <source src="{% static 'videos/gifts-loop.mp4'%}" type="video/mp4">
+              </video>
+            </a>
+          </div>
+          <div class="category-content">
+            <div class="product-button">
+              <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; padding: 12px 24px; font-weight: 400;">ACCESSORIES</a>
+            </div>
+          </div>
+        </div>
+        <div class="cat-item image-zoom-effect">
+          <div class="image-holder">
+            <a href="{% url 'store:product_list' %}?major_category=new_arrivals">
+              <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+              </video>
+            </a>
+          </div>
+          <div class="category-content">
+            <div class="product-button">
+              <a href="{% url 'store:product_list' %}?major_category=new_arrivals" style="background-color: white; color: black; border: none; font-weight: 400;">NEW ARRIVALS</a>
+            </div>
+          </div>
+        </div>
+        <div class="cat-item image-zoom-effect">
+          <div class="image-holder">
+            <a href="{% url 'store:product_list' %}?major_category=decor">
+              <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
+                <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+              </video>
+            </a>
+          </div>
+          <div class="category-content">
+            <div class="product-button">
+              <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">DECOR</a>
             </div>
           </div>
         </div>
@@ -342,11 +602,7 @@
                     <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image img-fluid">
                   {% endif %}
                 </a>
-                <a href="{{ product.get_absolute_url }}" class="btn-icon btn-wishlist">
-                  <svg width="24" height="24" viewBox="0 0 24 24">
-                    <use xlink:href="#heart"></use>
-                  </svg>
-                </a>
+                <!-- Wishlist button removed as per request -->
                 <div class="product-content">
                   <h6 class="element-title text-uppercase mt-3" >
                     <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
@@ -361,7 +617,7 @@
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                       {% csrf_token %}
                       <input type="hidden" name="quantity" value="1">
-                      <button type="submit" class="btn btn-primary w-100" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}</button>
+                      <button type="submit" class="btn btn-outline-success w-100" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}</button>
                     </form>
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                       {% csrf_token %}
@@ -405,7 +661,7 @@
             <div class="collection-content p-5 m-0 m-md-5">
               <h3 class="element-title text-uppercase">Islamic Essentials for Everyone</h3>
               <p>Discover our handpicked range: Qur'an (Arabic, Hindi, English), Tasbi, Topi, Janamaz, Digital Tasbi, Dua Stickers, Dua Frames, and Dua Books. Perfect for daily worship, gifting, and bringing barakah to your home. Shop authentic Islamic products trusted by families across India.</p>
-              <a href="{% url 'store:product_list' %}" class="btn btn-dark text-uppercase mt-3">Shop All Products</a>
+              <a href="{% url 'store:product_list' %}" class="btn btn-success text-uppercase mt-3">Shop All Products</a>
             </div>
           </div>
         </div>
@@ -432,11 +688,7 @@
                     <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image img-fluid">
                   {% endif %}
                 </a>
-                <a href="{{ product.get_absolute_url }}" class="btn-icon btn-wishlist">
-                  <svg width="24" height="24" viewBox="0 0 24 24">
-                    <use xlink:href="#heart"></use>
-                  </svg>
-                </a>
+                <!-- Wishlist button removed for consistency -->
                 <div class="product-content">
                   <h6 class="element-title text-uppercase mt-3">
                     <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
@@ -451,7 +703,7 @@
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                       {% csrf_token %}
                       <input type="hidden" name="quantity" value="1">
-                      <button type="submit" class="btn btn-primary w-100" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}</button>
+                      <button type="submit" class="btn btn-outline-success w-100" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}</button>
                     </form>
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                       {% csrf_token %}
@@ -563,11 +815,7 @@
                     <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" class="product-image img-fluid">
                   {% endif %}
                 </a>
-                <a href="{{ product.get_absolute_url }}" class="btn-icon btn-wishlist">
-                  <svg width="24" height="24" viewBox="0 0 24 24">
-                    <use xlink:href="#heart"></use>
-                  </svg>
-                </a>
+                <!-- Wishlist button removed for consistency across all sections -->
                 <div class="product-content">
                   <h6 class="element-title text-uppercase mt-3">
                     <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
@@ -582,7 +830,7 @@
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                       {% csrf_token %}
                       <input type="hidden" name="quantity" value="1">
-                      <button type="submit" class="btn btn-primary w-100" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}</button>
+                      <button type="submit" class="btn btn-outline-success w-100" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}</button>
                     </form>
                     <form method="post" action="{% url 'cart:cart_add' product.id %}" class="flex-fill">
                       {% csrf_token %}
@@ -617,7 +865,7 @@
       <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 mb-3">
         <h4 class="text-uppercase">Read Blog Posts</h4>
         <a href="{% url 'blog:blog_list' %}" class="btn-link">View All</a>
-      </div>
+      </div>s
       <div class="row">
         {% for post in blog_posts %}
         <div class="col-md-4 mb-4">
@@ -1128,4 +1376,70 @@
     });
   </script>
 
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.categorySwiperInstance) {
+    window.categorySwiperInstance.destroy(true, true);
+    window.categorySwiperInstance = null;
+  }
+  window.categorySwiperInstance = new Swiper('.category-swiper', {
+    loop: true,
+    slidesPerView: 2.5,
+    spaceBetween: 16,
+    centeredSlides: false,
+    speed: 5000,
+    allowTouchMove: true,
+    grabCursor: true,
+    loopedSlides: 5,
+    freeMode: {
+      enabled: true,
+      momentum: false,
+      sticky: false
+    },
+    autoplay: {
+      delay: 1,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: false,
+      reverseDirection: false,
+      waitForTransition: false
+    },
+    breakpoints: {
+      576: {
+        slidesPerView: 3,
+        spaceBetween: 24,
+      },
+      768: {
+        slidesPerView: 4,
+        spaceBetween: 24,
+      }
+    },
+    navigation: false,
+    pagination: false,
+    on: {
+      init: function() {
+        this.autoplay.start();
+      }
+    }
+  });
+});
+</script>
+{% endblock %}
+
+<!-- Remove Swiper arrows and pagination for this section -->
+<style>
+  .category-swiper .swiper-pagination,
+  .category-swiper .swiper-button-next,
+  .category-swiper .swiper-button-prev {
+    display: none !important;
+  }
+</style>
+
+<!-- Remove navigation/pagination HTML for this Swiper -->
+<div class="swiper category-swiper">
+  <div class="swiper-wrapper">
+    <!-- ...slides... -->
+  </div>
+  <!-- No .swiper-pagination, .swiper-button-next, .swiper-button-prev here -->
+</div>
 {% endblock %}

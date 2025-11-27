@@ -6,25 +6,33 @@ from .models import Order, OrderItem
 
 
 def send_order_confirmation_email(order):
-    """Send order confirmation email to customer"""
+    """Send order confirmation email to customer using HTML template"""
     try:
+        from django.template.loader import render_to_string
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@jannatlibrary.com')
         recipient_email = order.email
         
         # Prepare email content
-        subject = f'Order Confirmation - #{order.order_number or order.id}'
+        subject = f'Order Confirmation #{order.order_number or order.id} - JannatLibrary.com'
         
-        # Build order items list
-        items_list = []
+        # Build order items list for template
+        order_items = []
         for item in order.items.all():
-            items_list.append({
+            order_items.append({
                 'name': item.product.name,
                 'quantity': item.quantity,
                 'price': item.price,
                 'total': item.get_cost()
             })
         
-        message = f'''Hello {order.first_name},
+        # Render HTML template
+        html_message = render_to_string('emails/order_confirmation.html', {
+            'order': order,
+            'order_items': order_items,
+        })
+        
+        # Plain text fallback
+        plain_message = f'''Hello {order.first_name},
 
 Thank you for your order! Your order has been confirmed and is being processed.
 
@@ -36,26 +44,30 @@ Order Details:
 
 Order Items:
 '''
-        for item in items_list:
-            message += f'- {item["name"]} x {item["quantity"]} = ₹{item["total"]}\n'
+        for item in order_items:
+            plain_message += f'- {item["name"]} x {item["quantity"]} = ₹{item["total"]}\n'
         
-        message += f'''
+        plain_message += f'''
 Shipping Address:
-{order.full_address}
+{order.first_name} {order.last_name}
+{order.address}
+{order.city}, {order.state} {order.zipcode}
 
-You can track your order status from your dashboard.
+You can track your order at: https://jannatlibrary.com/orders/{order.id}/
 
-Thank you for shopping with Jannat Library!
+Thank you for shopping with JannatLibrary.com!
 
 Best regards,
 Jannat Library Team
+JannatLibrary.com
 '''
         
         send_mail(
             subject=subject,
-            message=message,
+            message=plain_message,
             from_email=from_email,
             recipient_list=[recipient_email],
+            html_message=html_message,
             fail_silently=False,
         )
         
@@ -66,16 +78,17 @@ Jannat Library Team
 
 
 def send_order_status_update_email(order):
-    """Send order status update email to customer"""
+    """Send order status update email to customer using HTML template"""
     try:
+        from django.template.loader import render_to_string
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@jannatlibrary.com')
         recipient_email = order.email
         
         status_messages = {
-            'processing': 'Your order is now being processed.',
-            'shipped': 'Great news! Your order has been shipped.',
-            'delivered': 'Your order has been delivered. Enjoy your purchase!',
-            'cancelled': 'Your order has been cancelled.',
+            'processing': 'Your order is now being processed and will be shipped soon.',
+            'shipped': 'Great news! Your order has been shipped and is on its way to you.',
+            'delivered': 'Your order has been delivered successfully. Enjoy your purchase!',
+            'cancelled': 'Your order has been cancelled. If this was unexpected, please contact our support team.',
         }
         
         status_display = {
@@ -88,9 +101,17 @@ def send_order_status_update_email(order):
         if order.order_status not in status_messages:
             return
         
-        subject = f'Order Update - #{order.order_number or order.id}'
+        subject = f'Order Update #{order.order_number or order.id} - JannatLibrary.com'
         
-        message = f'''Hello {order.first_name},
+        # Render HTML template
+        html_message = render_to_string('emails/order_status_update.html', {
+            'order': order,
+            'status_message': status_messages[order.order_status],
+            'status_display': status_display.get(order.order_status, order.order_status.title()),
+        })
+        
+        # Plain text fallback
+        plain_message = f'''Hello {order.first_name},
 
 Your order status has been updated.
 
@@ -102,24 +123,24 @@ New Status: {status_display.get(order.order_status, order.order_status.title())}
 '''
         
         if order.order_status == 'shipped' and order.awb_code:
-            message += f'Tracking Number: {order.awb_code}\n'
+            plain_message += f'Tracking Information:\nAWB/Tracking Number: {order.awb_code}\n'
             if order.courier_name:
-                message += f'Courier: {order.courier_name}\n'
+                plain_message += f'Courier: {order.courier_name}\n'
         
-        message += f'''
-You can track your order from your dashboard.
-
-Thank you for shopping with Jannat Library!
+        plain_message += f'''
+You can track your order at: https://jannatlibrary.com/orders/{order.id}/
 
 Best regards,
 Jannat Library Team
+JannatLibrary.com
 '''
         
         send_mail(
             subject=subject,
-            message=message,
+            message=plain_message,
             from_email=from_email,
             recipient_list=[recipient_email],
+            html_message=html_message,
             fail_silently=False,
         )
         

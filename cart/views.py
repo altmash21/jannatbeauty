@@ -1,3 +1,33 @@
+from django.views.decorators.http import require_GET
+
+# Real-time cart totals for AJAX
+@require_GET
+def cart_detail_json(request):
+    cart = Cart(request)
+    # Calculate MRP total (compare price) and discount
+    mrp_total = 0
+    compare_discount = 0
+    for item in cart:
+        product = item['product']
+        quantity = item['quantity']
+        if hasattr(product, 'compare_price') and product.compare_price and product.compare_price > 0:
+            mrp_total += float(product.compare_price) * quantity
+            if product.compare_price > product.price:
+                compare_discount += float(product.compare_price - product.price) * quantity
+        else:
+            mrp_total += float(product.price) * quantity
+    coupon_discount = request.session.get('coupon_discount', 0)
+    subtotal = cart.get_total_price()
+    total_discount = compare_discount + float(coupon_discount)
+    total = max(0, subtotal - float(coupon_discount))
+    return JsonResponse({
+        'mrp_total': mrp_total,
+        'subtotal': subtotal,
+        'compare_discount': compare_discount,
+        'coupon_discount': coupon_discount,
+        'discount': total_discount,
+        'total': total
+    })
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
@@ -113,7 +143,7 @@ def cart_update(request, product_id):
     from django.contrib import messages
     success = True
     message = 'Cart updated!'
-
+    item_total_price = None
     # Bulk update if product_id == 0
     if product_id == 0:
         for key, value in request.POST.items():
@@ -144,6 +174,11 @@ def cart_update(request, product_id):
                 cart.add(product=product, quantity=quantity, override_quantity=True)
             else:
                 cart.remove(product)
+            # Find updated item total price
+            for item in cart:
+                if item['product'].id == product_id:
+                    item_total_price = item['total_price']
+                    break
         except (ValueError, TypeError) as e:
             success = False
             message = f'Error updating product {product_id}: {str(e)}'
@@ -152,10 +187,31 @@ def cart_update(request, product_id):
             message = f'Error updating product {product_id}: {str(e)}'
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # Calculate cart summary fields for AJAX response
+        mrp_total = 0
+        compare_discount = 0
+        for item in cart:
+            product = item['product']
+            quantity = item['quantity']
+            if hasattr(product, 'compare_price') and product.compare_price and product.compare_price > 0:
+                mrp_total += float(product.compare_price) * quantity
+                if product.compare_price > product.price:
+                    compare_discount += float(product.compare_price - product.price) * quantity
+            else:
+                mrp_total += float(product.price) * quantity
+        coupon_discount = request.session.get('coupon_discount', 0)
+        subtotal = cart.get_total_price()
+        total_discount = compare_discount + float(coupon_discount)
+        total = max(0, subtotal - float(coupon_discount))
         return JsonResponse({
             'success': success,
             'cart_total_items': len(cart),
             'cart_total_price': float(cart.get_total_price()),
+            'item_total_price': float(item_total_price) if item_total_price is not None else None,
+            'mrp_total': mrp_total,
+            'discount': total_discount,
+            'total': total,
+            'cart_count': len(cart),
             'message': message
         })
 

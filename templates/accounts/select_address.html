@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2>Select Address</h2>
+  <ul class="list-group mb-3">
+    {% for address in addresses %}
+      <li class="list-group-item{% if address.is_default %} active{% endif %}">
+        <strong>{{ address.full_name }}</strong><br>
+        {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif %}<br>
+        {{ address.city }}, {{ address.state }} - {{ address.postal_code }}<br>
+        {{ address.country }}<br>
+        Phone: {{ address.phone }}
+        {% if address.is_default %}<span class="badge bg-success ms-2">Default</span>{% endif %}
+      </li>
+    {% empty %}
+      <li class="list-group-item">No addresses saved yet.</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'accounts:save_address' %}" class="btn btn-primary">Add New Address</a>
+</div>
+{% endblock %}

@@ -410,17 +410,112 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return cookieValue;
     }
+
+    // Helper: update all cart summary fields from JSON
+    function updateCartSummary(data) {
+        // Desktop summary
+        const mrpEls = document.querySelectorAll('.cart-summary .fw-bold, .cart-summary-mobile .fw-bold');
+        document.querySelectorAll('.cart-summary .fw-bold, .cart-summary-mobile .fw-bold').forEach(function(el) {
+            if (el.closest('.d-flex') && el.previousElementSibling && el.previousElementSibling.textContent.includes('Price')) {
+                el.textContent = '₹' + (data.mrp_total !== undefined ? data.mrp_total.toFixed(2) : '0.00');
+            }
+        });
+        document.querySelectorAll('.cart-summary .text-success, .cart-summary-mobile .text-success').forEach(function(el) {
+            if (el.textContent.includes('-₹')) {
+                el.textContent = '-₹' + (data.discount !== undefined ? data.discount.toFixed(2) : '0.00');
+            }
+        });
+        document.querySelectorAll('.cart-summary .text-primary, .cart-summary-mobile .text-primary').forEach(function(el) {
+            el.textContent = '₹' + (data.total !== undefined ? data.total.toFixed(2) : '0.00');
+        });
+        // Update item count
+        document.querySelectorAll('.cart-summary span, .cart-summary-mobile span').forEach(function(el) {
+            if (el.textContent.match(/Price \(\d+ item/)) {
+                el.textContent = `Price (${data.cart_count} item${data.cart_count == 1 ? '' : 's'})`;
+            }
+        });
+        // Update cart icon count if present
+        document.querySelectorAll('.cart-count').forEach(function(el) {
+            el.textContent = data.cart_count;
+        });
+    }
+
+    // Helper: update per-item total price in the row (desktop)
+    function updateItemTotal(productId, totalPrice) {
+        // Desktop
+        const row = document.querySelector(`tr [data-product-id='${productId}']`);
+        if (row) {
+            const td = row.closest('tr').querySelectorAll('td');
+            if (td && td.length > 3) {
+                td[3].querySelector('span').textContent = '₹' + totalPrice.toFixed(2);
+            }
+        }
+        // Mobile
+        const mobile = document.querySelector(`.cart-item-mobile [data-product-id='${productId}']`);
+        if (mobile) {
+            // Find the price span in the same mobile cart item
+            const priceSpan = mobile.closest('.cart-item-mobile').querySelector('.fw-bold.text-primary');
+            if (priceSpan) priceSpan.textContent = '₹' + totalPrice.toFixed(2);
+        }
+    }
+
+    // AJAX remove item (already present, just update summary after removal)
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.remove-item-btn').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const form = this.form;
-                const url = form.getAttribute('action');
-                let csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
-                if (!csrfToken) {
-                    csrfToken = getCookie('csrftoken');
+                if (window.fetch) {
+                    e.preventDefault();
+                    const form = this.form;
+                    const url = form.getAttribute('action');
+                    let csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+                    if (!csrfToken) {
+                        csrfToken = getCookie('csrftoken');
+                    }
+                    btn.disabled = true;
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let cartItem = btn.closest('.cart-item-mobile') || btn.closest('tr');
+                            if (cartItem) cartItem.remove();
+                            // Fetch new cart summary
+                            fetch('/cart/detail/json/', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                                .then(r => r.json())
+                                .then(updateCartSummary);
+                        } else {
+                            alert(data.message || 'Failed to remove item from cart');
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while removing the item');
+                        btn.disabled = false;
+                    });
                 }
-                btn.disabled = true;
+            });
+        });
+
+        // Desktop: quantity input change
+        document.querySelectorAll('table input[type="number"]').forEach(function(input) {
+            input.addEventListener('change', function(e) {
+                const tr = input.closest('tr');
+                const productId = input.name.replace('quantity_', '');
+                let quantity = parseInt(input.value);
+                if (isNaN(quantity) || quantity < 1) quantity = 1;
+                input.value = quantity;
+                // AJAX update
+                const url = `/cart/update/${productId}/`;
+                let csrfToken = getCookie('csrftoken');
+                input.disabled = true;
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -428,33 +523,78 @@ document.addEventListener('DOMContentLoaded', function() {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
+                    body: `quantity=${quantity}`,
                     credentials: 'same-origin'
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove the row from the DOM without refreshing
-                        const row = btn.closest('tr');
-                        if (row) row.remove();
-                        // Optionally update cart totals here (production best practice)
-                        if (data.cart_total_items !== undefined) {
-                            const cartCountEls = document.querySelectorAll('.cart-count');
-                            cartCountEls.forEach(el => el.textContent = data.cart_total_items);
-                        }
-                        if (data.cart_total_price !== undefined) {
-                            const cartTotalEls = document.querySelectorAll('.cart-total');
-                            cartTotalEls.forEach(el => el.textContent = '₹' + data.cart_total_price.toFixed(2));
-                        }
+                        updateItemTotal(productId, data.item_total_price);
+                        fetch('/cart/detail/json/', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                            .then(r => r.json())
+                            .then(updateCartSummary);
                     } else {
-                        alert(data.message || 'Failed to remove item from cart');
-                        btn.disabled = false;
+                        alert(data.message || 'Failed to update quantity');
                     }
+                    input.disabled = false;
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while removing the item');
-                    btn.disabled = false;
+                    alert('Error updating cart');
+                    input.disabled = false;
                 });
+            });
+        });
+
+        // Mobile: quantity input change
+        document.querySelectorAll('.cart-item-mobile input[type="number"]').forEach(function(input) {
+            input.addEventListener('change', function(e) {
+                const cartItem = input.closest('.cart-item-mobile');
+                const btn = cartItem.querySelector('.remove-item-btn');
+                const productId = btn ? btn.getAttribute('data-product-id') : null;
+                let quantity = parseInt(input.value);
+                if (isNaN(quantity) || quantity < 1) quantity = 1;
+                input.value = quantity;
+                const url = `/cart/update/${productId}/`;
+                let csrfToken = getCookie('csrftoken');
+                input.disabled = true;
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `quantity=${quantity}`,
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateItemTotal(productId, data.item_total_price);
+                        fetch('/cart/detail/json/', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                            .then(r => r.json())
+                            .then(updateCartSummary);
+                    } else {
+                        alert(data.message || 'Failed to update quantity');
+                    }
+                    input.disabled = false;
+                })
+                .catch(error => {
+                    alert('Error updating cart');
+                    input.disabled = false;
+                });
+            });
+        });
+
+        // Mobile: plus button
+        document.querySelectorAll('.plus-btn-mobile').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                const form = btn.closest('form');
+                const input = form.querySelector('input[type="number"]');
+                input.value = parseInt(input.value) + 1;
+                input.dispatchEvent(new Event('change'));
+                btn.disabled = true;
+                setTimeout(function() { btn.disabled = false; }, 400);
             });
         });
     });

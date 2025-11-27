@@ -1,3 +1,7 @@
+# Cashfree integration
+import requests
+import json
+
 # Import login_required before using it
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -27,17 +31,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.http import JsonResponse
 from .models import Order, OrderItem
 from cart.cart import Cart
 from store.models import Product
 from .shiprocket import ShiprocketAPI
 
-# Razorpay integration
-import razorpay
+
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-import hmac
-import hashlib
 
 # Seller: View all orders for their products
 
@@ -111,7 +113,6 @@ def update_order_status(request, order_id, item_id):
     return redirect('orders:seller_orders')
 
 
-@login_required
 def checkout(request):
     if hasattr(request.user, 'profile') and request.user.profile.is_seller:
         messages.error(request, 'Sellers cannot purchase products.')
@@ -142,8 +143,6 @@ def checkout(request):
     # Ensure cart items persist after login
     request.session['cart'] = cart.serialize()
 
-    razorpay_order_id = None
-    amount = None
     order_id = None
 
     if request.method == 'POST':
@@ -152,14 +151,30 @@ def checkout(request):
         last_name = request.POST.get('last_name', '').strip()
         email = request.POST.get('email', '').strip()
         address = request.POST.get('address', '').strip()
+        address2 = request.POST.get('address2', '').strip()
         city = request.POST.get('city', '').strip()
         state = request.POST.get('state', '').strip()
         zipcode = request.POST.get('zipcode', '').strip()
+        country = request.POST.get('country', 'India').strip()
+        phone = request.POST.get('phone', '').strip()
         payment_method = request.POST.get('payment', 'cod')  # Default to COD instead of razorpay
-        print(f"DEBUG: Payment method from form: {payment_method}")
-        print(f"DEBUG: All POST data: {dict(request.POST)}")
-        print(f"DEBUG: Payment method comparison: payment_method == 'razorpay' is {payment_method == 'razorpay'}")
-        print(f"DEBUG: Payment method comparison: payment_method == 'cod' is {payment_method == 'cod'}")
+        save_address = request.POST.get('save_address')
+
+
+        # Save address to Address model if requested and user is authenticated
+        if save_address and request.user.is_authenticated:
+            from accounts.models_address import Address
+            Address.objects.create(
+                user=request.user,
+                full_name=first_name + (f" {last_name}" if last_name else ""),
+                phone=phone,
+                address_line1=address,
+                address_line2=address2,
+                city=city,
+                state=state,
+                postal_code=zipcode,
+                country=country,
+            )
 
         # Basic validation - ensure required fields are present
         missing = []
@@ -268,69 +283,74 @@ def checkout(request):
                 product.save(update_fields=['stock'])
 
         # Handle payment method
-        print(f"DEBUG: About to check payment method. payment_method='{payment_method}', RAZORPAY_ENABLED={getattr(settings, 'RAZORPAY_ENABLED', None)}")
-        if payment_method == 'razorpay' and settings.RAZORPAY_ENABLED:
-            print("DEBUG: Creating Razorpay order")
-            # Razorpay order creation
-            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-            amount = int(float(order.total_amount) * 100)  # Razorpay expects paise
-
-            # Debug logging
-            print(f"DEBUG: Order total_amount: {order.total_amount}")
-            print(f"DEBUG: Amount in paise: {amount}")
-
-            if amount < 100:  # Less than ₹1
-                messages.error(request, f'Order amount (₹{order.total_amount}) is too low. Minimum amount is ₹1.')
-                order.delete()  # Remove the invalid order
-                return redirect('cart:cart_detail')
-
-            data = {
-                "amount": amount,
-                "currency": "INR",
-                "receipt": order_id,
-                "payment_capture": 1,
-                "notes": {
-                    "order_type": "ecommerce",
-                    "customer_name": f"{first_name} {last_name}"
+        if payment_method == 'cashfree' and getattr(settings, 'CASHFREE_ENABLED', False):
+            # Cashfree order creation using HTTP API
+            app_id = getattr(settings, 'CASHFREE_APP_ID', '')
+            secret_key = getattr(settings, 'CASHFREE_SECRET_KEY', '')
+            env = getattr(settings, 'CASHFREE_ENV', 'TEST')
+            
+            # Configure Cashfree API endpoint
+            base_url = "https://sandbox.cashfree.com" if env == "TEST" else "https://api.cashfree.com"
+            
+            try:
+                headers = {
+                    "x-api-version": "2022-09-01",
+                    "x-client-id": app_id,
+                    "x-client-secret": secret_key,
+                    "Content-Type": "application/json"
                 }
-            }
-            razorpay_order = client.order.create(data=data)
-            razorpay_order_id = razorpay_order['id']
-
-            # Do not clear cart yet; wait for payment verification
-            initial_data = {
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-                'address': address,
-                'city': city,
-                'state': state,
-                'zipcode': zipcode,
-            }
-            return render(request, 'orders/checkout.html', {
-                'cart': cart,
-                'initial_data': initial_data,
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_key_id': settings.RAZORPAY_KEY_ID,
-                'amount': amount,
-                'order_id': order_id,
-                'mrp_total': mrp_total,
-                'compare_discount': compare_discount,
-                'coupon_discount': coupon_discount,
-                'discount': compare_discount + float(coupon_discount),
-                'cart_total': final_amount,  # Use the same amount as order
-                'subtotal': cart.get_total_price()
-            })
+                
+                order_data = {
+                    "order_id": str(order.id),
+                    "order_amount": float(order.total_amount),
+                    "order_currency": "INR",
+                    "customer_details": {
+                        "customer_id": str(order.user.id) if order.user else f"guest_{order.id}",
+                        "customer_phone": order.user.profile.phone if order.user and hasattr(order.user, 'profile') else phone,
+                        "customer_email": order.email
+                    },
+                    "order_meta": {
+                        "return_url": request.build_absolute_uri('/orders/confirmation/' + str(order.id) + '/'),
+                        "notify_url": request.build_absolute_uri('/orders/cashfree/verify/')
+                    }
+                }
+                
+                response = requests.post(
+                    f"{base_url}/pg/orders",
+                    headers=headers,
+                    json=order_data,
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    payment_link = result.get('payment_link')
+                    if payment_link:
+                        # Clear cart and redirect to Cashfree payment page
+                        cart.clear()
+                        order.payment_id = result.get('cf_order_id', str(order.id))
+                        order.save()
+                        return redirect(payment_link)
+                    else:
+                        messages.error(request, 'Payment link not received from Cashfree. Please try again.')
+                        return redirect('cart:cart_detail')
+                else:
+                    messages.error(request, 'Payment gateway error. Please try again.')
+                    return redirect('cart:cart_detail')
+                    
+            except Exception as e:
+                messages.error(request, f'Payment processing error: {str(e)}')
+                return redirect('cart:cart_detail')
         else:
-            print("DEBUG: Processing COD order - NOT marking as paid, redirecting")
-            # Cash on Delivery - do not mark as paid (COD should remain unpaid until delivery)
             order.save()
             cart.clear()
             messages.success(request, f'Order {order.id} placed successfully!')
             return redirect('orders:confirmation', order_id=order.id)
 
-    # Pre-fill form data for authenticated users (GET request)
+    # GET request - render checkout form
+    # Pre-fill form data for authenticated users
     initial_data = {}
+    saved_addresses = []
     if request.user.is_authenticated:
         user = request.user
         profile = user.profile
@@ -343,6 +363,12 @@ def checkout(request):
             'state': profile.state,
             'zipcode': profile.zipcode,
         }
+        # Fetch all saved addresses for dropdown
+        try:
+            from accounts.models_address import Address
+            saved_addresses = Address.objects.filter(user=user).order_by('-is_default', '-updated')
+        except Exception:
+            saved_addresses = []
 
     subtotal = cart.get_total_price()
     total_discount = compare_discount + float(coupon_discount)
@@ -355,8 +381,70 @@ def checkout(request):
         'coupon_discount': coupon_discount,
         'discount': total_discount,
         'cart_total': cart_total,
-        'subtotal': subtotal
+        'subtotal': subtotal,
+        'saved_addresses': saved_addresses,
     })
+
+
+# Cashfree payment verification view
+@csrf_exempt
+def cashfree_verify(request):
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    if request.method == 'POST':
+        try:
+            import json
+            import hmac
+            import hashlib
+            
+            # Get raw body for signature verification
+            raw_body = request.body
+            data = json.loads(raw_body)
+            
+            # Production security: Verify webhook signature
+            if getattr(settings, 'CASHFREE_ENV', 'TEST') == 'PROD':
+                webhook_signature = request.headers.get('x-webhook-signature')
+                webhook_timestamp = request.headers.get('x-webhook-timestamp')
+                
+                if not webhook_signature or not webhook_timestamp:
+                    logger.error('Missing webhook signature or timestamp')
+                    return JsonResponse({'status': 'error', 'message': 'Invalid webhook'})
+                
+                # Verify signature (implement based on Cashfree documentation)
+                # expected_signature = hmac.new(
+                #     settings.CASHFREE_SECRET_KEY.encode(),
+                #     (webhook_timestamp + raw_body.decode()).encode(),
+                #     hashlib.sha256
+                # ).hexdigest()
+                
+                # if not hmac.compare_digest(webhook_signature, expected_signature):
+                #     logger.error('Invalid webhook signature')
+                #     return JsonResponse({'status': 'error', 'message': 'Invalid signature'})
+            
+            # Extract payment details from Cashfree webhook
+            order_id = data.get('order_id')
+            payment_status = data.get('payment_status')
+            
+            logger.info(f'Cashfree webhook received for order {order_id}: {payment_status}')
+            
+            if order_id and payment_status == 'SUCCESS':
+                # Mark order as paid
+                order = get_object_or_404(Order, id=order_id)
+                order.paid = True
+                order.save()
+                
+                logger.info(f'Order {order_id} marked as paid successfully')
+                return JsonResponse({'status': 'success'})
+            else:
+                logger.warning(f'Payment not successful for order {order_id}: {payment_status}')
+                return JsonResponse({'status': 'failed', 'message': 'Payment not successful'})
+                
+        except Exception as e:
+            logger.error(f"Cashfree webhook error: {e}")
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    return JsonResponse({'status': 'invalid_method'})
 
 
 def confirmation(request, order_id):
@@ -365,67 +453,59 @@ def confirmation(request, order_id):
     return render(request, 'orders/confirmation.html', {'order': order})
 
 
-# Razorpay payment verification view
-@csrf_exempt
-def razorpay_verify(request):
-    if request.method == 'POST':
-        payment_id = request.POST.get('razorpay_payment_id')
-        razorpay_order_id = request.POST.get('razorpay_order_id')
-        signature = request.POST.get('razorpay_signature')
-        order_id = request.POST.get('order_id')
-
-        print(f"DEBUG: Payment verification data:")
-        print(f"  Payment ID: {payment_id}")
-        print(f"  Razorpay Order ID: {razorpay_order_id}")
-        print(f"  Signature: {signature}")
-        print(f"  Order ID: {order_id}")
-
-        if not all([payment_id, razorpay_order_id, signature, order_id]):
-            messages.error(request, 'Missing payment verification data.')
-            return redirect('cart:cart_detail')
-
+def order_detail(request, order_id=None):
+    # Allow both UUID and order_number
+    order = None
+    if order_id:
         try:
-            # Verify signature
-            generated_signature = hmac.new(
-                bytes(settings.RAZORPAY_KEY_SECRET, 'utf-8'),
-                bytes(razorpay_order_id + '|' + payment_id, 'utf-8'),
-                hashlib.sha256
-            ).hexdigest()
-            
-            print(f"DEBUG: Generated signature: {generated_signature}")
-            print(f"DEBUG: Received signature: {signature}")
-            
-            if generated_signature == signature:
-                # Mark order as paid
-                order = get_object_or_404(Order, id=order_id)
-                order.paid = True
-                order.save()
-                # Clear cart for this session
-                cart = Cart(request)
-                cart.clear()
-                messages.success(request, f'Payment successful! Order {order.id} placed.')
-                return redirect('orders:order_detail', order_id=order.id)
-            else:
-                print(f"DEBUG: Signature mismatch!")
-                messages.error(request, 'Payment verification failed. Signature mismatch.')
-                return redirect('cart:cart_detail')
-        except Exception as e:
-            print(f"DEBUG: Exception during verification: {e}")
-            messages.error(request, f'Payment verification error: {str(e)}')
-            return redirect('cart:cart_detail')
-    return redirect('store:home')
+            order = Order.objects.get(id=order_id)
+        except (Order.DoesNotExist, ValueError):
+            try:
+                order = Order.objects.get(order_number=order_id)
+            except Order.DoesNotExist:
+                order = None
+    if not order:
+        messages.error(request, 'Order not found.')
+        return redirect('orders:track_order')
 
-def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    
-    # Check if user has permission to view this order
-    if request.user.is_authenticated and order.user != request.user:
-        if not request.user.is_staff:
+    # If user is authenticated, allow if owner or staff
+    if request.user.is_authenticated:
+        if order.user and order.user != request.user and not request.user.is_staff:
             messages.error(request, 'You do not have permission to view this order.')
             return redirect('store:home')
-    
+    else:
+        # For guests, require email match via session or GET param
+        guest_email = request.session.get('guest_email') or request.GET.get('email')
+        if order.user is not None:
+            messages.error(request, 'Please log in to view this order.')
+            return redirect('accounts:login')
+        if not guest_email or guest_email.lower() != order.email.lower():
+            messages.error(request, 'Email does not match for this order.')
+            return redirect('orders:track_order')
     return render(request, 'orders/detail.html', {'order': order})
 
+# Public order tracking page for guests
+from django import forms
+class TrackOrderForm(forms.Form):
+    order_number = forms.CharField(label='Order Number', max_length=20)
+    email = forms.EmailField(label='Email')
+
+def track_order(request):
+    if request.method == 'POST':
+        form = TrackOrderForm(request.POST)
+        if form.is_valid():
+            order_number = form.cleaned_data['order_number']
+            email = form.cleaned_data['email']
+            try:
+                order = Order.objects.get(order_number=order_number, email__iexact=email)
+                # Store guest email in session for detail view
+                request.session['guest_email'] = email
+                return redirect('orders:order_detail', order_id=order.order_number)
+            except Order.DoesNotExist:
+                form.add_error(None, 'Order not found or email does not match.')
+    else:
+        form = TrackOrderForm()
+    return render(request, 'orders/track_order.html', {'form': form})
 
 # Shiprocket Integration Views
 

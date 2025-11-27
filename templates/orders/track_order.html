@@ -1,0 +1,23 @@
+{% extends 'base_plain.html' %}
+{% block title %}Track Your Order{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h2 class="mb-4 text-center">Track Your Order</h2>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary w-100">Track Order</button>
+      </form>
+      {% if form.errors %}
+        <div class="alert alert-danger mt-3">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}{{ error }}<br>{% endfor %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

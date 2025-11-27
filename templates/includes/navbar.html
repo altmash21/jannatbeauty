@@ -424,8 +424,8 @@
         }
 
         .mobile-brand-banner img {
-            width: 60px;
-            height: 60px;
+            width: 84px;
+            height: 84px;
             object-fit: contain;
         }
 
@@ -659,8 +659,7 @@
                     </button>
 
                           <div class="logo"><a href="{% url 'store:home' %}">
-                                    <h1>Jannat
-                                    </h1>
+                                    <img src="{% static 'images/main-logo.png' %}" alt="JannatLibrary.com" style="height: 55px; max-width: 100%; object-fit: contain;">
                                 </a></div>
 
                     <div class="search">
@@ -676,11 +675,46 @@
                                                 stroke-linejoin="round"></path>
                                         </svg>
                                     </div><input data-provide="typeahead" autocomplete="off" maxlength="160" name="q"
-                                        type="text" placeholder="Search For... Eg: Biotin" class="search-input"
-                                        value="{{ request.GET.q|default_if_none:'' }}">
+                                        type="text" placeholder="" class="search-input"
+                                        value="{{ request.GET.q|default_if_none:'' }}" id="typewriter-search">
                                 </form>
                             </div>
                         </div>
+                    <script>
+                    // Typewriter effect for search bar placeholder (desktop & mobile)
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var phrases = [
+                            'Search For... Eg: Biotin',
+                            'Quran, Prayer Mats, Books',
+                            'Islamic Gifts, Tasbeeh, Hijab',
+                            'Arabic, Urdu, English Qurans',
+                            'Ramadan, Eid, Decor, More...'
+                        ];
+                        var el = document.getElementById('typewriter-search');
+                        if (!el) return;
+                        var i = 0, j = 0, current = '', isDeleting = false, delay = 80, pause = 1200;
+                        function type() {
+                            var phrase = phrases[i % phrases.length];
+                            if (isDeleting) {
+                                current = phrase.substring(0, j--);
+                            } else {
+                                current = phrase.substring(0, j++);
+                            }
+                            el.setAttribute('placeholder', current);
+                            if (!isDeleting && j === phrase.length + 1) {
+                                isDeleting = true;
+                                setTimeout(type, pause);
+                            } else if (isDeleting && j === 0) {
+                                isDeleting = false;
+                                i++;
+                                setTimeout(type, 400);
+                            } else {
+                                setTimeout(type, isDeleting ? 40 : delay);
+                            }
+                        }
+                        type();
+                    });
+                    </script>
                     </div>
 
                     <div class="actions">
@@ -1032,11 +1066,10 @@
                 </div>
             </div>
             <div class="mobile-brand-banner">
-                <img src="data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='60' height='60' rx='8' fill='%23e8f4f8'/%3E%3Cpath d='M20 25h20M20 30h20M20 35h15' stroke='%2300a7b8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"
-                    alt="hk vitals">
+                <img src="{% static 'images/main-logo.png' %}" alt="JannatLibrary.com Logo">
                 <div class="mobile-brand-info">
-                    <h3>hk vitals:</h3>
-                    <p>Research Driven Health Solutions</p>
+                    <h3>JannatLibrary.com</h3>
+                    <p>Your Gateway to Islamic Knowledge</p>
                 </div>
             </div>
         </div>

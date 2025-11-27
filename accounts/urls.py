@@ -3,7 +3,7 @@ Clean URL Configuration for Accounts App
 Separated customer and seller routes
 """
 from django.urls import path
-from . import views_new as views
+from . import views_new as views, views_address
 
 app_name = 'accounts'
 
@@ -39,6 +39,12 @@ urlpatterns = [
     path('customer/orders/', views.customer_orders, name='customer_orders'),
     path('customer/notifications/', views.customer_notifications, name='customer_notifications'),
     path('customer/addresses/', views.customer_addresses, name='customer_addresses'),
+    
+    # ============================================================================
+    # ADDRESS MANAGEMENT
+    # ============================================================================
+    path('address/save/', views_address.save_address, name='save_address'),
+    path('address/select/', views_address.select_address, name='select_address'),
     
     # ============================================================================
     # LEGACY ROUTES - For backward compatibility

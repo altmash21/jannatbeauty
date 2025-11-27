@@ -2,47 +2,63 @@
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 def send_welcome_email(user):
-    """Send welcome email after account creation"""
+    """Send welcome email after account creation using HTML template"""
     try:
+        from django.template.loader import render_to_string
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@jannatlibrary.com')
         recipient_email = user.email
         
         if not recipient_email:
             return
         
-        subject = 'Welcome to Jannat Library!'
+        subject = 'Welcome to JannatLibrary.com - Your Journey Begins!'
         
-        message = f'''Hello {user.first_name or user.username},
+        # Render HTML template
+        html_message = render_to_string('emails/welcome.html', {
+            'user_name': user.first_name or user.username,
+            'user_email': recipient_email,
+        })
+        
+        # Plain text fallback
+        plain_message = f'''Hello {user.first_name or user.username},
 
-Welcome to Jannat Library! We're thrilled to have you as part of our community.
+Welcome to JannatLibrary.com! We're thrilled to have you as part of our community dedicated to authentic Islamic products and knowledge.
 
 Your account has been successfully created. You can now:
-- Browse our extensive collection of Islamic books and products
-- Add items to your cart and checkout securely
-- Track your orders from your dashboard
-- Save your favorite products
+✓ Browse our extensive collection of Islamic books and products
+✓ Enjoy secure checkout and order tracking
+✓ Save your favorite items for later
+✓ Receive exclusive offers and updates
 
 Get Started:
-- Visit our store: {getattr(settings, 'SITE_URL', 'https://jannatlibrary.com')}
-- Browse categories: {getattr(settings, 'SITE_URL', 'https://jannatlibrary.com')}/products/
+🌐 Visit our store: {getattr(settings, 'SITE_URL', 'https://jannatlibrary.com')}
+📚 Browse categories: {getattr(settings, 'SITE_URL', 'https://jannatlibrary.com')}/products/
+👤 Manage your account: {getattr(settings, 'SITE_URL', 'https://jannatlibrary.com')}/accounts/dashboard/
 
-Thank you for choosing Jannat Library!
+New Customer Offer: Use code WELCOME10 for 10% off your first order above ₹500!
+
+At JannatLibrary.com, we're committed to providing you with authentic Islamic products that enrich your spiritual journey.
+
+Thank you for choosing us as your trusted partner!
 
 Best regards,
 Jannat Library Team
+JannatLibrary.com
 
 ---
-Need help? Contact us at {from_email}
+Questions? Contact us at {from_email}
 '''
         
         send_mail(
             subject=subject,
-            message=message,
+            message=plain_message,
             from_email=from_email,
             recipient_list=[recipient_email],
+            html_message=html_message,
             fail_silently=False,
         )
         
@@ -53,8 +69,9 @@ Need help? Contact us at {from_email}
 
 
 def send_seller_approval_email(seller_profile, status):
-    """Send email to seller when their account is approved/rejected/suspended"""
+    """Send email to seller when their account is approved/rejected/suspended using HTML template"""
     try:
+        from django.template.loader import render_to_string
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@jannatlibrary.com')
         recipient_email = seller_profile.user.email or seller_profile.business_email
         
@@ -62,67 +79,115 @@ def send_seller_approval_email(seller_profile, status):
             return
         
         subject_map = {
-            'approved': 'Seller Account Approved - Jannat Library',
-            'rejected': 'Seller Account Application Update - Jannat Library',
-            'suspended': 'Seller Account Suspended - Jannat Library',
+            'approved': 'Seller Account Approved - JannatLibrary.com',
+            'rejected': 'Seller Account Application Update - JannatLibrary.com',
+            'suspended': 'Seller Account Suspended - JannatLibrary.com',
         }
         
         message_map = {
             'approved': f'''Hello {seller_profile.user.first_name or seller_profile.user.username},
 
-Great news! Your seller account has been approved.
+🎉 Congratulations! Your seller account has been approved on JannatLibrary.com!
 
-Business Name: {seller_profile.business_name}
+Business Details:
+• Business Name: {seller_profile.business_name}
+• Account Status: APPROVED ✅
 
-You can now:
-- Add products to your seller dashboard
-- Manage your product listings
-- Track orders and sales
-- Access seller analytics
+You can now start your journey as a seller on our platform:
 
-Get started by visiting your seller dashboard and adding your first product.
+✓ Add authentic Islamic products to your inventory
+✓ Manage your product listings through the seller dashboard
+✓ Track orders and sales in real-time
+✓ Access detailed seller analytics and insights
+✓ Reach thousands of customers looking for quality Islamic products
 
-We're excited to have you as part of the Jannat Library seller community!
+Next Steps:
+1. Visit your seller dashboard: https://jannatlibrary.com/accounts/seller/dashboard/
+2. Add your first product listing
+3. Complete your seller profile
+4. Start connecting with customers!
+
+We're excited to have you as part of the JannatLibrary.com seller community. Together, we can serve the Muslim community with authentic, quality products.
+
+Welcome aboard!
 
 Best regards,
-Jannat Library Team
+JannatLibrary.com Team
+Your Partner in Islamic Commerce
+
+---
+Need assistance? Contact us at {from_email}
 ''',
             'rejected': f'''Hello {seller_profile.user.first_name or seller_profile.user.username},
 
-Thank you for your interest in becoming a seller on Jannat Library.
+Thank you for your interest in becoming a seller on JannatLibrary.com.
 
-Unfortunately, we are unable to approve your seller account application at this time.
+After careful review of your application, we are unable to approve your seller account at this time.
 
 Business Name: {seller_profile.business_name}
+Application Status: Not Approved
 
-If you have any questions or would like to reapply in the future, please contact us.
+This decision may be due to various factors including documentation requirements, business verification criteria, or platform capacity.
+
+What you can do:
+• Review our seller guidelines at: https://jannatlibrary.com/seller-guidelines/
+• Ensure all required documentation is complete
+• You may reapply in the future once requirements are met
+
+If you have questions about this decision or need clarification on our requirements, please don't hesitate to contact our seller support team.
+
+We appreciate your interest in JannatLibrary.com and wish you success in your business endeavors.
 
 Best regards,
-Jannat Library Team
+JannatLibrary.com Team
+
+---
+Questions? Contact us at {from_email}
 ''',
             'suspended': f'''Hello {seller_profile.user.first_name or seller_profile.user.username},
 
-Your seller account has been suspended.
+Your seller account on JannatLibrary.com has been temporarily suspended.
 
 Business Name: {seller_profile.business_name}
+Account Status: SUSPENDED
 
-Your account privileges have been temporarily suspended. Please contact our support team for more information.
+Your seller privileges have been temporarily suspended due to policy violations or account security concerns. During this period, your products will not be visible to customers and you cannot process new orders.
 
-If you have any questions, please contact us at {from_email}
+Important Actions Required:
+1. Review our seller policies and terms of service
+2. Contact our support team to understand the suspension reason
+3. Provide any requested documentation or clarification
+4. Wait for account review and potential reinstatement
+
+To resolve this matter quickly:
+📧 Email us at: {from_email}
+📞 Contact seller support for immediate assistance
+
+We value our seller community and want to work with you to resolve any issues promptly.
 
 Best regards,
-Jannat Library Team
+JannatLibrary.com Team
+
+---
+This is an automated notification. Please contact support for immediate assistance.
 ''',
         }
         
-        subject = subject_map.get(status, 'Seller Account Update - Jannat Library')
-        message = message_map.get(status, 'Your seller account status has been updated.')
+        # Render HTML template
+        html_message = render_to_string('emails/seller_status_update.html', {
+            'seller_profile': seller_profile,
+            'status': status,
+        })
+        
+        subject = subject_map.get(status, 'Seller Account Update - JannatLibrary.com')
+        plain_message = message_map.get(status, 'Your seller account status has been updated.')
         
         send_mail(
             subject=subject,
-            message=message,
+            message=plain_message,
             from_email=from_email,
             recipient_list=[recipient_email],
+            html_message=html_message,
             fail_silently=False,
         )
         
@@ -141,23 +206,37 @@ def send_password_change_confirmation_email(user):
         if not recipient_email:
             return
         
-        subject = 'Password Changed Successfully - Jannat Library'
+        subject = 'Password Changed Successfully - JannatLibrary.com'
         
         message = f'''Hello {user.first_name or user.username},
 
-Your password has been successfully changed.
+🔒 Your password has been successfully changed for your JannatLibrary.com account.
 
-If you did not make this change, please contact us immediately at {from_email}
+Account Security Confirmation:
+• Account: {user.email}
+• Change Date: {timezone.now().strftime("%B %d, %Y at %I:%M %p")}
+• Change Method: Secure password update
 
-For your security:
-- Use a strong, unique password
-- Never share your password with anyone
-- Log out when using shared computers
+If you made this change, no further action is required. Your account remains secure.
 
-Thank you for keeping your account secure!
+⚠️ If you did not make this change:
+1. Contact our support team immediately at {from_email}
+2. Review your account activity
+3. Consider enabling additional security measures
+
+Security Best Practices:
+✓ Use a strong, unique password for your account
+✓ Never share your login credentials with anyone
+✓ Log out when using shared or public computers
+✓ Regularly review your account activity
+
+Your account security is our top priority. Thank you for keeping your JannatLibrary.com account safe!
 
 Best regards,
-Jannat Library Team
+JannatLibrary.com Security Team
+
+---
+Immediate assistance needed? Contact: {from_email}
 '''
         
         send_mail(

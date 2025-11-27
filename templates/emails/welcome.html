@@ -1,0 +1,71 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Welcome to JannatLibrary.com!{% endblock %}
+
+{% block content %}
+<div class="title">Welcome to Our Community! 🎉</div>
+
+<div class="message">
+    <p>Hello <strong>{{ user_name|default:"Valued Customer" }}</strong>,</p>
+    
+    <p>Welcome to <strong>JannatLibrary.com</strong>! We're thrilled to have you join our community dedicated to authentic Islamic products and knowledge.</p>
+    
+    <p>Your account has been successfully created and you're all set to begin your spiritual journey with us.</p>
+</div>
+
+<div class="info-box" style="background: linear-gradient(135deg, #f8f9fa, #e3f2fd);">
+    <h3 style="color: #06402B; margin-bottom: 15px;">🌟 What You Can Do Now:</h3>
+    <ul style="margin: 0; padding-left: 20px; color: #555;">
+        <li>Browse our extensive collection of authentic Islamic books and products</li>
+        <li>Enjoy secure checkout and order tracking</li>
+        <li>Save your favorite items for future purchases</li>
+        <li>Receive exclusive offers and spiritual content updates</li>
+        <li>Join our community of mindful Muslim shoppers</li>
+    </ul>
+</div>
+
+<div class="message">
+    <p><strong>Quick Start Guide:</strong></p>
+    <div style="display: grid; gap: 15px; margin: 20px 0;">
+        <div style="display: flex; align-items: center; background: #fafafa; padding: 15px; border-radius: 8px; border-left: 4px solid #06402B;">
+            <span style="font-size: 24px; margin-right: 15px;">🏪</span>
+            <div>
+                <strong style="color: #2c3e50;">Explore Our Store</strong><br>
+                <span class="text-small text-muted">Discover authentic Islamic products curated for your spiritual needs</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; background: #fafafa; padding: 15px; border-radius: 8px; border-left: 4px solid #06402B;">
+            <span style="font-size: 24px; margin-right: 15px;">👤</span>
+            <div>
+                <strong style="color: #2c3e50;">Complete Your Profile</strong><br>
+                <span class="text-small text-muted">Add your preferences for a personalized shopping experience</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; background: #fafafa; padding: 15px; border-radius: 8px; border-left: 4px solid #06402B;">
+            <span style="font-size: 24px; margin-right: 15px;">🎁</span>
+            <div>
+                <strong style="color: #2c3e50;">Join Our Newsletter</strong><br>
+                <span class="text-small text-muted">Stay updated with new arrivals and exclusive member offers</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-20">
+    <a href="https://jannatlibrary.com/products/" class="btn" style="margin-right: 15px;">Start Shopping</a>
+    <a href="https://jannatlibrary.com/accounts/dashboard/" style="color: #06402B; text-decoration: none; font-weight: 600;">Manage Account →</a>
+</div>
+
+<div class="info-box" style="margin-top: 30px; background: #fff3cd; border: 1px solid #ffeaa7;">
+    <div style="text-align: center;">
+        <strong style="color: #856404;">🏷️ New Customer Offer</strong><br>
+        <span style="color: #856404; font-size: 14px;">Use code <strong>WELCOME10</strong> for 10% off your first order above ₹500!</span>
+    </div>
+</div>
+
+<div class="text-center mt-20 text-small text-muted">
+    Questions or need assistance? We're here to help! Contact us at <a href="mailto:support@jannatlibrary.com" style="color: #06402B;">support@jannatlibrary.com</a>
+</div>
+{% endblock %}

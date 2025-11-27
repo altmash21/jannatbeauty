@@ -1,0 +1,75 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Order Update #{{ order.order_number|default:order.id }} - JannatLibrary.com{% endblock %}
+
+{% block content %}
+<div class="title">Order Status Update</div>
+
+<div class="message">
+    <p>Hello <strong>{{ order.first_name }}</strong>,</p>
+    
+    <p>We have an update on your order from JannatLibrary.com:</p>
+</div>
+
+<div class="info-box">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 18px; color: #2c3e50; margin-bottom: 5px;">Order #{{ order.order_number|default:order.id }}</div>
+        <div style="background: {% if order.order_status == 'delivered' %}#28a745{% elif order.order_status == 'shipped' %}#007bff{% elif order.order_status == 'processing' %}#ffc107{% elif order.order_status == 'cancelled' %}#dc3545{% else %}#6c757d{% endif %}; color: white; padding: 10px 20px; border-radius: 25px; display: inline-block; font-weight: bold; font-size: 16px;">
+            {{ status_display }}
+        </div>
+    </div>
+    
+    <div class="text-center">
+        <p style="font-size: 16px; color: #2c3e50;">{{ status_message }}</p>
+    </div>
+</div>
+
+{% if order.order_status == 'shipped' and order.awb_code %}
+<div class="info-box" style="background: #e3f2fd;">
+    <div class="text-center">
+        <strong style="color: #1976d2;">📦 Tracking Information</strong><br>
+        <div style="margin-top: 10px;">
+            <strong>AWB/Tracking Number:</strong> {{ order.awb_code }}<br>
+            {% if order.courier_name %}<strong>Courier:</strong> {{ order.courier_name }}{% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if order.order_status == 'delivered' %}
+<div class="message">
+    <p>🎉 <strong>Congratulations!</strong> Your order has been successfully delivered. We hope you love your authentic Islamic products from JannatLibrary.com!</p>
+    
+    <p><strong>How was your experience?</strong> We'd love to hear from you:</p>
+    <ul style="margin: 10px 0 0 20px; color: #555;">
+        <li>Share your feedback about the products</li>
+        <li>Rate your shopping experience</li>
+        <li>Recommend us to friends and family</li>
+    </ul>
+</div>
+{% elif order.order_status == 'shipped' %}
+<div class="message">
+    <p>📦 <strong>Great news!</strong> Your order is on its way to you. You can track the shipment using the tracking number provided above.</p>
+    
+    <p><strong>Estimated Delivery:</strong> Your order should arrive within 3-7 business days depending on your location.</p>
+</div>
+{% elif order.order_status == 'processing' %}
+<div class="message">
+    <p>⚙️ Your order is being carefully processed and packed. We'll notify you as soon as it's shipped with tracking details.</p>
+</div>
+{% elif order.order_status == 'cancelled' %}
+<div class="message">
+    <p>❌ Your order has been cancelled. If this was unexpected, please contact our support team immediately.</p>
+    
+    <p>If you paid online, any charges will be refunded to your original payment method within 5-7 business days.</p>
+</div>
+{% endif %}
+
+<div class="text-center mt-20">
+    <a href="https://jannatlibrary.com/orders/{{ order.id }}/" class="btn">View Order Details</a>
+</div>
+
+<div class="text-center mt-20 text-small text-muted">
+    Questions? Contact us at <a href="mailto:support@jannatlibrary.com" style="color: #06402B;">support@jannatlibrary.com</a> or visit our website for more information.
+</div>
+{% endblock %}

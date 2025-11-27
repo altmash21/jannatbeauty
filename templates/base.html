@@ -324,7 +324,47 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" class="position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none;">
                   <use xlink:href="#search"></use>
                 </svg>
-                <input type="search" name="q" class="form-control" placeholder="Search For... Eg: Quran" style="border-radius: 25px; padding: 10px 20px 10px 45px; border: 1px solid #ddd; width: 100%;">
+                <input id="typewriter-search" type="search" name="q" class="form-control" placeholder="Search for Quran" style="border-radius: 25px; padding: 10px 20px 10px 45px; border: 1px solid #ddd; width: 100%;">
+                  {% block extra_js %}
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                      var input = document.getElementById('typewriter-search');
+                      if (!input) return;
+                      // Get category names from the category bar if available, else fallback
+                      var categories = [];
+                      {% for category in all_categories %}
+                        categories.push(`{{ category.name|escapejs }}`);
+                      {% endfor %}
+                      if (categories.length === 0) categories = ["Quran", "Tasbi", "Topi", "Janamaz", "Dua Books", "Accessories"];
+                      var prefix = "Search for ";
+                      var i = 0, j = 0, typing = true;
+                      function typeLoop() {
+                        var current = categories[i];
+                        if (typing) {
+                          if (j < current.length) {
+                            input.setAttribute('placeholder', prefix + current.slice(0, j+1));
+                            j++;
+                            setTimeout(typeLoop, 90);
+                          } else {
+                            typing = false;
+                            setTimeout(typeLoop, 1200);
+                          }
+                        } else {
+                          if (j > 0) {
+                            input.setAttribute('placeholder', prefix + current.slice(0, j-1));
+                            j--;
+                            setTimeout(typeLoop, 40);
+                          } else {
+                            typing = true;
+                            i = (i + 1) % categories.length;
+                            setTimeout(typeLoop, 400);
+                          }
+                        }
+                      }
+                      typeLoop();
+                    });
+                  </script>
+                  {% endblock %}
               </div>
             </form>
           </div>
@@ -367,7 +407,8 @@
     </div>
   </nav>
   
-  <!-- Category Bar Below Navbar (Desktop Only) -->
+  {% if request.resolver_match.url_name == 'home' %}
+  <!-- Category Bar Below Navbar (Desktop Only, Home Only) -->
   <div class="d-none d-md-block category-bar-below-nav" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6; padding: 12px 0; ">
     <div class="container-fluid">
       <div class="d-flex align-items-center justify-content-center flex-wrap gap-3">
@@ -387,6 +428,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
 
    
     <!-- Main Content -->
@@ -416,6 +458,9 @@
         }
         #footer .footer-intro img {
           max-width: 120px;
+          width: 120px;
+          height: 120px;
+          object-fit: contain;
         }
       }
       @media (max-width: 576px) {
@@ -436,6 +481,9 @@
         }
         #footer .footer-intro img {
           max-width: 100px;
+          width: 100px;
+          height: 100px;
+          object-fit: contain;
         }
         #footer .py-5 {
           padding-top: 2rem !important;
@@ -451,7 +499,7 @@
           <div class="footer-menu footer-menu-001">
             <div class="footer-intro mb-4">
               <a href="{% url 'store:home' %}">
-                <img src="{% static 'images/main-logo.png' %}" alt="logo">
+                <img src="{% static 'images/main-logo.png' %}" alt="JannatLibrary.com Logo" style="width:120px;height:120px;object-fit:contain;display:block;margin:auto;filter:brightness(0) invert(1);">
               </a>
             </div>
             <p style="color: white;">Jannat Library is your trusted destination for authentic Islamic products. We offer a curated collection of Qurans, Islamic books, prayer essentials, accessories, and thoughtful gifts to enrich your spiritual journey and home.</p>

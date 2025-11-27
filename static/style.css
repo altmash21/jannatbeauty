@@ -11,6 +11,7 @@
   --primary-green-hover: #145c32;
 }
 
+
 .btn-primary,
 .btn.btn-primary,
 button.btn-primary,
@@ -18,12 +19,12 @@ button.btn-primary,
 .coupon-btn-mobile,
 .continue-shopping-mobile,
 .btn-outline-dark,
-.btn-lg,
-.btn {
+.btn-lg {
   background-color: var(--primary-green) !important;
   border-color: var(--primary-green) !important;
   color: #fff !important;
 }
+
 
 .btn-primary:hover,
 .btn.btn-primary:hover,
@@ -32,8 +33,7 @@ button.btn-primary:hover,
 .coupon-btn-mobile:hover,
 .continue-shopping-mobile:hover,
 .btn-outline-dark:hover,
-.btn-lg:hover,
-.btn:hover {
+.btn-lg:hover {
   background-color: var(--primary-green-hover) !important;
   border-color: var(--primary-green-hover) !important;
   color: #fff !important;
@@ -1167,6 +1167,7 @@ a.btn-link.text-light:after {
 .element-title {
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

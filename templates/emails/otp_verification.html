@@ -1,0 +1,48 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Email Verification - JannatLibrary.com{% endblock %}
+
+{% block content %}
+<div class="title">Email Verification Required</div>
+
+<div class="message">
+    <p>Hello <strong>{{ user_name|default:"Valued Customer" }}</strong>,</p>
+    
+    <p>Thank you for joining JannatLibrary.com! To complete your registration and secure your account, please verify your email address using the code below:</p>
+</div>
+
+<div class="otp-box">
+    <div class="otp-code">{{ otp_code }}</div>
+    <div class="otp-label">Verification Code</div>
+</div>
+
+<div class="info-box">
+    <div class="text-small">
+        <strong>Important Security Information:</strong>
+        <ul style="margin: 10px 0 0 20px; color: #666;">
+            <li>This code will expire in <strong>10 minutes</strong></li>
+            <li>Only use this code on our official website: <strong>JannatLibrary.com</strong></li>
+            <li>Never share this code with anyone</li>
+            <li>We will never ask for this code via phone or email</li>
+        </ul>
+    </div>
+</div>
+
+<div class="message">
+    <p>Once verified, you'll be able to:</p>
+    <ul style="margin: 10px 0 0 20px; color: #555;">
+        <li>Browse our extensive collection of Islamic books and products</li>
+        <li>Enjoy secure checkout and order tracking</li>
+        <li>Receive exclusive offers and updates</li>
+        <li>Save your favorite items for later</li>
+    </ul>
+</div>
+
+<div class="text-center mt-20">
+    <a href="https://jannatlibrary.com/accounts/verify-otp/" class="btn">Verify Email Now</a>
+</div>
+
+<div class="text-center mt-20 text-small text-muted">
+    Didn't request this verification? Please ignore this email or <a href="mailto:support@jannatlibrary.com" style="color: #06402B;">contact our support team</a>.
+</div>
+{% endblock %}

@@ -4,14 +4,37 @@
 
 {% block content %}
 <div class="container" style="max-width:720px;">
-    <div class="card">
-        <h3 style="margin:0 0 0.5rem 0;">Order Detail</h3>
-        <div class="order-info">
-            <p><strong>Order ID:</strong> {% if order.order_number %}#{{ order.order_number }}{% else %}#{{ order.id|slice:":8"|upper }}{% endif %}</p>
-            <p><strong>Date:</strong> {{ order.date }}</p>
-            <p><strong>Status:</strong> {{ order.status }}</p>
-                        <p><strong>Status:</strong> {{ order.get_order_status_display }}</p>
-            <!-- Add more order info as needed -->
+    <div class="card p-4 my-4">
+        <h3 class="mb-3">Order Details</h3>
+        <div class="order-info mb-3">
+            <p><strong>Order Number:</strong> {% if order.order_number %}#{{ order.order_number }}{% else %}#{{ order.id|slice:":8"|upper }}{% endif %}</p>
+            <p><strong>Date:</strong> {{ order.created|date:"M d, Y H:i" }}</p>
+            <p><strong>Status:</strong> {{ order.get_order_status_display }}</p>
+        </div>
+        <div class="mb-3">
+            <h5>Shipping Address</h5>
+            <p>
+                {{ order.first_name }} {{ order.last_name }}<br>
+                {{ order.address }}<br>
+                {{ order.city }}, {{ order.state }} - {{ order.zipcode }}<br>
+                Email: {{ order.email }}
+            </p>
+        </div>
+        <div class="mb-3">
+            <h5>Order Items</h5>
+            <ul class="list-group">
+                {% for item in order.items.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ item.product.name }} <span>x{{ item.quantity }}</span>
+                    <span>₹{{ item.price|floatformat:2 }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item">No items found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="mb-3 text-end">
+            <h5>Total: ₹{{ order.total_amount|floatformat:2 }}</h5>
         </div>
     </div>
 </div>

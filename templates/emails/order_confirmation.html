@@ -1,0 +1,83 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Order Confirmation #{{ order.order_number|default:order.id }} - JannatLibrary.com{% endblock %}
+
+{% block content %}
+<div class="title">Order Confirmation</div>
+
+<div class="message">
+    <p>Hello <strong>{{ order.first_name }}</strong>,</p>
+    
+    <p>Thank you for your order! We're excited to confirm that your order has been received and is now being processed. Here are the details:</p>
+</div>
+
+<div class="info-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div>
+            <strong style="color: #06402B; font-size: 18px;">Order #{{ order.order_number|default:order.id }}</strong><br>
+            <span class="text-small text-muted">Placed on {{ order.created|date:"F d, Y \a\t g:i A" }}</span>
+        </div>
+        <div class="text-center">
+            <div style="background: #06402B; color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                {{ order.get_payment_method_display }}
+            </div>
+        </div>
+    </div>
+    
+    <div style="border-top: 1px solid #e9ecef; padding-top: 15px;">
+        <strong>Shipping Address:</strong><br>
+        <span class="text-muted">
+            {{ order.first_name }} {{ order.last_name }}<br>
+            {{ order.address }}<br>
+            {{ order.city }}, {{ order.state }} {{ order.zipcode }}
+        </span>
+    </div>
+</div>
+
+<!-- Order Items -->
+<div style="margin: 30px 0;">
+    <h3 style="color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #06402B; padding-bottom: 10px;">Order Items</h3>
+    
+    {% for item in order_items %}
+    <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 15px; background: #fafafa;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong style="color: #2c3e50; font-size: 16px;">{{ item.name }}</strong><br>
+                <span class="text-muted">Quantity: {{ item.quantity }} × ₹{{ item.price }}</span>
+            </div>
+            <div style="text-align: right;">
+                <strong style="color: #06402B; font-size: 18px;">₹{{ item.total }}</strong>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Order Summary -->
+<div class="info-box" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+    <div style="text-align: right;">
+        <div style="font-size: 24px; font-weight: bold; color: #06402B;">
+            Total: ₹{{ order.total_amount }}
+        </div>
+        <div class="text-small text-muted">Including all taxes and fees</div>
+    </div>
+</div>
+
+<div class="message">
+    <p><strong>What happens next?</strong></p>
+    <ol style="margin: 10px 0 0 20px; color: #555;">
+        <li>We'll process and pack your order with care</li>
+        <li>You'll receive a shipping confirmation with tracking details</li>
+        <li>Your order will be delivered to your specified address</li>
+        <li>Enjoy your authentic Islamic products from JannatLibrary.com!</li>
+    </ol>
+</div>
+
+<div class="text-center mt-20">
+    <a href="https://jannatlibrary.com/orders/{{ order.id }}/" class="btn">Track Your Order</a>
+</div>
+
+<div class="text-center mt-20 text-small text-muted">
+    Questions about your order? Contact us at <a href="mailto:support@jannatlibrary.com" style="color: #06402B;">support@jannatlibrary.com</a> or call our customer service team.
+</div>
+{% endblock %}

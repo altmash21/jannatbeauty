@@ -1,0 +1,153 @@
+{% extends "emails/base.html" %}
+
+{% block title %}
+{% if status == 'approved' %}Seller Account Approved - JannatLibrary.com
+{% elif status == 'rejected' %}Seller Application Update - JannatLibrary.com
+{% elif status == 'suspended' %}Account Suspended - JannatLibrary.com
+{% else %}Seller Account Update - JannatLibrary.com{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if status == 'approved' %}
+<div class="title">🎉 Congratulations! Your Seller Account is Approved</div>
+
+<div class="message">
+    <p>Hello <strong>{{ seller_profile.user.first_name|default:seller_profile.user.username }}</strong>,</p>
+    
+    <p>We're excited to inform you that your seller account has been <strong>APPROVED</strong> on JannatLibrary.com!</p>
+</div>
+
+<div class="info-box" style="background: linear-gradient(135deg, #d4edda, #c3e6cb);">
+    <div style="text-align: center;">
+        <div style="background: #28a745; color: white; padding: 10px 20px; border-radius: 25px; display: inline-block; font-weight: bold; margin-bottom: 15px;">
+            ✅ APPROVED
+        </div>
+        <div>
+            <strong style="color: #155724;">Business Name:</strong> {{ seller_profile.business_name }}<br>
+            <span style="color: #6c757d; font-size: 14px;">Ready to start selling authentic Islamic products</span>
+        </div>
+    </div>
+</div>
+
+<div class="message">
+    <p><strong>🚀 You can now start your seller journey:</strong></p>
+    <ul style="margin: 15px 0 0 20px; color: #555;">
+        <li>Add authentic Islamic products to your inventory</li>
+        <li>Manage your product listings through the seller dashboard</li>
+        <li>Track orders and sales in real-time</li>
+        <li>Access detailed seller analytics and insights</li>
+        <li>Reach thousands of customers seeking quality Islamic products</li>
+    </ul>
+</div>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #06402B;">
+    <h4 style="color: #06402B; margin-bottom: 15px;">📋 Next Steps:</h4>
+    <ol style="margin: 0; color: #555;">
+        <li>Complete your seller profile with business details</li>
+        <li>Add your first product listing</li>
+        <li>Set up your payment and shipping preferences</li>
+        <li>Start connecting with customers!</li>
+    </ol>
+</div>
+
+<div class="text-center mt-20">
+    <a href="https://jannatlibrary.com/accounts/seller/dashboard/" class="btn">Access Seller Dashboard</a>
+</div>
+
+<div class="message mt-20">
+    <p>We're excited to have you as part of the JannatLibrary.com seller community. Together, we can serve the Muslim community with authentic, quality products.</p>
+</div>
+
+{% elif status == 'rejected' %}
+<div class="title">Application Status Update</div>
+
+<div class="message">
+    <p>Hello <strong>{{ seller_profile.user.first_name|default:seller_profile.user.username }}</strong>,</p>
+    
+    <p>Thank you for your interest in becoming a seller on JannatLibrary.com.</p>
+    
+    <p>After careful review of your application, we are unable to approve your seller account at this time.</p>
+</div>
+
+<div class="info-box" style="background: #f8d7da; border: 1px solid #f5c6cb;">
+    <div style="text-align: center;">
+        <strong style="color: #721c24;">Business Name:</strong> {{ seller_profile.business_name }}<br>
+        <div style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 14px; margin-top: 10px;">
+            Application Not Approved
+        </div>
+    </div>
+</div>
+
+<div class="message">
+    <p><strong>This decision may be due to:</strong></p>
+    <ul style="margin: 15px 0 0 20px; color: #555;">
+        <li>Documentation requirements not fully met</li>
+        <li>Business verification criteria</li>
+        <li>Platform capacity limitations</li>
+        <li>Adherence to our quality standards</li>
+    </ul>
+</div>
+
+<div style="background: #d1ecf1; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0c5460;">
+    <h4 style="color: #0c5460; margin-bottom: 15px;">💡 What You Can Do:</h4>
+    <ul style="margin: 0; color: #0c5460;">
+        <li>Review our seller guidelines and requirements</li>
+        <li>Ensure all required documentation is complete and accurate</li>
+        <li>Consider reapplying once all requirements are fully met</li>
+        <li>Contact our seller support team for specific guidance</li>
+    </ul>
+</div>
+
+<div class="text-center mt-20">
+    <a href="https://jannatlibrary.com/seller-guidelines/" style="color: #06402B; text-decoration: none; font-weight: 600; margin-right: 20px;">View Guidelines</a>
+    <a href="mailto:seller-support@jannatlibrary.com" style="color: #06402B; text-decoration: none; font-weight: 600;">Contact Support</a>
+</div>
+
+{% elif status == 'suspended' %}
+<div class="title">⚠️ Account Suspension Notice</div>
+
+<div class="message">
+    <p>Hello <strong>{{ seller_profile.user.first_name|default:seller_profile.user.username }}</strong>,</p>
+    
+    <p>Your seller account on JannatLibrary.com has been <strong>temporarily suspended</strong>.</p>
+</div>
+
+<div class="info-box" style="background: #fff3cd; border: 1px solid #ffeaa7;">
+    <div style="text-align: center;">
+        <strong style="color: #856404;">Business Name:</strong> {{ seller_profile.business_name }}<br>
+        <div style="background: #ffc107; color: #212529; padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 14px; margin-top: 10px; font-weight: bold;">
+            🚫 SUSPENDED
+        </div>
+    </div>
+</div>
+
+<div class="message">
+    <p><strong>During this suspension period:</strong></p>
+    <ul style="margin: 15px 0 0 20px; color: #555;">
+        <li>Your products are not visible to customers</li>
+        <li>You cannot process new orders</li>
+        <li>Existing orders will be handled according to platform policy</li>
+        <li>Account access may be limited</li>
+    </ul>
+</div>
+
+<div style="background: #f8d7da; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc3545;">
+    <h4 style="color: #721c24; margin-bottom: 15px;">🔧 Required Actions:</h4>
+    <ol style="margin: 0; color: #721c24;">
+        <li>Review our seller policies and terms of service</li>
+        <li>Contact our support team to understand the suspension reason</li>
+        <li>Provide any requested documentation or clarification</li>
+        <li>Wait for account review and potential reinstatement</li>
+    </ol>
+</div>
+
+<div class="text-center mt-20">
+    <a href="mailto:seller-support@jannatlibrary.com" class="btn" style="background: #dc3545;">Contact Support Immediately</a>
+</div>
+
+{% endif %}
+
+<div class="text-center mt-20 text-small text-muted">
+    This is an automated notification from JannatLibrary.com. For immediate assistance, please contact our seller support team.
+</div>
+{% endblock %}

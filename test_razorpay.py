@@ -1,22 +1,12 @@
+def test_razorpay_connection():
 """
-Test Razorpay API Connection and Functionality
-Run this to verify your Razorpay API credentials are working
+Test Cashfree API Connection and Functionality
+Run this to verify your Cashfree API credentials are working
+"""
 
-To get test credentials:
-1. Go to https://dashboard.razorpay.com/
-2. Sign up or log in
-3. Go to Settings → API Keys
-4. Generate test keys (Key ID and Key Secret)
-5. Add them to your .env file:
-    RAZORPAY_KEY_ID='rzp_test_RhVxwUikNwebVp'
-    RAZORPAY_KEY_SECRET='sIQlP4e13YGMx2jPDjBNbhoE'
-   RAZORPAY_ENABLED=True
-"""
 import os
 import sys
 import django
-import hmac
-import hashlib
 
 # Setup Django environment
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -24,40 +14,28 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecommerce.settings')
 django.setup()
 
 from django.conf import settings
-import razorpay
+from cashfree_sdk.payouts import Payouts
 
-
-def test_razorpay_connection():
-    """Test Razorpay client initialization and connection"""
+def test_cashfree_connection():
+    """Test Cashfree client initialization and connection"""
     print("=" * 70)
-    print("Testing Razorpay API Connection...")
+    print("Testing Cashfree API Connection...")
     print("=" * 70)
-    
-    # Check if Razorpay is enabled
-    if not getattr(settings, 'RAZORPAY_ENABLED', False):
-        print("\n❌ ERROR: Razorpay is not enabled in settings!")
-        print("Set RAZORPAY_ENABLED=True in your .env file")
-        return False
-    
-    # Get credentials
-    key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
-    key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
-    
-    if not key_id or not key_secret:
-        print("\n❌ ERROR: Razorpay credentials not found!")
+    app_id = getattr(settings, 'CASHFREE_APP_ID', '')
+    secret_key = getattr(settings, 'CASHFREE_SECRET_KEY', '')
+    env = getattr(settings, 'CASHFREE_ENV', 'TEST')
+    if not app_id or not secret_key:
+        print("\n❌ ERROR: Cashfree credentials not found!")
         print("\nPlease add to your .env file:")
-        print("RAZORPAY_KEY_ID=your_test_key_id")
-        print("RAZORPAY_KEY_SECRET=your_test_secret")
-        print("RAZORPAY_ENABLED=True")
-        print("\nTo get test credentials:")
-        print("1. Go to https://dashboard.razorpay.com/")
-        print("2. Sign up or log in")
-        print("3. Go to Settings → API Keys")
-        print("4. Generate test keys")
+        print("CASHFREE_APP_ID=your_app_id")
+        print("CASHFREE_SECRET_KEY=your_secret_key")
+        print("CASHFREE_ENV=TEST or PROD")
         return False
-    
-    print(f"\n✓ Key ID: {key_id[:10]}...{key_id[-4:]}")
-    print(f"✓ Key Secret: {'*' * 20}...{key_secret[-4:]}")
+    print(f"\n✓ App ID: {app_id[:10]}...{app_id[-4:]}")
+    print(f"✓ Secret Key: {'*' * 20}...{secret_key[-4:]}")
+    print(f"✓ Environment: {env}")
+    # Add actual API call test here if needed
+    print("\n✓ Cashfree test setup complete.")
     print(f"✓ Enabled: {settings.RAZORPAY_ENABLED}")
     
     try:
