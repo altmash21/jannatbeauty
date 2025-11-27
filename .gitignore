@@ -42,3 +42,6 @@ coverage.xml
 
 # Other
 *.swp
+
+# Local environment files
+.env.local
