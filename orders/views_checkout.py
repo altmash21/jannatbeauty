@@ -20,6 +20,19 @@ from store.models import Product
 logger = logging.getLogger(__name__)
 
 
+def get_absolute_url(request, path):
+    """
+    Generate absolute URL using SITE_URL setting for production or request for development
+    """
+    site_url = getattr(settings, 'SITE_URL', '')
+    if site_url and not settings.DEBUG:
+        # Use configured SITE_URL in production
+        return site_url.rstrip('/') + path
+    else:
+        # Use request.build_absolute_uri in development
+        return request.build_absolute_uri(path)
+
+
 def checkout(request):
     """
     Checkout page - validates cart and shows billing form
@@ -193,8 +206,8 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
             'customer_name': f"{customer_data['first_name']} {customer_data['last_name']}"
         },
         'order_meta': {
-            'return_url': request.build_absolute_uri(f'/orders/cashfree/return/?order_id={order_id}'),
-            'notify_url': request.build_absolute_uri('/orders/cashfree/webhook/')
+            'return_url': get_absolute_url(request, f'/orders/cashfree/return/?order_id={order_id}'),
+            'notify_url': get_absolute_url(request, '/orders/cashfree/webhook/')
         }
     }
     
@@ -245,7 +258,7 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
     total_discount = compare_discount + float(coupon_discount)
     
     # Create return URL for Cashfree
-    return_url = request.build_absolute_uri(f'/orders/cashfree/return/?order_id={order_id}')
+    return_url = get_absolute_url(request, f'/orders/cashfree/return/?order_id={order_id}')
     
     # Render checkout page with Cashfree integration for direct payment
     return render(request, 'orders/checkout.html', {

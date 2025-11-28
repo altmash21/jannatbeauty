@@ -50,6 +50,9 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost', cast=Csv())
 
+# Site URL for absolute URLs in production (webhooks, returns, etc.)
+SITE_URL = config('SITE_URL', default='http://127.0.0.1:8000')
+
 
 # Application definition
 

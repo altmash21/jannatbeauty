@@ -9,6 +9,7 @@
    CASHFREE_SECRET_KEY=YOUR_PRODUCTION_SECRET_KEY_HERE
    CASHFREE_ENV=PROD
    CASHFREE_ENABLED=True
+   SITE_URL=https://jannatbeauty.in
    ```
 
 2. **Get Production Credentials:**
@@ -17,10 +18,16 @@
    - Generate Production App ID and Secret Key
    - Replace placeholders in `.env`
 
-3. **Security Features Implemented:**
+3. **IMPORTANT: Update Site URL for Payment Returns:**
+   - Set `SITE_URL=https://jannatbeauty.in` in production `.env`
+   - This ensures payment success/failure returns to your domain, not localhost
+   - Critical for proper payment flow in production
+
+4. **Security Features Implemented:**
    - ✅ Webhook signature verification (ready for production)
    - ✅ Proper error handling and logging
    - ✅ Environment-based URL switching
+   - ✅ Production-ready return URL handling
    - ✅ Input validation and sanitization
 
 ## ✅ Other Production Requirements
