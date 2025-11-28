@@ -834,12 +834,17 @@ def order_detail(request, order_id=None):
     # Allow both UUID and order_number
     order = None
     if order_id:
+        from django.core.exceptions import ValidationError
+        import uuid
+        # Try by order_number first
         try:
-            order = Order.objects.get(id=order_id)
-        except (Order.DoesNotExist, ValueError):
+            order = Order.objects.get(order_number=order_id)
+        except Order.DoesNotExist:
+            # Try by UUID only if order_id looks like a UUID
             try:
-                order = Order.objects.get(order_number=order_id)
-            except Order.DoesNotExist:
+                uuid_obj = uuid.UUID(order_id)
+                order = Order.objects.get(id=uuid_obj)
+            except (Order.DoesNotExist, ValueError, ValidationError):
                 order = None
     if not order:
         messages.error(request, 'Order not found.')
@@ -864,21 +869,41 @@ def order_detail(request, order_id=None):
 # Public order tracking page for guests
 from django import forms
 class TrackOrderForm(forms.Form):
-    order_number = forms.CharField(label='Order Number', max_length=20)
+    order_number = forms.CharField(label='Order Number', max_length=64, widget=forms.TextInput(attrs={'size': 40}))
     email = forms.EmailField(label='Email')
 
 def track_order(request):
+    import sys
     if request.method == 'POST':
         form = TrackOrderForm(request.POST)
         if form.is_valid():
             order_number = form.cleaned_data['order_number']
             email = form.cleaned_data['email']
+            print(f"[DEBUG] Tracking order: order_number='{order_number}', email='{email}'", file=sys.stderr)
+            # Print all matching orders for debug
+            from .models import Order
+            matches = Order.objects.filter(order_number=order_number)
+            print(f"[DEBUG] Orders with this number: {[o.email for o in matches]}", file=sys.stderr)
+            from django.core.exceptions import ValidationError
+            order = None
+            # Try by order_number first
             try:
                 order = Order.objects.get(order_number=order_number, email__iexact=email)
+                print(f"[DEBUG] Order found by order_number: id={order.id}, email={order.email}", file=sys.stderr)
+            except Order.DoesNotExist:
+                # Try by UUID id if order_number lookup fails
+                try:
+                    import uuid
+                    uuid_obj = uuid.UUID(order_number)
+                    order = Order.objects.get(id=uuid_obj, email__iexact=email)
+                    print(f"[DEBUG] Order found by UUID id: id={order.id}, email={order.email}", file=sys.stderr)
+                except (Order.DoesNotExist, ValueError, ValidationError):
+                    print(f"[DEBUG] No order found with this number or UUID and email.", file=sys.stderr)
+            if order:
                 # Store guest email in session for detail view
                 request.session['guest_email'] = email
                 return redirect('orders:order_detail', order_id=order.order_number)
-            except Order.DoesNotExist:
+            else:
                 form.add_error(None, 'Order not found or email does not match.')
     else:
         form = TrackOrderForm()

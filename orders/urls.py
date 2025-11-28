@@ -14,8 +14,8 @@ urlpatterns = [
     path('confirmation/<uuid:order_id>/', views_checkout.confirmation, name='confirmation'),
     
     # Order management
-    path('<str:order_id>/', views.order_detail, name='order_detail'),
     path('track/', views.track_order, name='track_order'),
+    path('<str:order_id>/', views.order_detail, name='order_detail'),
     
     # Seller routes
     path('seller/orders/', views.seller_orders, name='seller_orders'),

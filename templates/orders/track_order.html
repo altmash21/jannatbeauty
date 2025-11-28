@@ -7,7 +7,14 @@
       <h2 class="mb-4 text-center">Track Your Order</h2>
       <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="mb-3">
+          <label for="id_order_number" class="form-label">Order Number:</label>
+          <input type="text" name="order_number" maxlength="64" size="40" class="form-control" id="id_order_number" value="{{ form.order_number.value|default_if_none:'' }}">
+        </div>
+        <div class="mb-3">
+          <label for="id_email" class="form-label">Email:</label>
+          <input type="email" name="email" class="form-control" id="id_email" value="{{ form.email.value|default_if_none:'' }}">
+        </div>
         <button type="submit" class="btn btn-primary w-100">Track Order</button>
       </form>
       {% if form.errors %}
