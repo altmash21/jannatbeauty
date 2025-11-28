@@ -22,14 +22,8 @@ logger = logging.getLogger(__name__)
 
 def get_site_url(request):
     """Get the correct site URL based on environment"""
-    # Use SITE_URL from settings if configured
-    site_url = getattr(settings, 'SITE_URL', None)
-    if site_url and site_url != 'http://127.0.0.1:8000':
-        # If SITE_URL is explicitly set to something other than localhost, use it
-        return site_url
-    else:
-        # For development/testing, use the request host
-        return f"{'https' if request.is_secure() else 'http'}://{request.get_host()}"
+    # Hardcoded for production as requested
+    return 'https://jannatlibrary.com'
 
 
 def checkout(request):
@@ -193,9 +187,8 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
     # Generate unique order ID
     order_id = f"order_{uuid.uuid4().hex[:16]}"
     
-    # Get the correct base URL for production or development
-    base_url = get_site_url(request)
-    
+    # Hardcoded base URL for production
+    base_url = 'https://jannatlibrary.com'
     # Prepare order data as per Cashfree documentation
     order_data = {
         'order_id': order_id,
@@ -259,9 +252,8 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
     coupon_discount = customer_data.get('coupon_discount', 0)
     total_discount = compare_discount + float(coupon_discount)
     
-    # Create return URL for Cashfree using site URL
-    base_url = get_site_url(request)
-    return_url = f'{base_url}/orders/cashfree/return/?order_id={order_id}'
+    # Create return URL for Cashfree using hardcoded site URL
+    return_url = f'https://jannatlibrary.com/orders/cashfree/return/?order_id={order_id}'
     
     # Render checkout page with Cashfree integration for direct payment
     return render(request, 'orders/checkout.html', {

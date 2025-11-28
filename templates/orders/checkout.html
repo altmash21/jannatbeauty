@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const checkoutOptions = {
         paymentSessionId: "{{ payment_session_id }}",
-        returnUrl: "http://127.0.0.1:8000{% url 'orders:cashfree_return' %}?order_id={{ order_id }}",
+        returnUrl: "{{ return_url }}",
     };
     
     // Redirect to Cashfree payment gateway
