@@ -336,56 +336,66 @@ REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
 REDIS_DB = config('REDIS_DB', default=0, cast=int)
 REDIS_PASSWORD = config('REDIS_PASSWORD', default=None)
 
-# Try to use Redis, fallback to local memory cache if Redis is not available
-REDIS_AVAILABLE = False
-try:
-    import redis
-    # Test Redis connection with very short timeout to avoid blocking startup
-    redis_client = redis.Redis(
-        host=REDIS_HOST,
-        port=REDIS_PORT,
-        db=REDIS_DB,
-        password=REDIS_PASSWORD,
-        socket_connect_timeout=1,  # 1 second timeout
-        socket_timeout=1,
-        decode_responses=True
-    )
-    # Use a quick ping with timeout
-    redis_client.ping()
-    REDIS_AVAILABLE = True
-except (redis.ConnectionError, redis.TimeoutError, Exception) as e:
-    # Redis not available - use local memory cache
+# Only use Redis in production
+if CASHFREE_ENV == 'PROD':
     REDIS_AVAILABLE = False
-    # Only print in debug mode to avoid cluttering production logs
-    if DEBUG:
-        import sys
-        print(f"Redis not available, using local memory cache: {type(e).__name__}", file=sys.stderr)
+    try:
+        import redis
+        # Test Redis connection with very short timeout to avoid blocking startup
+        redis_client = redis.Redis(
+            host=REDIS_HOST,
+            port=REDIS_PORT,
+            db=REDIS_DB,
+            password=REDIS_PASSWORD,
+            socket_connect_timeout=1,  # 1 second timeout
+            socket_timeout=1,
+            decode_responses=True
+        )
+        # Use a quick ping with timeout
+        redis_client.ping()
+        REDIS_AVAILABLE = True
+    except (Exception,) as e:
+        REDIS_AVAILABLE = False
+        if DEBUG:
+            import sys
+            print(f"Redis not available, using local memory cache: {type(e).__name__}", file=sys.stderr)
 
-if REDIS_AVAILABLE:
-    # Use Redis for caching
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'CONNECTION_POOL_KWARGS': {
-                    'max_connections': 50,
-                    'retry_on_timeout': True,
+    if REDIS_AVAILABLE:
+        # Use Redis for caching
+        CACHES = {
+            'default': {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                    'CONNECTION_POOL_KWARGS': {
+                        'max_connections': 50,
+                        'retry_on_timeout': True,
+                    },
+                    'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+                    'IGNORE_EXCEPTIONS': True,  # Don't break if Redis connection fails
                 },
-                'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-                'IGNORE_EXCEPTIONS': True,  # Don't break if Redis connection fails
-            },
-            'KEY_PREFIX': 'ecommerce',
-            'TIMEOUT': 300,  # 5 minutes default timeout
+                'KEY_PREFIX': 'ecommerce',
+                'TIMEOUT': 300,  # 5 minutes default timeout
+            }
         }
-    }
-    
-    # Optional: Use Redis for sessions (uncomment to enable)
-    # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-    # SESSION_CACHE_ALIAS = 'default'
+        # Optional: Use Redis for sessions (uncomment to enable)
+        # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+        # SESSION_CACHE_ALIAS = 'default'
+    else:
+        # Fallback to local memory cache if Redis is not available
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'unique-snowflake',
+                'TIMEOUT': 300,
+                'OPTIONS': {
+                    'MAX_ENTRIES': 1000
+                }
+            }
+        }
 else:
-    # Fallback to local memory cache if Redis is not available
+    # Always use local memory cache in non-production
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

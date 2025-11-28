@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Payment Failed{% endblock %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Payment Failed</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+                        <h5>Your payment could not be processed</h5>
+                        <p class="text-muted">Don't worry, your cart items are still saved. You can try again with a different payment method or contact our support team for assistance.</p>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'cart:cart_detail' %}" class="btn btn-primary">Return to Cart</a>
+                        <a href="{% url 'store:home' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

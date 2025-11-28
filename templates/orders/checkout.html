@@ -207,7 +207,53 @@
 </section>
 
 {% if payment_session_id %}
-<!-- Redirect-based payment - no JS SDK needed -->
+<!-- Cashfree Direct Payment Integration -->
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show loading state
+    document.body.innerHTML = `
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4>Redirecting to Payment Gateway...</h4>
+                    <p class="text-muted">Please wait while we redirect you to the secure payment page.</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Initialize Cashfree
+    const cashfree = Cashfree({
+        mode: "{{ cashfree_env }}" // "sandbox" or "production"
+    });
+    
+    // Auto-trigger Cashfree payment for online payment
+    console.log('Initializing Cashfree payment...');
+    
+    const checkoutOptions = {
+        paymentSessionId: "{{ payment_session_id }}",
+        returnUrl: "http://127.0.0.1:8000{% url 'orders:cashfree_return' %}?order_id={{ order_id }}",
+    };
+    
+    // Redirect to Cashfree payment gateway
+    cashfree.checkout(checkoutOptions).then(function(result) {
+        if (result.error) {
+            console.error("Payment initialization failed:", result.error);
+            alert("Payment initialization failed. Please try again.");
+            window.location.href = "{% url 'orders:checkout' %}";
+        }
+        // User will be redirected to Cashfree payment page automatically
+    }).catch(function(error) {
+        console.error("Cashfree checkout error:", error);
+        alert("Payment gateway error. Please try again.");
+        window.location.href = "{% url 'orders:checkout' %}";
+    });
+});
+</script>
 {% endif %}
 
 <script>
@@ -267,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get stored payment method from localStorage
     const storedPayment = localStorage.getItem('selectedPaymentMethod');
     if (storedPayment) {
-        const paymentRadio = document.getElementById(storedPayment === 'razorpay' ? 'razorpay' : 'cashOnDelivery');
+        const paymentRadio = document.getElementById(storedPayment === 'cashfree' ? 'cashfree' : 'cashOnDelivery');
         if (paymentRadio) {
             paymentRadio.checked = true;
         }
@@ -296,120 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Razorpay Integration -->
-{% if razorpay_order_id %}
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Only trigger Razorpay modal if Razorpay is selected
-    var razorpayRadio = document.getElementById('razorpay');
-    if (razorpayRadio && razorpayRadio.checked) {
-        var options = {
-            "key": "{{ razorpay_key_id }}",
-            "amount": "{{ amount }}",
-            "currency": "INR",
-            "name": "Jannat Library",
-            "description": "Order Payment",
-            "image": "",
-            "order_id": "{{ razorpay_order_id }}",
-            "config": {
-                "display": {
-                    "blocks": {
-                        "cards": {
-                            "name": "Pay using Cards",
-                            "instruments": [
-                                {
-                                    "method": "card"
-                                }
-                            ]
-                        },
-                        "other": {
-                            "name": "More Payment Options",
-                            "instruments": [
-                                {
-                                    "method": "netbanking"
-                                },
-                                {
-                                    "method": "wallet"
-                                },
-                                {
-                                    "method": "upi"
-                                }
-                            ]
-                        }
-                    },
-                    "sequence": ["block.cards", "block.other"],
-                    "preferences": {
-                        "show_default_blocks": true
-                    }
-                }
-            },
-            "handler": function (response) {
-                console.log('Payment Success:', response);
-                // Submit payment verification form
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{% url "orders:razorpay_verify" %}';
-                // Add CSRF token
-                var csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = 'csrfmiddlewaretoken';
-                csrfInput.value = '{{ csrf_token }}';
-                form.appendChild(csrfInput);
-                // Add payment data
-                var paymentId = document.createElement('input');
-                paymentId.type = 'hidden';
-                paymentId.name = 'razorpay_payment_id';
-                paymentId.value = response.razorpay_payment_id;
-                form.appendChild(paymentId);
-                var orderId = document.createElement('input');
-                orderId.type = 'hidden';
-                orderId.name = 'razorpay_order_id';
-                orderId.value = response.razorpay_order_id;
-                form.appendChild(orderId);
-                var signature = document.createElement('input');
-                signature.type = 'hidden';
-                signature.name = 'razorpay_signature';
-                signature.value = response.razorpay_signature;
-                form.appendChild(signature);
-                var orderIdField = document.createElement('input');
-                orderIdField.type = 'hidden';
-                orderIdField.name = 'order_id';
-                orderIdField.value = '{{ order_id }}';
-                form.appendChild(orderIdField);
-                console.log('Submitting verification form...');
-                document.body.appendChild(form);
-                form.submit();
-            },
-            "prefill": {
-                "name": "{{ initial_data.first_name }} {{ initial_data.last_name }}",
-                "email": "{{ initial_data.email }}",
-                "contact": ""
-            },
-            "notes": {
-                "address": "{{ initial_data.address }}"
-            },
-            "theme": {
-                "color": "#176a3a"
-            },
-            "modal": {
-                "ondismiss": function() {
-                    // Redirect to cart if payment is cancelled
-                    window.location.href = "{% url 'cart:cart_detail' %}";
-                }
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-        rzp1.on('payment.failed', function (response) {
-            console.log('Payment Failed:', response);
-            alert('Payment Failed: ' + response.error.description + ' (Error Code: ' + response.error.code + ')');
-            window.location.href = "{% url 'cart:cart_detail' %}";
-        });
-    }
-});
-</script>
-{% endif %}
+
 
 <script>
 // Auto-dismiss messages after 5 seconds and prevent accumulation on checkout page
