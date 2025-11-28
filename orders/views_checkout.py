@@ -431,21 +431,52 @@ def create_confirmed_order(request, pending_order, cashfree_order_id):
 @csrf_exempt
 def cashfree_webhook(request):
     """
-    Handle Cashfree webhook notifications
+    Handle Cashfree webhook notifications with signature verification
     """
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
     
     try:
         import json
-        data = json.loads(request.body)
+        import hashlib
+        import hmac
+        
+        # Get raw body for signature verification
+        raw_body = request.body
+        data = json.loads(raw_body)
+        
+        # Verify webhook signature for security (production requirement)
+        received_signature = request.headers.get('x-webhook-signature', '')
+        if received_signature and hasattr(settings, 'CASHFREE_SECRET_KEY'):
+            # Generate expected signature
+            secret_key = getattr(settings, 'CASHFREE_SECRET_KEY', '')
+            expected_signature = hmac.new(
+                secret_key.encode('utf-8'),
+                raw_body,
+                hashlib.sha256
+            ).hexdigest()
+            
+            if not hmac.compare_digest(received_signature, expected_signature):
+                logger.warning(f"Webhook signature verification failed for data: {data}")
+                return JsonResponse({'status': 'error', 'message': 'Invalid signature'}, status=403)
         
         logger.info(f"Cashfree webhook received: {data}")
         
         order_id = data.get('order', {}).get('order_id')
         order_status = data.get('order', {}).get('order_status')
         
-        logger.info(f"Webhook: Order {order_id}, Status: {order_status}")
+        if order_id and order_status:
+            logger.info(f"Webhook: Order {order_id}, Status: {order_status}")
+            
+            # Update order status in database if needed
+            try:
+                order = Order.objects.get(cashfree_order_id=order_id)
+                if order_status == 'PAID':
+                    order.status = 'paid'
+                    order.save()
+                    logger.info(f"Updated order {order.id} status to paid")
+            except Order.DoesNotExist:
+                logger.warning(f"Order with cashfree_order_id {order_id} not found")
         
         return JsonResponse({'status': 'success'})
         

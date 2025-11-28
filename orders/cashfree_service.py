@@ -19,7 +19,7 @@ class CashfreeService:
         self.env = getattr(settings, 'CASHFREE_ENV', 'TEST')
         
         # Set base URL based on environment
-        if self.env == 'PRODUCTION':
+        if self.env == 'PROD':  # Changed from 'PRODUCTION' to 'PROD' for consistency
             self.base_url = 'https://api.cashfree.com/pg'
         else:
             self.base_url = 'https://sandbox.cashfree.com/pg'
