@@ -20,6 +20,17 @@ from store.models import Product
 logger = logging.getLogger(__name__)
 
 
+def get_site_url(request):
+    """Get the correct site URL based on environment"""
+    # Use SITE_URL from settings if configured, otherwise use request host
+    site_url = getattr(settings, 'SITE_URL', None)
+    if site_url:
+        return site_url
+    else:
+        # Fallback to request host for development
+        return f"{'https' if request.is_secure() else 'http'}://{request.get_host()}"
+
+
 def checkout(request):
     """
     Checkout page - validates cart and shows billing form
@@ -181,6 +192,9 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
     # Generate unique order ID
     order_id = f"order_{uuid.uuid4().hex[:16]}"
     
+    # Get the correct base URL for production or development
+    base_url = get_site_url(request)
+    
     # Prepare order data as per Cashfree documentation
     order_data = {
         'order_id': order_id,
@@ -193,8 +207,8 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
             'customer_name': f"{customer_data['first_name']} {customer_data['last_name']}"
         },
         'order_meta': {
-            'return_url': request.build_absolute_uri(f'/orders/cashfree/return/?order_id={order_id}'),
-            'notify_url': request.build_absolute_uri('/orders/cashfree/webhook/')
+            'return_url': f'{base_url}/orders/cashfree/return/?order_id={order_id}',
+            'notify_url': f'{base_url}/orders/cashfree/webhook/'
         }
     }
     

@@ -9,7 +9,7 @@
    CASHFREE_SECRET_KEY=YOUR_PRODUCTION_SECRET_KEY_HERE
    CASHFREE_ENV=PROD
    CASHFREE_ENABLED=True
-   SITE_URL=https://jannatbeauty.in
+   SITE_URL=https://jannatlibrary.cm
    ```
 
 2. **Get Production Credentials:**
@@ -19,7 +19,7 @@
    - Replace placeholders in `.env`
 
 3. **IMPORTANT: Update Site URL for Payment Returns:**
-   - Set `SITE_URL=https://jannatbeauty.in` in production `.env`
+   - Set `SITE_URL=https://jannatlibrary.cm` in production `.env`
    - This ensures payment success/failure returns to your domain, not localhost
    - Critical for proper payment flow in production
 
