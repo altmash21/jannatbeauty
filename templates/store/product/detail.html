@@ -1,5 +1,6 @@
 {% extends 'base_plain.html' %}
 {% load static %}
+
 {% block title %}{{ product.name }} - Product Details{% endblock %}
 
 {% block content %}
@@ -8,7 +9,7 @@
     * {
         box-sizing: border-box;
     }
-    
+
     @media (max-width: 600px) {
         .fixed-bottom-action-bar {
             position: fixed;
@@ -17,31 +18,36 @@
             bottom: 56px;
             z-index: 1051;
             background: #fff;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.07);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.07);
             padding: 0.5rem 0.75rem;
             display: flex;
             gap: 0.5rem;
         }
+
         .mobile-breadcrumb {
             padding: 0.5rem 0 !important;
             margin-bottom: 0.5rem !important;
             background-color: transparent !important;
             font-size: 0.85rem !important;
         }
+
         .mobile-product-layout {
             display: grid !important;
             grid-template-columns: 1fr !important;
             gap: 0.5rem !important;
         }
+
         .mobile-image-section {
             display: grid !important;
             grid-template-columns: 1fr auto !important;
             gap: 0.75rem !important;
         }
+
         .mobile-main-image {
             width: 100% !important;
             order: 1;
         }
+
         .mobile-main-image img {
             width: 100% !important;
             height: auto !important;
@@ -50,6 +56,7 @@
             background: #f8f9fa !important;
             border-radius: 0.5rem !important;
         }
+
         .mobile-extra-images {
             width: auto !important;
             display: flex !important;
@@ -61,11 +68,13 @@
             -webkit-overflow-scrolling: touch !important;
             max-height: 60vh !important;
         }
+
         .mobile-extra-images > div {
             flex: 0 0 80px !important;
             max-width: 80px !important;
-            aspect-ratio: 1/1 !important;
+            aspect-ratio: 1 / 1 !important;
         }
+
         .mobile-extra-images img {
             width: 100% !important;
             height: 100% !important;
@@ -74,28 +83,35 @@
             border: 2px solid transparent !important;
             transition: border-color 0.2s !important;
         }
+
         .mobile-extra-images img:active {
             border-color: #06402B !important;
         }
+
         .mobile-product-title {
             font-size: 1.5rem !important;
             margin-bottom: 0.5rem !important;
             font-weight: 700 !important;
         }
+
         .mobile-price {
             font-size: 1.1rem !important;
             font-weight: 500 !important;
         }
+
         .mobile-compare-price {
             font-size: 1rem !important;
             font-weight: 400 !important;
         }
+
         .mobile-hide-description {
             display: none !important;
         }
+
         .mobile-hide-quantity {
             display: none !important;
         }
+
         .related-products-grid {
             display: flex !important;
             overflow-x: auto !important;
@@ -104,46 +120,166 @@
             -webkit-overflow-scrolling: touch !important;
             padding-bottom: 0.5rem !important;
         }
+
         .related-product-card {
             flex: 0 0 45% !important;
             scroll-snap-align: start !important;
             max-width: 180px !important;
         }
+
         .related-product-card img {
             width: 100% !important;
             height: 100% !important;
-            aspect-ratio: 1/1 !important;
+            aspect-ratio: 1 / 1 !important;
             object-fit: cover !important;
         }
-       
     }
 
+    @media (min-width: 768px) {
+        .fixed-bottom-action-bar {
+            display: none !important;
+        }
+
+        div[style*="display: none"][style*="gap: 1rem"][style*="margin-bottom: 1.5rem"] {
+            display: flex !important;
+        }
+
+        div[style*="grid-template-columns: 1fr"] {
+            grid-template-columns: 1fr 1fr !important;
+        }
+
+        .mobile-image-section {
+            display: grid !important;
+            grid-template-columns: 1fr auto !important;
+            gap: 1rem !important;
+        }
+
+        .mobile-main-image {
+            order: 1 !important;
+        }
+
+        .mobile-main-image img {
+            max-height: 70vh !important;
+            object-fit: contain !important;
+        }
+
+        .mobile-extra-images {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+            overflow-y: auto !important;
+            overflow-x: visible !important;
+            max-height: 70vh !important;
+        }
+
+        .mobile-extra-images > div {
+            flex: 0 0 80px !important;
+            max-width: 80px !important;
+        }
+    }
+
+    /* Related Products Desktop Styles */
+    .related-products-grid {
+        max-width: 100%;
+    }
+
+    .related-product-card {
+        background: #fff;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .related-product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .related-product-card img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .related-product-card:hover img {
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .related-products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        }
+
+        .related-product-card {
+            max-width: 160px !important;
+        }
+
+        .related-product-card h5 {
+            font-size: 0.75rem !important;
+        }
+
+        .related-product-card span {
+            font-size: 0.8125rem !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .related-products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+        }
+
+        .related-product-card {
+            max-width: 150px !important;
+        }
+
+        footer {
+            margin-bottom: 2rem !important;
+        }
+    }
 </style>
+
 <section style="padding: 1rem 0;">
     <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
         <nav aria-label="breadcrumb" style="margin-bottom: 1rem;">
-            <ol class="mobile-breadcrumb" style="display: flex; flex-wrap: wrap; padding: 0.75rem 1rem; margin-bottom: 1rem; list-style: none;; border-radius: 0.25rem;">
-                <li style="display: flex; align-items: center;"><a href="/" style="color: #0d6efd; text-decoration: none;">Home</a><span style="margin: 0 0.5rem; color: #6c757d;">/</span></li>
-                <li style="display: flex; align-items: center;"><a href="{% url 'store:product_list' %}" style="color: #0d6efd; text-decoration: none;">Shop</a><span style="margin: 0 0.5rem; color: #6c757d;">/</span></li>
+            <ol class="mobile-breadcrumb"
+                style="display: flex; flex-wrap: wrap; padding: 0.75rem 1rem; margin-bottom: 1rem; list-style: none; border-radius: 0.25rem;">
+                <li style="display: flex; align-items: center;">
+                    <a href="/" style="color: #0d6efd; text-decoration: none;">Home</a>
+                    <span style="margin: 0 0.5rem; color: #6c757d;">/</span>
+                </li>
+                <li style="display: flex; align-items: center;">
+                    <a href="{% url 'store:product_list' %}" style="color: #0d6efd; text-decoration: none;">Shop</a>
+                    <span style="margin: 0 0.5rem; color: #6c757d;">/</span>
+                </li>
                 <li style="color: #6c757d;">{{ product.name }}</li>
             </ol>
         </nav>
 
-        <div class="mobile-product-layout" style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 1rem;">
+        <div class="mobile-product-layout"
+             style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 1rem;">
             <div style="width: 100%; margin-bottom: 0; padding-bottom: 0;">
                 <div class="mobile-image-section">
                     <div class="mobile-main-image" style="margin-bottom: 0; padding-bottom: 0;">
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%; height: auto; border-radius: 0.25rem; margin-bottom: 0; padding-bottom: 0; display: block;">
+                            <img src="{{ product.image.url }}"
+                                 alt="{{ product.name }}"
+                                 style="max-width: 100%; height: auto; border-radius: 0.25rem; margin-bottom: 0; padding-bottom: 0; display: block;">
                         {% else %}
-                            <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ product.name }}" style="max-width: 100%; height: auto; border-radius: 0.25rem; margin-bottom: 0; padding-bottom: 0; display: block;">
+                            <img src="{% static 'images/product-placeholder.jpg' %}"
+                                 alt="{{ product.name }}"
+                                 style="max-width: 100%; height: auto; border-radius: 0.25rem; margin-bottom: 0; padding-bottom: 0; display: block;">
                         {% endif %}
                     </div>
+
                     {% if product.images.all %}
                         <div class="mobile-extra-images">
                             {% for img in product.images.all %}
                                 <div>
-                                    <img src="{{ img.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; border-radius: 0.25rem; object-fit: cover; cursor: pointer;" onclick="document.querySelector('.mobile-main-image img').src='{{ img.image.url }}'">
+                                    <img src="{{ img.image.url }}"
+                                         alt="{{ product.name }}"
+                                         style="width: 100%; height: 100%; border-radius: 0.25rem; object-fit: cover; cursor: pointer;"
+                                         onclick="document.querySelector('.mobile-main-image img').src='{{ img.image.url }}'">
                                 </div>
                             {% endfor %}
                         </div>
@@ -153,7 +289,10 @@
 
             <div style="width: 100%;">
                 <div>
-                    <h3 class="mobile-product-title" style="margin-bottom: 0.5rem; font-size: 2.2rem; font-weight: 700; color: #111;">{{ product.name }}</h3>
+                    <h3 class="mobile-product-title"
+                        style="margin-bottom: 0.5rem; font-size: 2.2rem; font-weight: 700; color: #111;">
+                        {{ product.name }}
+                    </h3>
 
                     <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
                         <div style="color: #ffc107; margin-right: 0.5rem;">
@@ -178,26 +317,52 @@
 
                     <div style="margin-bottom: 0.75rem;">
                         <div style="display: flex; align-items: baseline; gap: 1.2em;">
-                            <span class="mobile-price" style="color: #111; font-size: 1.3rem; font-weight: 500; margin-bottom: 0;">₹{{ product.price }}</span>
+                            <span class="mobile-price"
+                                  style="color: #111; font-size: 1.3rem; font-weight: 500; margin-bottom: 0;">
+                                ₹{{ product.price }}
+                            </span>
+
                             {% if product.compare_price %}
-                                <span class="mobile-compare-price" style="text-decoration: line-through; color: #6c757d; font-size: 1.1rem; font-weight: 400; margin-bottom: 0;">₹{{ product.compare_price }}</span>
+                                <span class="mobile-compare-price"
+                                      style="text-decoration: line-through; color: #6c757d; font-size: 1.1rem; font-weight: 400; margin-bottom: 0;">
+                                    ₹{{ product.compare_price }}
+                                </span>
                             {% endif %}
                         </div>
                     </div>
 
-                    
-                    <p class="mobile-hide-description" style="margin-bottom: 1.5rem; color: #495057; line-height: 1.6;">{{ product.description }}</p>
+                    <p class="mobile-hide-description"
+                       style="margin-bottom: 1.5rem; color: #495057; line-height: 1.6;">
+                        {{ product.description }}
+                    </p>
 
                     <div class="mobile-hide-quantity" style="margin-bottom: 1.5rem;">
-                        <span style="display: block; text-transform: uppercase; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 600; letter-spacing: 1px; color: #111;">Quantity</span>
+                        <span style="display: block; text-transform: uppercase; margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 600; letter-spacing: 1px; color: #111;">
+                            Quantity
+                        </span>
+
                         <div style="display: flex; max-width: 150px;">
-                            <button type="button" id="qty-minus" style="padding: 0.5rem 1rem; border: 1px solid #212529; background: #fff; color: #212529; cursor: pointer; border-radius: 0.25rem 0 0 0.25rem;" {% if product.stock == 0 %}disabled{% endif %}>
+                            <button type="button"
+                                    id="qty-minus"
+                                    style="padding: 0.5rem 1rem; border: 1px solid #212529; background: #fff; color: #212529; cursor: pointer; border-radius: 0.25rem 0 0 0.25rem;"
+                                    {% if product.stock == 0 %}disabled{% endif %}>
                                 <svg width="20" height="20">
                                     <use xlink:href="#minus"></use>
                                 </svg>
                             </button>
-                            <input type="number" id="qty-input" value="1" min="1" max="{{ product.stock }}" style="width: 60px; text-align: center; border: 1px solid #212529; border-left: 0; border-right: 0; padding: 0.5rem;" {% if product.stock == 0 %}disabled{% endif %}>
-                            <button type="button" id="qty-plus" style="padding: 0.5rem 1rem; border: 1px solid #212529; background: #fff; color: #212529; cursor: pointer; border-radius: 0 0.25rem 0.25rem 0;" {% if product.stock == 0 %}disabled{% endif %}>
+
+                            <input type="number"
+                                   id="qty-input"
+                                   value="1"
+                                   min="1"
+                                   max="{{ product.stock }}"
+                                   style="width: 60px; text-align: center; border: 1px solid #212529; border-left: 0; border-right: 0; padding: 0.5rem;"
+                                   {% if product.stock == 0 %}disabled{% endif %}>
+
+                            <button type="button"
+                                    id="qty-plus"
+                                    style="padding: 0.5rem 1rem; border: 1px solid #212529; background: #fff; color: #212529; cursor: pointer; border-radius: 0 0.25rem 0.25rem 0;"
+                                    {% if product.stock == 0 %}disabled{% endif %}>
                                 <svg width="20" height="20">
                                     <use xlink:href="#plus"></use>
                                 </svg>
@@ -207,21 +372,43 @@
 
                     <!-- Desktop buttons -->
                     <div style="display: none; gap: 1rem; margin-bottom: 1.5rem;">
-                        <form method="post" action="{% url 'cart:cart_add' product.id %}" style="display: inline-block; width: 100%;" id="cart-form">
+                        <form method="post"
+                              action="{% url 'cart:cart_add' product.id %}"
+                              style="display: inline-block; width: 100%;"
+                              id="cart-form">
                             {% csrf_token %}
                             <input type="hidden" name="quantity" value="1" id="cart-quantity-input">
-                            <button type="submit" {% if product.stock == 0 %}disabled style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; background-color: #6c757d; border: 1px solid #6c757d; color: #fff; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"{% else %}style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; background-color: #06402B; border: 1px solid #06402B; color: #fff; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"{% endif %}>
+
+                            <button type="submit"
+                                    {% if product.stock == 0 %}
+                                        disabled
+                                        style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; background-color: #6c757d; border: 1px solid #6c757d; color: #fff; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                                    {% else %}
+                                        style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; background-color: #06402B; border: 1px solid #06402B; color: #fff; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                                    {% endif %}>
                                 <svg width="20" height="20" style="margin-right: 0.5rem;">
                                     <use xlink:href="#cart"></use>
                                 </svg>
                                 {% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}
                             </button>
                         </form>
-                        <form method="get" action="{% url 'orders:checkout' %}" style="display: inline-block; width: 100%;" id="buy-now-form">
+
+                        <form method="get"
+                              action="{% url 'orders:checkout' %}"
+                              style="display: inline-block; width: 100%;"
+                              id="buy-now-form">
                             <input type="hidden" name="product_id" value="{{ product.id }}">
                             <input type="hidden" name="quantity" id="buy-now-quantity-input" value="1">
-                            <button type="submit" {% if product.stock == 0 %}disabled style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; border: 2px solid #6c757d; color: #6c757d; background: transparent; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"{% else %}style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; border: 2px solid #176a3a; color: #176a3a; background: transparent; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"{% endif %}>
-                                <svg width="20" height="20" style="fill: {% if product.stock == 0 %}#6c757d{% else %}#176a3a{% endif %}; margin-right: 0.5rem;">
+
+                            <button type="submit"
+                                    {% if product.stock == 0 %}
+                                        disabled
+                                        style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; border: 2px solid #6c757d; color: #6c757d; background: transparent; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                                    {% else %}
+                                        style="width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; border: 2px solid #176a3a; color: #176a3a; background: transparent; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                                    {% endif %}>
+                                <svg width="20" height="20"
+                                     style="fill: {% if product.stock == 0 %}#6c757d{% else %}#176a3a{% endif %}; margin-right: 0.5rem;">
                                     <use xlink:href="#cart"></use>
                                 </svg>
                                 {% if product.stock == 0 %}Out of Stock{% else %}Buy Now{% endif %}
@@ -231,21 +418,43 @@
 
                     <!-- Mobile fixed action bar -->
                     <div class="fixed-bottom-action-bar" style="display: flex;">
-                        <form method="post" action="{% url 'cart:cart_add' product.id %}" style="display: inline-block; width: 100%;" id="cart-form-mobile">
+                        <form method="post"
+                              action="{% url 'cart:cart_add' product.id %}"
+                              style="display: inline-block; width: 100%;"
+                              id="cart-form-mobile">
                             {% csrf_token %}
                             <input type="hidden" name="quantity" value="1" id="cart-quantity-input-mobile">
-                            <button type="submit" {% if product.stock == 0 %}disabled style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #6c757d; border: 1px solid #6c757d; color: #fff; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"{% else %}style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #06402B; border: 1px solid #06402B; color: #fff; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"{% endif %}>
+
+                            <button type="submit"
+                                    {% if product.stock == 0 %}
+                                        disabled
+                                        style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #6c757d; border: 1px solid #6c757d; color: #fff; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"
+                                    {% else %}
+                                        style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; background-color: #06402B; border: 1px solid #06402B; color: #fff; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"
+                                    {% endif %}>
                                 <svg width="16" height="16" style="margin-right: 0.25rem;">
                                     <use xlink:href="#cart"></use>
                                 </svg>
                                 {% if product.stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}
                             </button>
                         </form>
-                        <form method="get" action="{% url 'orders:checkout' %}" style="display: inline-block; width: 100%;" id="buy-now-form-mobile">
+
+                        <form method="get"
+                              action="{% url 'orders:checkout' %}"
+                              style="display: inline-block; width: 100%;"
+                              id="buy-now-form-mobile">
                             <input type="hidden" name="product_id" value="{{ product.id }}">
                             <input type="hidden" name="quantity" id="buy-now-quantity-input-mobile" value="1">
-                            <button type="submit" {% if product.stock == 0 %}disabled style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; border: 2px solid #6c757d; color: #6c757d; background: transparent; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"{% else %}style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; border: 2px solid #176a3a; color: #176a3a; background: transparent; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"{% endif %}>
-                                <svg width="16" height="16" style="fill: {% if product.stock == 0 %}#6c757d{% else %}#176a3a{% endif %}; margin-right: 0.25rem;">
+
+                            <button type="submit"
+                                    {% if product.stock == 0 %}
+                                        disabled
+                                        style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; border: 2px solid #6c757d; color: #6c757d; background: transparent; border-radius: 0.25rem; cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"
+                                    {% else %}
+                                        style="width: 100%; padding: 0.5rem 1rem; font-size: 0.9rem; border: 2px solid #176a3a; color: #176a3a; background: transparent; border-radius: 0.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;"
+                                    {% endif %}>
+                                <svg width="16" height="16"
+                                     style="fill: {% if product.stock == 0 %}#6c757d{% else %}#176a3a{% endif %}; margin-right: 0.25rem;">
                                     <use xlink:href="#cart"></use>
                                 </svg>
                                 {% if product.stock == 0 %}Out of Stock{% else %}Buy Now{% endif %}
@@ -254,75 +463,119 @@
                     </div>
 
                     <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        var qtyInput = document.getElementById('qty-input');
-                        var qtyMinus = document.getElementById('qty-minus');
-                        var qtyPlus = document.getElementById('qty-plus');
-                        var cartQtyInput = document.getElementById('cart-quantity-input');
-                        var cartQtyInputMobile = document.getElementById('cart-quantity-input-mobile');
-                        var buyNowQtyInput = document.getElementById('buy-now-quantity-input');
-                        var buyNowQtyInputMobile = document.getElementById('buy-now-quantity-input-mobile');
-                        var cartForm = document.getElementById('cart-form');
-                        var cartFormMobile = document.getElementById('cart-form-mobile');
-                        var buyNowForm = document.getElementById('buy-now-form');
-                        var buyNowFormMobile = document.getElementById('buy-now-form-mobile');
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var qtyInput = document.getElementById('qty-input');
+                            var qtyMinus = document.getElementById('qty-minus');
+                            var qtyPlus = document.getElementById('qty-plus');
+                            var cartQtyInput = document.getElementById('cart-quantity-input');
+                            var cartQtyInputMobile = document.getElementById('cart-quantity-input-mobile');
+                            var buyNowQtyInput = document.getElementById('buy-now-quantity-input');
+                            var buyNowQtyInputMobile = document.getElementById('buy-now-quantity-input-mobile');
+                            var cartForm = document.getElementById('cart-form');
+                            var cartFormMobile = document.getElementById('cart-form-mobile');
+                            var buyNowForm = document.getElementById('buy-now-form');
+                            var buyNowFormMobile = document.getElementById('buy-now-form-mobile');
 
-                        qtyMinus.addEventListener('click', function() {
-                            var val = parseInt(qtyInput.value) || 1;
-                            if (val > 1) qtyInput.value = val - 1;
-                        });
-                        
-                        qtyPlus.addEventListener('click', function() {
-                            var val = parseInt(qtyInput.value) || 1;
-                            var maxStock = parseInt(qtyInput.getAttribute('max')) || 999;
-                            if (val < maxStock) {
-                                qtyInput.value = val + 1;
+                            qtyMinus.addEventListener('click', function () {
+                                var val = parseInt(qtyInput.value) || 1;
+                                if (val > 1) {
+                                    qtyInput.value = val - 1;
+                                }
+                            });
+
+                            qtyPlus.addEventListener('click', function () {
+                                var val = parseInt(qtyInput.value) || 1;
+                                var maxStock = parseInt(qtyInput.getAttribute('max')) || 999;
+                                if (val < maxStock) {
+                                    qtyInput.value = val + 1;
+                                }
+                            });
+
+                            qtyInput.addEventListener('change', function () {
+                                if (qtyInput.value < 1) {
+                                    qtyInput.value = 1;
+                                }
+                            });
+
+                            if (cartForm) {
+                                cartForm.addEventListener('submit', function () {
+                                    cartQtyInput.value = qtyInput.value;
+                                });
+                            }
+
+                            if (cartFormMobile) {
+                                cartFormMobile.addEventListener('submit', function () {
+                                    cartQtyInputMobile.value = qtyInput.value;
+                                });
+                            }
+
+                            if (buyNowForm) {
+                                buyNowForm.addEventListener('submit', function () {
+                                    buyNowQtyInput.value = qtyInput.value;
+                                });
+                            }
+
+                            if (buyNowFormMobile) {
+                                buyNowFormMobile.addEventListener('submit', function () {
+                                    buyNowQtyInputMobile.value = qtyInput.value;
+                                });
+                            }
+
+                            var descTab = document.getElementById('description-tab');
+                            var reviewsTab = document.getElementById('reviews-tab');
+                            var descPanel = document.getElementById('description');
+                            var reviewsPanel = document.getElementById('reviews');
+
+                            if (descTab && reviewsTab && descPanel && reviewsPanel) {
+                                descTab.addEventListener('click', function () {
+                                    descTab.style.color = '#111';
+                                    descTab.style.borderBottom = '2px solid #0d6efd';
+                                    reviewsTab.style.color = '#6c757d';
+                                    reviewsTab.style.borderBottom = '2px solid transparent';
+                                    descPanel.style.display = 'block';
+                                    reviewsPanel.style.display = 'none';
+                                });
+                                reviewsTab.addEventListener('click', function () {
+                                    reviewsTab.style.color = '#111';
+                                    reviewsTab.style.borderBottom = '2px solid #0d6efd';
+                                    descTab.style.color = '#6c757d';
+                                    descTab.style.borderBottom = '2px solid transparent';
+                                    descPanel.style.display = 'none';
+                                    reviewsPanel.style.display = 'block';
+                                });
                             }
                         });
-                        
-                        qtyInput.addEventListener('change', function() {
-                            if (qtyInput.value < 1) qtyInput.value = 1;
-                        });
-                        
-                        if (cartForm) {
-                            cartForm.addEventListener('submit', function(e) {
-                                cartQtyInput.value = qtyInput.value;
-                            });
-                        }
-                        
-                        if (cartFormMobile) {
-                            cartFormMobile.addEventListener('submit', function(e) {
-                                cartQtyInputMobile.value = qtyInput.value;
-                            });
-                        }
-                        
-                        if (buyNowForm) {
-                            buyNowForm.addEventListener('submit', function(e) {
-                                buyNowQtyInput.value = qtyInput.value;
-                            });
-                        }
-                        
-                        if (buyNowFormMobile) {
-                            buyNowFormMobile.addEventListener('submit', function(e) {
-                                buyNowQtyInputMobile.value = qtyInput.value;
-                            });
-                        }
-                    });
                     </script>
+
                     <div style="border-top: 1px solid #dee2e6; padding-top: 1.5rem; margin-top: 2rem;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div style="margin-bottom: 1rem;">
-                                <strong style="color: #111;">SKU:</strong> <span style="color: #6c757d;">{{ product.sku|default:product.id }}</span>
+                                <strong style="color: #111;">SKU:</strong>
+                                <span style="color: #6c757d;">
+                                    {{ product.sku|default:product.id }}
+                                </span>
                             </div>
+
                             <div style="margin-bottom: 1rem;">
-                                <strong style="color: #111;">Category:</strong> <a href="{% url 'store:product_list_by_category' product.category.slug %}" style="color: #6c757d; text-decoration: none;">{{ product.category.name }}</a>
+                                <strong style="color: #111;">Category:</strong>
+                                <a href="{% url 'store:product_list_by_category' product.category.slug %}"
+                                   style="color: #6c757d; text-decoration: none;">
+                                    {{ product.category.name }}
+                                </a>
                             </div>
+
                             <div style="margin-bottom: 1rem;">
-                                <strong style="color: #111;">Tags:</strong> <span style="color: #6c757d;">{% if product.tags %}{{ product.tags }}{% else %}Islamic, Essentials{% endif %}</span>
+                                <strong style="color: #111;">Tags:</strong>
+                                <span style="color: #6c757d;">
+                                    {% if product.tags %}
+                                        {{ product.tags }}
+                                    {% else %}
+                                        Islamic, Essentials
+                                    {% endif %}
+                                </span>
                             </div>
-                            <div style="margin-bottom: 1rem;">
-                                <strong style="color: #111;">Availability:</strong> <span style="color: {% if product.stock > 0 %}#198754{% else %}#dc3545{% endif %};">{% if product.stock > 0 %}In Stock ({{ product.stock }} available){% else %}Out of Stock{% endif %}</span>
-                            </div>
+
+                            <!-- Availability info removed as per request -->
                         </div>
                     </div>
                 </div>
@@ -332,222 +585,247 @@
         <!-- Product Details Tabs -->
         <div style="margin-top: 3rem;">
             <div style="width: 100%;">
-                <ul style="display: flex; border-bottom: 1px solid #dee2e6; list-style: none; padding: 0; margin: 0;" id="productTabs" role="tablist">
-                    <li style="margin-right: 1rem;" role="presentation">
-                        <button style="padding: 1rem 1.5rem; border: none; background: none; text-transform: uppercase; cursor: pointer; color: #111; border-bottom: 2px solid #0d6efd;" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
+                <ul id="productTabs"
+                    role="tablist"
+                    style="display: flex; border-bottom: 1px solid #dee2e6; list-style: none; padding: 0; margin: 0;">
+                    <li role="presentation" style="margin-right: 1rem;">
+                        <button id="description-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#description"
+                                type="button"
+                                role="tab"
+                                style="padding: 1rem 1.5rem; border: none; background: none; text-transform: uppercase; cursor: pointer; color: #111; border-bottom: 2px solid #0d6efd;">
+                            Description
+                        </button>
                     </li>
-                    <li style="margin-right: 1rem;" role="presentation">
-                        <button style="padding: 1rem 1.5rem; border: none; background: none; text-transform: uppercase; cursor: pointer; color: #6c757d; border-bottom: 2px solid transparent;" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (24)</button>
+
+                    <li role="presentation" style="margin-right: 1rem;">
+                        <button id="reviews-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#reviews"
+                                type="button"
+                                role="tab"
+                                style="padding: 1rem 1.5rem; border: none; background: none; text-transform: uppercase; cursor: pointer; color: #6c757d; border-bottom: 2px solid transparent;">
+                            Reviews (24)
+                        </button>
                     </li>
                 </ul>
-                <div style="padding: 2rem 0;" id="productTabContent">
-                    <div style="display: block;" id="description" role="tabpanel">
-                        <p style="color: #495057; line-height: 1.6;">{{ product.description }}</p>
+
+                <div id="productTabContent" style="padding: 2rem 0;">
+                    <div id="description" role="tabpanel" style="display: block;">
+                        <p style="color: #495057; line-height: 1.6;">
+                            {{ product.description }}
+                        </p>
                     </div>
-                    <div style="display: none;" id="reviews" role="tabpanel">
+
+                    <div id="reviews" role="tabpanel" style="display: none;">
                         <div>
-                            <p style="margin-bottom: 1.5rem; font-size: 1rem; font-weight: 500; color: #111;">Customer Reviews</p>
-                            {% if not reviews %}
-                            <div style="background: #e3f7ff; color: #176a3a; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
-                                No reviews yet. Be the first to review this product!
-                            </div>
+                            <p style="margin-bottom: 1.5rem; font-weight: 500; color: #111;">
+                                Customer Reviews
+                            </p>
+
+                            {% if user.is_authenticated %}
+                                {% if user_has_reviewed %}
+                                    <div style="background: #e3f7ff; color: #176a3a; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; font-size: 1.05rem; text-align: center;">
+                                        You have already submitted a review for this product. Thank you for your feedback!
+                                    </div>
+                                {% else %}
+                                    <form method="post" action="{% url 'reviews:add_review' product.id %}" class="review-form-modern">
+                                        {% csrf_token %}
+                                        <div class="review-form-row">
+                                            <label for="review-rating" class="review-label">Your Rating:</label>
+                                            <select name="rating" id="review-rating" required class="review-select">
+                                                <option value="">Select</option>
+                                                <option value="5">★★★★★ 5 - Excellent</option>
+                                                <option value="4">★★★★☆ 4 - Good</option>
+                                                <option value="3">★★★☆☆ 3 - Average</option>
+                                                <option value="2">★★☆☆☆ 2 - Poor</option>
+                                                <option value="1">★☆☆☆☆ 1 - Terrible</option>
+                                            </select>
+                                            <input type="hidden" name="slug" value="{{ product.slug }}">
+                                        </div>
+                                        <div class="review-form-row">
+                                            <label for="review-comment" class="review-label">Your Review:</label>
+                                            <textarea name="comment" id="review-comment" rows="4" required class="review-textarea" placeholder="Share your experience..."></textarea>
+                                        </div>
+                                        <div class="review-form-row" style="text-align: right;">
+                                            <button type="submit" class="review-submit-btn">Submit Review</button>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                                <style>
+                                    .review-form-modern {
+                                        margin-bottom: 2rem;
+                                        background: #f8f9fa;
+                                        padding: 2rem 2.5rem 1.5rem 2.5rem;
+                                        border-radius: 0.75rem;
+                                        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+                                        max-width: 700px;
+                                        margin-left: auto;
+                                        margin-right: auto;
+                                    }
+                                    .review-form-row {
+                                        margin-bottom: 1.25rem;
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 0.5rem;
+                                    }
+                                    .review-label {
+                                        font-weight: 600;
+                                        color: #222;
+                                        margin-bottom: 0.25rem;
+                                        font-size: 1.05rem;
+                                    }
+                                    .review-select {
+                                        padding: 0.5rem 0.75rem;
+                                        border-radius: 0.35rem;
+                                        border: 1px solid #ced4da;
+                                        font-size: 1rem;
+                                        background: #fff;
+                                        transition: border-color 0.2s;
+                                    }
+                                    .review-select:focus {
+                                        border-color: #176a3a;
+                                        outline: none;
+                                    }
+                                    .review-textarea {
+                                        width: 100%;
+                                        border-radius: 0.35rem;
+                                        border: 1px solid #ced4da;
+                                        padding: 0.75rem 1rem;
+                                        font-size: 1rem;
+                                        min-height: 100px;
+                                        resize: vertical;
+                                        background: #fff;
+                                        transition: border-color 0.2s;
+                                    }
+                                    .review-textarea:focus {
+                                        border-color: #176a3a;
+                                        outline: none;
+                                    }
+                                    .review-submit-btn {
+                                        background: #06402B;
+                                        color: #fff;
+                                        border: none;
+                                        border-radius: 0.35rem;
+                                        padding: 0.65rem 2.2rem;
+                                        font-weight: 700;
+                                        font-size: 1.1rem;
+                                        cursor: pointer;
+                                        box-shadow: 0 2px 8px rgba(6,64,43,0.07);
+                                        transition: background 0.2s, box-shadow 0.2s;
+                                    }
+                                    .review-submit-btn:hover, .review-submit-btn:focus {
+                                        background: #176a3a;
+                                        box-shadow: 0 4px 16px rgba(23,106,58,0.10);
+                                    }
+                                    @media (max-width: 600px) {
+                                        .review-form-modern {
+                                            padding: 1.2rem 0.7rem 1rem 0.7rem;
+                                        }
+                                        .review-submit-btn {
+                                            width: 100%;
+                                            padding: 0.7rem 0;
+                                            font-size: 1rem;
+                                        }
+                                    }
+                                </style>
+                            {% else %}
+                                <div style="background: #e3f7ff; color: #176a3a; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                                    Please <a href="{% url 'accounts:login' %}" style="color: #06402B; text-decoration: underline;">log in</a> to write a review.
+                                </div>
                             {% endif %}
-                            <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <div>
-                                        <strong style="color: #111; font-size: 0.95rem;">Sarah Johnson</strong>
-                                        <div style="color: #ffc107;">
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <span style="color: #6c757d; font-size: 0.85rem;">2 days ago</span>
+
+                            {% if not reviews %}
+                                <div style="background: #e3f7ff; color: #176a3a; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                                    No reviews yet. Be the first to review this product!
                                 </div>
-                                <p style="color: #495057; font-size: 0.9rem;">Absolutely love this jacket! The quality is outstanding and it fits perfectly. Highly recommended!</p>
-                            </div>
-                            <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <div>
-                                        <strong style="color: #111; font-size: 0.95rem;">Michael Chen</strong>
-                                        <div style="color: #ffc107;">
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-solid"></use>
-                                            </svg>
-                                            <svg width="16" height="16">
-                                                <use xlink:href="#star-outline"></use>
-                                            </svg>
+                            {% else %}
+                                {% for review in reviews %}
+                                    <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                            <div>
+                                                <strong style="color: #111; font-size: 0.95rem;">
+                                                    {{ review.user.get_full_name|default:review.user.username }}
+                                                </strong>
+                                                <div style="color: #ffc107;">
+                                                    {% for i in "12345" %}
+                                                        {% if forloop.counter <= review.rating %}
+                                                            <svg width="16" height="16"><use xlink:href="#star-solid"></use></svg>
+                                                        {% else %}
+                                                            <svg width="16" height="16"><use xlink:href="#star-outline"></use></svg>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <span style="color: #6c757d; font-size: 0.85rem;">
+                                                {{ review.created_at|timesince }} ago
+                                            </span>
                                         </div>
+                                        <p style="color: #495057; font-size: 0.9rem;">
+                                            {{ review.comment }}
+                                        </p>
                                     </div>
-                                    <span style="color: #6c757d; font-size: 0.85rem;">1 week ago</span>
-                                </div>
-                                <p style="color: #495057; font-size: 0.9rem;">Great jacket, very comfortable. The only reason I didn't give 5 stars is that it took a bit longer to arrive than expected.</p>
-                            </div>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Reviews Section -->
-        {% include 'reviews/review_section.html' %}
+
+        {% comment %} <!-- Reviews Section -->
+        {% include 'reviews/review_section.html' %} {% endcomment %}
 
         <!-- Related Products -->
         <div style="margin-top: 3rem;">
             <div style="width: 100%;">
-                <h3 style="text-align: center; margin-bottom: 2rem; font-size: 1.75rem; font-weight: 500; color: #111;">Related Products</h3>
+                <h3 style="text-align: center; margin-bottom: 2rem; font-size: 1.75rem; font-weight: 500; color: #111;">
+                    Related Products
+                </h3>
             </div>
-            <div class="related-products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; overflow-x: auto;">
+
+            <div class="related-products-grid"
+                 style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; overflow-x: auto;">
                 {% for related in related_products %}
-                <div class="related-product-card" style="max-width: 200px;">
-                    <div>
-                        <div style="overflow: hidden; border-radius: 0.375rem; aspect-ratio: 1/1; background: #f8f9fa; width: 100%;">
-                            <a href="{{ related.get_absolute_url }}" style="display: block; width: 100%; height: 100%;">
-                                {% if related.image %}
-                                    <img src="{{ related.image.url }}" alt="{{ related.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.375rem; display: block;">
-                                {% else %}
-                                    <img src="{% static 'images/product-placeholder.jpg' %}" alt="{{ related.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.375rem; display: block;">
-                                {% endif %}
-                            </a>
-                        </div>
-                        <div style="text-align: center; margin-top: 0.75rem; padding: 0 0.5rem;">
-                            <h5 style="text-transform: uppercase; margin-bottom: 0.375rem; font-size: 0.8125rem; line-height: 1.3; min-height: 2.5em;"><a href="{{ related.get_absolute_url }}" style="text-decoration: none; color: #212529; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ related.name }}</a></h5>
-                            <span style="color: #111; font-weight: 600; font-size: 0.875rem;">₹{{ related.price }}</span>
+                    <div class="related-product-card" style="max-width: 200px;">
+                        <div>
+                            <div style="overflow: hidden; border-radius: 0.375rem; aspect-ratio: 1 / 1; background: #f8f9fa; width: 100%;">
+                                <a href="{{ related.get_absolute_url }}"
+                                   style="display: block; width: 100%; height: 100%;">
+                                    {% if related.image %}
+                                        <img src="{{ related.image.url }}"
+                                             alt="{{ related.name }}"
+                                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.375rem; display: block;">
+                                    {% else %}
+                                        <img src="{% static 'images/product-placeholder.jpg' %}"
+                                             alt="{{ related.name }}"
+                                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.375rem; display: block;">
+                                    {% endif %}
+                                </a>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 0.75rem; padding: 0 0.5rem;">
+                                <h5 style="text-transform: uppercase; margin-bottom: 0.375rem; font-size: 0.8125rem; line-height: 1.3; min-height: 2.5em;">
+                                    <a href="{{ related.get_absolute_url }}"
+                                       style="text-decoration: none; color: #212529; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ related.name }}
+                                    </a>
+                                </h5>
+
+                                <span style="color: #111; font-weight: 600; font-size: 0.875rem;">
+                                    ₹{{ related.price }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
                 {% empty %}
-                <div style="grid-column: 1 / -1; text-align: center; color: #6c757d; padding: 2rem 0;">No related products found in this category.</div>
+                    <div style="grid-column: 1 / -1; text-align: center; color: #6c757d; padding: 2rem 0;">
+                        No related products found in this category.
+                    </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 </section>
-
-<style>
-@media (min-width: 768px) {
-    .fixed-bottom-action-bar {
-        display: none !important;
-    }
-    
-    div[style*="display: none"][style*="gap: 1rem"][style*="margin-bottom: 1.5rem"] {
-        display: flex !important;
-    }
-    
-    div[style*="grid-template-columns: 1fr"] {
-        grid-template-columns: 1fr 1fr !important;
-    }
-    
-    .mobile-image-section {
-        display: grid !important;
-        grid-template-columns: 1fr auto !important;
-        gap: 1rem !important;
-    }
-    
-    .mobile-main-image {
-        order: 1 !important;
-    }
-    
-    .mobile-main-image img {
-        max-height: 70vh !important;
-        object-fit: contain !important;
-    }
-    
-    .mobile-extra-images {
-        flex-direction: column !important;
-        gap: 0.75rem !important;
-        overflow-y: auto !important;
-        overflow-x: visible !important;
-        max-height: 70vh !important;
-    }
-    
-    .mobile-extra-images > div {
-        flex: 0 0 80px !important;
-        max-width: 80px !important;
-    }
-}
-
-/* Related Products Desktop Styles */
-.related-products-grid {
-    max-width: 100%;
-}
-
-.related-product-card {
-    background: #fff;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.related-product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.related-product-card img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.related-product-card:hover img {
-    transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-    .related-products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-    }
-    
-    .related-product-card {
-        max-width: 160px !important;
-    }
-    
-    .related-product-card h5 {
-        font-size: 0.75rem !important;
-    }
-    
-    .related-product-card span {
-        font-size: 0.8125rem !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .related-products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-    }
-    
-    .related-product-card {
-        max-width: 150px !important;
-    }
-    footer{
-        margin-bottom: 2rem !important;
-    }
-}
-
-</style>
-
 {% endblock %}

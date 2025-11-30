@@ -17,27 +17,32 @@ def add_review(request, product_id):
     ).exists()
     
     if request.method == 'POST':
+        print(f"Review form submitted for product {product.id}")  # Debug
+        print(f"POST data: {request.POST}")  # Debug
+        
         # Check if user already reviewed this product
         if Review.objects.filter(product=product, user=request.user).exists():
             messages.error(request, 'You have already reviewed this product.')
             return redirect('store:product_detail', slug=product.slug)
         
         rating = request.POST.get('rating')
-        title = request.POST.get('title')
         comment = request.POST.get('comment')
-        
-        if not all([rating, title, comment]):
+        slug = request.POST.get('slug', product.slug)
+        # Set title to user's full name or username
+        if request.user.get_full_name():
+            title = request.user.get_full_name()
+        else:
+            title = request.user.username
+        if not all([rating, comment]):
             messages.error(request, 'Please fill in all fields.')
-            return redirect('store:product_detail', slug=product.slug)
-        
+            return redirect('store:product_detail', slug=slug)
         try:
             rating = int(rating)
             if rating < 1 or rating > 5:
                 raise ValueError
         except ValueError:
             messages.error(request, 'Invalid rating value.')
-            return redirect('store:product_detail', slug=product.slug)
-        
+            return redirect('store:product_detail', slug=slug)
         review = Review.objects.create(
             product=product,
             user=request.user,
@@ -57,7 +62,7 @@ def add_review(request, product_id):
             logger.error(f'Failed to send review notification email: {str(e)}')
         
         messages.success(request, 'Thank you for your review!')
-        return redirect('store:product_detail', slug=product.slug)
+        return redirect('store:product_detail', slug=slug)
     
     return redirect('store:product_detail', slug=product.slug)
 

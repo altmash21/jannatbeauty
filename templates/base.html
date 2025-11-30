@@ -299,7 +299,7 @@
         </div>
         <div class="w-100 px-2 pb-2 mt-1">
           <form role="search" method="get" action="{% url 'store:product_list' %}" class="mobile-search-bar d-flex align-items-center w-100 position-relative" style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-            <input type="search" name="q" class="form-control" placeholder="Search products..." style="font-size:1em; border:1px solid #eee; border-radius:6px; padding:0.5em 3em 0.5em 1em; width:100%; background:#f9f9f9;" />
+            <input id="typewriter-search-mobile" type="search" name="q" class="form-control" placeholder="Search products..." style="font-size:1em; border:1px solid #eee; border-radius:6px; padding:0.5em 3em 0.5em 1em; width:100%; background:#f9f9f9;" />
             <button type="submit" class=" btn-link p-0 position-absolute" style="color:#111; right:12px; top:50%; transform:translateY(-50%); z-index:1; border:none; background:transparent;">
               <svg width="22" height="22" viewBox="0 0 24 24">
                 <use xlink:href="#search"></use>
@@ -328,40 +328,43 @@
                   {% block extra_js %}
                   <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                      var input = document.getElementById('typewriter-search');
-                      if (!input) return;
-                      // Get category names from the category bar if available, else fallback
-                      var categories = [];
-                      {% for category in all_categories %}
-                        categories.push(`{{ category.name|escapejs }}`);
-                      {% endfor %}
-                      if (categories.length === 0) categories = ["Quran", "Tasbi", "Topi", "Janamaz", "Dua Books", "Accessories"];
-                      var prefix = "Search for ";
-                      var i = 0, j = 0, typing = true;
-                      function typeLoop() {
-                        var current = categories[i];
-                        if (typing) {
-                          if (j < current.length) {
-                            input.setAttribute('placeholder', prefix + current.slice(0, j+1));
-                            j++;
-                            setTimeout(typeLoop, 90);
+                      function setupTypewriter(inputId) {
+                        var input = document.getElementById(inputId);
+                        if (!input) return;
+                        var categories = [];
+                        {% for category in all_categories %}
+                          categories.push(`{{ category.name|escapejs }}`);
+                        {% endfor %}
+                        if (categories.length === 0) categories = ["Quran", "Tasbi", "Topi", "Janamaz", "Dua Books", "Accessories"];
+                        var prefix = "Search for ";
+                        var i = 0, j = 0, typing = true;
+                        function typeLoop() {
+                          var current = categories[i];
+                          if (typing) {
+                            if (j < current.length) {
+                              input.setAttribute('placeholder', prefix + current.slice(0, j+1));
+                              j++;
+                              setTimeout(typeLoop, 90);
+                            } else {
+                              typing = false;
+                              setTimeout(typeLoop, 1200);
+                            }
                           } else {
-                            typing = false;
-                            setTimeout(typeLoop, 1200);
-                          }
-                        } else {
-                          if (j > 0) {
-                            input.setAttribute('placeholder', prefix + current.slice(0, j-1));
-                            j--;
-                            setTimeout(typeLoop, 40);
-                          } else {
-                            typing = true;
-                            i = (i + 1) % categories.length;
-                            setTimeout(typeLoop, 400);
+                            if (j > 0) {
+                              input.setAttribute('placeholder', prefix + current.slice(0, j-1));
+                              j--;
+                              setTimeout(typeLoop, 40);
+                            } else {
+                              typing = true;
+                              i = (i + 1) % categories.length;
+                              setTimeout(typeLoop, 400);
+                            }
                           }
                         }
+                        typeLoop();
                       }
-                      typeLoop();
+                      setupTypewriter('typewriter-search');
+                      setupTypewriter('typewriter-search-mobile');
                     });
                   </script>
                   {% endblock %}

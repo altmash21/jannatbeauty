@@ -217,6 +217,7 @@ def product_detail(request, slug):
     context = {
         'product': product,
         'related_products': related_products,
+        'reviews': reviews,
         'average_rating': average_rating,
         'user_has_reviewed': user_has_reviewed,
     }
