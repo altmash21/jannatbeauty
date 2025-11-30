@@ -10,12 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from decouple import config, Csv
-from pathlib import Path
+
 import os
+from pathlib import Path
+from decouple import AutoConfig, Csv
+
+# Prefer .env.local if it exists, otherwise fallback to .env
+BASE_DIR = Path(__file__).resolve().parent.parent
+config = AutoConfig(search_path=BASE_DIR)
+
 
 # Cashfree API Configuration
-# IMPORTANT: Set these in .env file - never commit credentials to version control
+# IMPORTANT: Set these in .env/.env.local file - never commit credentials to version control
 CASHFREE_APP_ID = config('CASHFREE_APP_ID', default='')
 CASHFREE_SECRET_KEY = config('CASHFREE_SECRET_KEY', default='')
 CASHFREE_ENV = config('CASHFREE_ENV', default='TEST')  # TEST or PROD
@@ -32,11 +38,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from decouple import config, Csv
-from pathlib import Path
-import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

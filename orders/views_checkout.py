@@ -1,6 +1,7 @@
 """
 Order processing and management
 Clean implementation of checkout and order confirmation
+UPDATED: Fixed Cashfree payment status handling for failed/cancelled payments
 """
 import uuid
 import logging
@@ -22,7 +23,13 @@ logger = logging.getLogger(__name__)
 
 def get_site_url(request):
     """Get the correct site URL based on environment"""
-    # Hardcoded for production as requested
+    # Use SITE_URL from settings, fallback to localhost if not set
+    site_url = getattr(settings, 'SITE_URL', None)
+    if site_url:
+        return site_url.rstrip('/')
+    # Fallback: use localhost for dev
+    if settings.DEBUG:
+        return 'http://127.0.0.1:8000'
     return 'https://jannatlibrary.com'
 
 
@@ -187,8 +194,8 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
     # Generate unique order ID
     order_id = f"order_{uuid.uuid4().hex[:16]}"
     
-    # Hardcoded base URL for production
-    base_url = 'https://jannatlibrary.com'
+    # Use dynamic site URL for return/fallback
+    base_url = get_site_url(request)
     # Prepare order data as per Cashfree documentation
     order_data = {
         'order_id': order_id,
@@ -252,8 +259,8 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
     coupon_discount = customer_data.get('coupon_discount', 0)
     total_discount = compare_discount + float(coupon_discount)
     
-    # Create return URL for Cashfree using hardcoded site URL
-    return_url = f'https://jannatlibrary.com/orders/cashfree/return/?order_id={order_id}'
+    # Create return URL for Cashfree using dynamic site URL
+    return_url = f'{base_url}/orders/cashfree/return/?order_id={order_id}'
     
     # Render checkout page with Cashfree integration for direct payment
     return render(request, 'orders/checkout.html', {
@@ -331,6 +338,7 @@ def cashfree_return(request):
     """
     Handle Cashfree return URL after payment
     Step 3: Verify payment and create order
+    UPDATED: Now handles all payment statuses including FAILED, CANCELLED, USER_DROPPED
     """
     logger.info("=== CASHFREE RETURN HANDLER ===")
     logger.info(f"GET params: {request.GET.dict()}")
@@ -356,18 +364,38 @@ def cashfree_return(request):
     
     logger.info(f"Payment status for {order_id}: {order_status}")
     
+    # Handle different payment statuses
     if order_status == 'PAID':
         # Payment successful - create order
         return create_confirmed_order(request, pending_order, order_id)
+    
     elif order_status in ['ACTIVE', 'PENDING']:
-        # Payment still processing - show processing page
+        # Payment still processing - show processing page with polling
         return render(request, 'orders/cashfree_processing.html', {
-            'order_id': order_id
+            'order_id': order_id,
+            'check_status_url': f'/orders/cashfree/status/?order_id={order_id}'
         })
+    
     else:
-        # Payment failed
-        logger.warning(f"Payment failed: {order_status}")
-        messages.error(request, 'Payment was not successful. Please try again.')
+        # Payment failed, cancelled, expired, or any other non-success status
+        logger.warning(f"Payment {order_status.lower()}: {order_id}")
+        # Clean up session
+        if 'pending_order' in request.session:
+            del request.session['pending_order']
+            request.session.modified = True
+        # Set appropriate error message
+        if order_status == 'USER_DROPPED':
+            messages.warning(request, 'Payment was cancelled. You can try again.')
+        elif order_status == 'CANCELLED':
+            messages.warning(request, 'Payment was cancelled. Please try again.')
+        elif order_status == 'EXPIRED':
+            messages.error(request, 'Payment session expired. Please try again.')
+            return redirect('orders:checkout')
+        elif order_status == 'UNKNOWN':
+            logger.error(f"Unknown payment status: {order_status}")
+            messages.error(request, 'Unable to verify payment status. Please contact support if amount was deducted.')
+        else:
+            messages.error(request, 'Payment failed. Please try again or choose a different payment method.')
         return redirect('orders:payment_failed')
 
 
@@ -440,6 +468,7 @@ def create_confirmed_order(request, pending_order, cashfree_order_id):
 def cashfree_webhook(request):
     """
     Handle Cashfree webhook notifications with signature verification
+    UPDATED: Better error handling and logging
     """
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
@@ -470,42 +499,89 @@ def cashfree_webhook(request):
         
         logger.info(f"Cashfree webhook received: {data}")
         
-        order_id = data.get('order', {}).get('order_id')
-        order_status = data.get('order', {}).get('order_status')
+        # Extract order details
+        order_details = data.get('order', {})
+        order_id = order_details.get('order_id')
+        order_status = order_details.get('order_status')
         
         if order_id and order_status:
             logger.info(f"Webhook: Order {order_id}, Status: {order_status}")
             
-            # Update order status in database if needed
+            # Update order status in database if order exists
             try:
-                order = Order.objects.get(cashfree_order_id=order_id)
-                if order_status == 'PAID':
-                    order.status = 'paid'
-                    order.save()
-                    logger.info(f"Updated order {order.id} status to paid")
-            except Order.DoesNotExist:
-                logger.warning(f"Order with cashfree_order_id {order_id} not found")
+                # Try to find order by payment_id (cashfree_order_id)
+                order = Order.objects.filter(payment_id=order_id).first()
+                
+                if order:
+                    if order_status == 'PAID' and not order.paid:
+                        order.paid = True
+                        order.order_status = 'confirmed'
+                        order.save(update_fields=['paid', 'order_status'])
+                        logger.info(f"Updated order {order.id} status to paid via webhook")
+                    elif order_status in ['FAILED', 'CANCELLED']:
+                        order.order_status = 'cancelled'
+                        order.save(update_fields=['order_status'])
+                        logger.info(f"Updated order {order.id} status to cancelled via webhook")
+                else:
+                    logger.info(f"Order with payment_id {order_id} not found (may not be created yet)")
+                    
+            except Exception as e:
+                logger.error(f"Error updating order from webhook: {str(e)}")
         
         return JsonResponse({'status': 'success'})
         
     except Exception as e:
-        logger.error(f"Webhook error: {str(e)}")
+        logger.error(f"Webhook error: {str(e)}", exc_info=True)
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
 def cashfree_status(request):
     """
     AJAX endpoint to check payment status (for polling)
+    UPDATED: Returns detailed status information for better handling
     """
     order_id = request.GET.get('order_id')
     
     if not order_id:
-        return JsonResponse({'status': 'ERROR', 'message': 'No order_id provided'})
+        return JsonResponse({
+            'status': 'ERROR', 
+            'message': 'No order_id provided'
+        }, status=400)
     
-    cashfree = CashfreeService()
-    status = cashfree.verify_payment(order_id)
-    
-    return JsonResponse({'status': status})
+    try:
+        cashfree = CashfreeService()
+        status = cashfree.verify_payment(order_id)
+        
+        logger.info(f"Status check for {order_id}: {status}")
+        
+        # Return appropriate response based on status
+        response_data = {
+            'status': status,
+            'order_id': order_id
+        }
+        
+        if status == 'PAID':
+            response_data['redirect_url'] = f'/orders/cashfree/return/?order_id={order_id}'
+            response_data['message'] = 'Payment successful!'
+        elif status in ['FAILED', 'CANCELLED', 'USER_DROPPED']:
+            response_data['redirect_url'] = f'/orders/cashfree/return/?order_id={order_id}'
+            response_data['message'] = 'Payment was not completed.'
+        elif status in ['ACTIVE', 'PENDING']:
+            response_data['message'] = 'Payment is being processed...'
+        elif status == 'EXPIRED':
+            response_data['redirect_url'] = '/orders/checkout/'
+            response_data['message'] = 'Payment session expired.'
+        else:
+            response_data['message'] = 'Checking payment status...'
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error checking payment status: {str(e)}", exc_info=True)
+        return JsonResponse({
+            'status': 'ERROR',
+            'message': 'Failed to check payment status'
+        }, status=500)
 
 
 def confirmation(request, order_id):

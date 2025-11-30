@@ -164,8 +164,13 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <form method="post" action="{% url 'cart:cart_update' item.product.id %}" class="quantity-controls-mobile">
                                     {% csrf_token %}
+                                    <button type="button" class="minus-btn-mobile" aria-label="Decrease quantity">
+                                        <svg width="20" height="20" viewBox="0 0 20 20">
+                                            <rect x="4" y="9" width="12" height="2" fill="currentColor" />
+                                        </svg>
+                                    </button>
                                     <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                                    <button type="button" class="plus-btn-mobile">
+                                    <button type="button" class="plus-btn-mobile" aria-label="Increase quantity">
                                         <svg width="20" height="20">
                                             <use xlink:href="#plus"></use>
                                         </svg>
@@ -593,6 +598,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const input = form.querySelector('input[type="number"]');
                 input.value = parseInt(input.value) + 1;
                 input.dispatchEvent(new Event('change'));
+                btn.disabled = true;
+                setTimeout(function() { btn.disabled = false; }, 400);
+            });
+        });
+        // Mobile: minus button
+        document.querySelectorAll('.minus-btn-mobile').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                const form = btn.closest('form');
+                const input = form.querySelector('input[type="number"]');
+                let val = parseInt(input.value);
+                if (val > 1) {
+                    input.value = val - 1;
+                    input.dispatchEvent(new Event('change'));
+                }
                 btn.disabled = true;
                 setTimeout(function() { btn.disabled = false; }, 400);
             });

@@ -363,13 +363,13 @@
               <div class="image-holder">
                 <a href="{% url 'store:product_list' %}?major_category=decor">
                   <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
-                    <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+                    <source src="{% static 'videos/calligraphy.mp4'%}" type="video/mp4">
                   </video>
                 </a>
               </div>
               <div class="category-content">
                 <div class="product-button">
-                  <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">DECOR</a>
+                  <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">CALLIGRAPHY</a>
                 </div>
               </div>
             </div>
@@ -434,13 +434,13 @@
               <div class="image-holder">
                 <a href="{% url 'store:product_list' %}?major_category=decor">
                   <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
-                    <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+                    <source src="{% static 'videos/calligraphy.mp4'%}" type="video/mp4">
                   </video>
                 </a>
               </div>
-              <div class="category-content">
+              <div class="category-content">  
                 <div class="product-button">
-                  <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">DECOR</a>
+                  <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">CALLIGRAPHY</a>
                 </div>
               </div>
             </div>
@@ -468,7 +468,7 @@
       <div class="category-static-row">
         <div class="cat-item image-zoom-effect">
           <div class="image-holder">
-            <a href="{% url 'store:product_list_by_category' 'quran' %}">
+            <a href="{% url 'store:product_list_by_category' 'quran-and-hadith' %}">
               <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
                 <source src="{% static 'videos/quran-loop.mp4' %}" type="video/mp4">
               </video>
@@ -476,7 +476,7 @@
           </div>
           <div class="category-content">
             <div class="product-button">
-              <a href="{% url 'store:product_list_by_category' 'quran' %}" style="background-color: white; color: black; border: none;font-weight: 400;">QURAN</a>
+              <a href="{% url 'store:product_list_by_category' 'quran-and-hadith' %}" style="background-color: white; color: black; border: none;font-weight: 400;">QURAN & HADITH</a>
             </div>
           </div>
         </div>
@@ -490,7 +490,7 @@
           </div>
           <div class="category-content">
             <div class="product-button">
-              <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; font-weight: 400;">FOR KIDS</a>
+              <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; font-weight: 400;">DUA STICKERS</a>
             </div>
           </div>
         </div>
@@ -504,7 +504,7 @@
           </div>
           <div class="category-content">
             <div class="product-button">
-              <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; padding: 12px 24px; font-weight: 400;">ACCESSORIES</a>
+              <a href="{% url 'store:product_list' %}" style="background-color: white; color: black; border: none; padding: 12px 24px; font-weight: 400;">PRAYER ESSENTIALS</a>
             </div>
           </div>
         </div>
@@ -512,13 +512,13 @@
           <div class="image-holder">
             <a href="{% url 'store:product_list' %}?major_category=new_arrivals">
               <video class="w-100" autoplay muted loop playsinline style="aspect-ratio: 1 / 1; object-fit: cover;">
-                <source src="{% static 'videos/4th-loop.mp4'%}" type="video/mp4">
+                <source src="{% static 'videos/calligraphy.mp4'%}" type="video/mp4">
               </video>
             </a>
           </div>
           <div class="category-content">
             <div class="product-button">
-              <a href="{% url 'store:product_list' %}?major_category=new_arrivals" style="background-color: white; color: black; border: none; font-weight: 400;">NEW ARRIVALS</a>
+              <a href="{% url 'store:product_list' %}?major_category=new_arrivals" style="background-color: white; color: black; border: none; font-weight: 400;">CALLIGRAPHY</a>
             </div>
           </div>
         </div>
@@ -532,7 +532,7 @@
           </div>
           <div class="category-content">
             <div class="product-button">
-              <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">DECOR</a>
+              <a href="{% url 'store:product_list' %}?major_category=decor" style="background-color: white; color: black; border: none; font-weight: 400;">GIFTS</a>
             </div>
           </div>
         </div>
@@ -659,8 +659,8 @@
           </div>
           <div class="col-md-6 column-container bg-white">
             <div class="collection-content p-5 m-0 m-md-5">
-              <h3 class="element-title text-uppercase">Islamic Essentials for Everyone</h3>
-              <p>Discover our handpicked range: Qur'an (Arabic, Hindi, English), Tasbi, Topi, Janamaz, Digital Tasbi, Dua Stickers, Dua Frames, and Dua Books. Perfect for daily worship, gifting, and bringing barakah to your home. Shop authentic Islamic products trusted by families across India.</p>
+              <h4>ISLAMIC ESSENTIALS FOR EVERYONE</h4>
+              <p style="font-size: 1.5rem; line-height: 1.7; max-width: 600px; margin-bottom: 2rem; word-break: break-word; white-space: normal; overflow-wrap: break-word;">Discover our handpicked range: Qur'an (Arabic, Hindi, English), Tasbi, Topi, Janamaz, Digital Tasbi, Dua Stickers, Dua Frames, and Dua Books. Perfect for daily worship, gifting, and bringing barakah to your home. Shop authentic Islamic products trusted by families across India.</p>
               <a href="{% url 'store:product_list' %}" class="btn btn-success text-uppercase mt-3">Shop All Products</a>
             </div>
           </div>

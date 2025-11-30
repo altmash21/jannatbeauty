@@ -53,11 +53,9 @@ function checkPaymentStatus() {
                     `Checking payment status... (${pollAttempts}/${maxPollAttempts})`;
                 setTimeout(checkPaymentStatus, pollInterval);
             } else {
-                // Max attempts reached
-                document.getElementById('status-message').innerHTML = 
-                    '<div class="alert alert-warning">Payment verification is taking longer than expected. ' +
-                    'Your order will be confirmed once payment is verified. ' +
-                    'Please check your email or contact support if you have any concerns.</div>';
+                // Max attempts reached - treat as failure
+                console.log('Max polling attempts reached, treating as failed payment');
+                window.location.href = '/orders/payment-failed/';
             }
         })
         .catch(error => {
