@@ -31,6 +31,7 @@ class Order(models.Model):
     payment_method = models.CharField(max_length=20, choices=[('cashfree', 'Cashfree'), ('cod', 'Cash on Delivery')], default='cod', help_text='Payment method used for this order')
     payment_id = models.CharField(max_length=100, blank=True, null=True, help_text='Payment gateway order/transaction ID')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    delivery_charge = models.DecimalField(max_digits=7, decimal_places=2, default=75.0, help_text='Delivery charge for the order')
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     
     # Shiprocket fields

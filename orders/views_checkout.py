@@ -3,6 +3,7 @@ Order processing and management
 Clean implementation of checkout and order confirmation
 UPDATED: Fixed Cashfree payment status handling for failed/cancelled payments
 """
+
 import uuid
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
@@ -19,6 +20,9 @@ from cart.cart import Cart
 from store.models import Product
 
 logger = logging.getLogger(__name__)
+
+# Delivery charge constant
+DELIVERY_CHARGE = 75.0
 
 
 def get_site_url(request):
@@ -92,7 +96,8 @@ def checkout(request):
     subtotal = cart.get_total_price()
     total_discount = compare_discount + float(coupon_discount)
     cart_total = max(1.00, subtotal - float(coupon_discount))
-    
+    final_total = cart_total + DELIVERY_CHARGE
+
     return render(request, 'orders/checkout.html', {
         'cart': cart,
         'initial_data': initial_data,
@@ -102,6 +107,8 @@ def checkout(request):
         'discount': total_discount,
         'cart_total': cart_total,
         'subtotal': subtotal,
+        'delivery_charge': DELIVERY_CHARGE,
+        'final_total': final_total,
         'saved_addresses': saved_addresses,
     })
 
@@ -148,7 +155,7 @@ def process_checkout(request, cart, coupon_discount):
     
     # Calculate final amount
     cart_total = cart.get_total_price()
-    final_amount = max(1.00, cart_total - float(coupon_discount))
+    final_amount = max(1.00, cart_total - float(coupon_discount)) + DELIVERY_CHARGE
     
     # Route to payment method
     if payment_method == 'cashfree':
@@ -270,8 +277,10 @@ def process_cashfree_payment(request, cart, final_amount, customer_data):
         'compare_discount': compare_discount,
         'coupon_discount': coupon_discount,
         'discount': total_discount,
-        'cart_total': final_amount,
+        'cart_total': cart.get_total_price() - float(coupon_discount),
         'subtotal': cart.get_total_price(),
+        'delivery_charge': DELIVERY_CHARGE,
+        'final_total': final_amount,
         'payment_session_id': payment_session_id,
         'cashfree_env': 'sandbox' if cashfree.env == 'TEST' else 'production',
         'order_id': order_id,

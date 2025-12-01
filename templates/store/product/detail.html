@@ -273,16 +273,29 @@
                     </div>
 
                     {% if product.images.all %}
-                        <div class="mobile-extra-images">
+                        <div class="mobile-extra-images" id="extra-images-container">
                             {% for img in product.images.all %}
                                 <div>
                                     <img src="{{ img.image.url }}"
                                          alt="{{ product.name }}"
-                                         style="width: 100%; height: 100%; border-radius: 0.25rem; object-fit: cover; cursor: pointer;"
-                                         onclick="document.querySelector('.mobile-main-image img').src='{{ img.image.url }}'">
+                                         class="extra-image-thumb"
+                                         style="width: 100%; height: 100%; border-radius: 0.25rem; object-fit: cover; cursor: pointer;">
                                 </div>
                             {% endfor %}
                         </div>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var mainImg = document.querySelector('.mobile-main-image img');
+                            var extraImgs = document.querySelectorAll('.extra-image-thumb');
+                            extraImgs.forEach(function(thumb) {
+                                thumb.addEventListener('click', function() {
+                                    var tempSrc = mainImg.src;
+                                    mainImg.src = thumb.src;
+                                    thumb.src = tempSrc;
+                                });
+                            });
+                        });
+                        </script>
                     {% endif %}
                 </div>
             </div>

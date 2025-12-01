@@ -11,6 +11,25 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 
 
+from django.db import models
+
+
+from django.db import models
+
+class OfferBanner(models.Model):
+    text = models.CharField(max_length=255, help_text='Banner text to display at the top of the site')
+    active = models.BooleanField(default=True, help_text='Show this banner if active')
+    expires_at = models.DateTimeField(null=True, blank=True, help_text='Banner expiry date/time (optional)')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ['-created']
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True)

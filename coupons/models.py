@@ -21,6 +21,7 @@ class Coupon(models.Model):
     valid_to = models.DateTimeField()
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    show_on_banner = models.BooleanField(default=False, help_text='Show this coupon in the top offer banner')
     
     class Meta:
         ordering = ['-created_at']

@@ -103,6 +103,7 @@ TEMPLATES = [
                 'cart.context_processors.cart',
                 'accounts.context_processors.notification_count',
                 'store.context_processors.categories',
+                'store.context_processors_offerbanner.offer_banner',
             ],
         },
     },

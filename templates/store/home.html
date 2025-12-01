@@ -2,7 +2,28 @@
 {% load static %}
 {% block title %}Jannat Library{% endblock %}
 {% block extra_css %}
+
 <style>
+
+  #whatsapp-float {
+  /* ...existing styles... */
+}
+
+@media (max-width: 600px) {
+  .mobile-bottom-nav {
+    padding-right: 60px !important;
+  }
+  #whatsapp-float {
+    width: 48px;
+    height: 48px;
+    bottom: 80px;
+    right: 16px;
+  }
+  #whatsapp-float img {
+    width: 28px;
+    height: 28px;
+  }
+}
     /* Responsive font size for collection section */
     @media (max-width: 768px) {
       .collection .title-xlarge {
@@ -27,6 +48,7 @@
       max-height: 30vh !important;
       height: 30vh !important;
       overflow: hidden;
+      margin-top: 50px !important;
     }
     .video-content .video-bg {
       height: 220px !important;
@@ -1442,4 +1464,45 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <!-- No .swiper-pagination, .swiper-button-next, .swiper-button-prev here -->
 </div>
+<a href="https://wa.me/918400043322" target="_blank" id="whatsapp-float" title="Contact us on WhatsApp" aria-label="Contact us on WhatsApp">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width: 48px; height: 48px; display: block;">
+</a>
+<style>
+#whatsapp-float {
+  position: fixed;
+  width: 56px;
+  height: 56px;
+  bottom:60px;
+  right: 60px;
+  z-index: 9999;
+  background: #25d366;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+#whatsapp-float:hover {
+  box-shadow: 0 4px 16px rgba(37,211,102,0.25);
+  transform: scale(1.08);
+}
+#whatsapp-float img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+@media (max-width: 600px) {
+  #whatsapp-float {
+    width: 48px;
+    height: 48px;
+    bottom: 80px;
+    right: 16px;
+  }
+  #whatsapp-float img {
+    width: 28px;
+    height: 28px;
+  }
+}
+</style>
 {% endblock %}

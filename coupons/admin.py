@@ -3,11 +3,12 @@ from .models import Coupon, CouponUsage
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ['code', 'discount_type', 'discount_value', 'active', 'valid_from', 'valid_to', 'usage_count']
-    list_filter = ['active', 'discount_type', 'created_at']
+    list_display = ['code', 'discount_type', 'discount_value', 'active', 'valid_from', 'valid_to', 'usage_count', 'show_on_banner']
+    list_filter = ['active', 'discount_type', 'created_at', 'show_on_banner']
     search_fields = ['code']
     date_hierarchy = 'created_at'
     ordering = ['-created_at']
+    fields = ('code', 'discount_type', 'discount_value', 'min_purchase_amount', 'max_discount_amount', 'usage_limit', 'valid_from', 'valid_to', 'active', 'show_on_banner')
 
 @admin.register(CouponUsage)
 class CouponUsageAdmin(admin.ModelAdmin):

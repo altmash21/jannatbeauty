@@ -19,7 +19,6 @@ try:
 except ImportError:
     Lead = None
 
-@login_required
 def apply_coupon(request):
     if request.method == 'POST':
         code = request.POST.get('coupon_code', '').strip().upper()
@@ -58,7 +57,6 @@ def apply_coupon(request):
     
     return redirect('cart:cart_detail')
 
-@login_required
 def remove_coupon(request):
     if 'coupon_id' in request.session:
         del request.session['coupon_id']

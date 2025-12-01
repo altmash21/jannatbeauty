@@ -73,6 +73,10 @@
       .category-bar-below-nav {
         top: 76px; /* Height of fixed navbar */
       }
+      
+      body.has-banner .category-bar-below-nav {
+        top: 124px; /* Banner (48px) + Navbar (76px) */
+      }
     }
     
     .category-bar-below-nav a:hover {
@@ -242,12 +246,156 @@
     });
   </script>
 
-
-  <!-- Banner Section -->
-  <div id="topBanner" class="banner bg-success text-white text-center py-2 position-relative ">
-    <p class="mb-0">Welcome to Jannat Library! Enjoy exclusive offers on our products.</p>
-    <button type="button" class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3" onclick="closeBanner()" aria-label="Close banner"></button>
+  <!-- Offer Banner -->
+  <div id="topBanner" class="offer-banner">
+    <div class="container-fluid px-2">
+      <div class="d-flex justify-content-center align-items-center position-relative py-2">
+        {% if offer_banner.coupon %}
+          <p class="mb-0 text-white banner-text">
+            <span class="d-none d-md-inline"><strong>Special Offer!</strong> Use code </span>
+            <span class="d-md-none">Get {{ offer_banner.coupon.discount_value|floatformat:0 }}% off! </span>
+            <span class="coupon-code px-2 py-1 mx-1" style="background: rgba(255,255,255,0.2); border-radius: 4px; font-family: monospace; cursor: pointer; font-size: 0.9em;" onclick="copyCouponCode('{{ offer_banner.coupon.code }}')">
+              {{ offer_banner.coupon.code }}
+            </span>
+            <span class="d-none d-md-inline">
+              for {{ offer_banner.coupon.discount_value|floatformat:0 }}% off! 
+              {% if offer_banner.coupon.valid_to %}
+                <small>Valid till {{ offer_banner.coupon.valid_to|date:"M d, Y" }}</small>
+              {% endif %}
+            </span>
+          </p>
+        {% else %}
+          <p class="mb-0 text-white banner-text">{{ offer_banner.text }}</p>
+        {% endif %}
+        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" onclick="closeBanner()" aria-label="Close banner" style="font-size: 0.8rem;"></button>
+      </div>
+    </div>
   </div>
+
+  <style>
+    .offer-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #06402B 0%, #0a5c3f 100%);
+      z-index: 2050;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease-out;
+      height: 48px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .offer-banner .banner-text {
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100% - 50px);
+    }
+    
+    .offer-banner.closing {
+      transform: translateY(-100%);
+    }
+    
+    body.has-banner {
+      padding-top: 48px;
+    }
+    
+    body.has-banner .navbar.fixed-top {
+      top: 48px !important;
+    }
+    
+    .navbar.fixed-top {
+      top: 0;
+      transition: top 0.3s ease-out;
+    }
+    
+    @media (max-width: 767px) {
+      .offer-banner {
+        height: 40px;
+      }
+      
+      .offer-banner .banner-text {
+        font-size: 0.8rem;
+      }
+      
+      body.has-banner {
+        padding-top: 40px !important;
+      }
+      
+      body.has-banner .navbar.fixed-top {
+        top: 40px !important;
+      }
+    }
+  </style>
+
+  <script>
+    // Add has-banner class to body
+    document.body.classList.add('has-banner');
+    
+    function closeBanner() {
+      const banner = document.getElementById('topBanner');
+      if (banner) {
+        // Remove has-banner class from body
+        document.body.classList.remove('has-banner');
+        // Add closing animation
+        banner.classList.add('closing');
+        // Remove banner from DOM after animation
+        setTimeout(() => {
+          banner.remove();
+        }, 300);
+      }
+    }
+    
+    function copyCouponCode(code) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          const couponEl = event.target;
+          const originalText = couponEl.textContent;
+          const originalBg = couponEl.style.background;
+          couponEl.textContent = '✓ Copied!';
+          couponEl.style.background = 'rgba(255,255,255,0.3)';
+          couponEl.style.fontWeight = 'bold';
+          setTimeout(() => {
+            couponEl.textContent = originalText;
+            couponEl.style.background = originalBg;
+            couponEl.style.fontWeight = 'normal';
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+          // Fallback: show alert
+          alert('Coupon code: ' + code);
+        });
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          const couponEl = event.target;
+          const originalText = couponEl.textContent;
+          const originalBg = couponEl.style.background;
+          couponEl.textContent = '✓ Copied!';
+          couponEl.style.background = 'rgba(255,255,255,0.3)';
+          couponEl.style.fontWeight = 'bold';
+          setTimeout(() => {
+            couponEl.textContent = originalText;
+            couponEl.style.background = originalBg;
+            couponEl.style.fontWeight = 'normal';
+          }, 2000);
+        } catch (err) {
+          alert('Coupon code: ' + code);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
+  </script>
 
   <nav class="navbar navbar-expand-lg text-uppercase fs-6 border-bottom align-items-center fixed-top" style="z-index:1040; background-color: #fff;">
     <div class="container-fluid">
@@ -328,21 +476,24 @@
                   {% block extra_js %}
                   <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                      function setupTypewriter(inputId) {
-                        var input = document.getElementById(inputId);
-                        if (!input) return;
-                        var categories = [];
-                        {% for category in all_categories %}
-                          categories.push(`{{ category.name|escapejs }}`);
-                        {% endfor %}
-                        if (categories.length === 0) categories = ["Quran", "Tasbi", "Topi", "Janamaz", "Dua Books", "Accessories"];
-                        var prefix = "Search for ";
+                      // Get category names
+                      var categories = [];
+                      {% for category in all_categories %}
+                        categories.push(`{{ category.name|escapejs }}`);
+                      {% endfor %}
+                      if (categories.length === 0) categories = ["Quran", "Tasbi", "Topi", "Janamaz", "Dua Books", "Accessories"];
+                      
+                      var prefix = "Search for ";
+                      
+                      // Desktop typewriter
+                      var inputDesktop = document.getElementById('typewriter-search');
+                      if (inputDesktop) {
                         var i = 0, j = 0, typing = true;
                         function typeLoop() {
                           var current = categories[i];
                           if (typing) {
                             if (j < current.length) {
-                              input.setAttribute('placeholder', prefix + current.slice(0, j+1));
+                              inputDesktop.setAttribute('placeholder', prefix + current.slice(0, j+1));
                               j++;
                               setTimeout(typeLoop, 90);
                             } else {
@@ -351,7 +502,7 @@
                             }
                           } else {
                             if (j > 0) {
-                              input.setAttribute('placeholder', prefix + current.slice(0, j-1));
+                              inputDesktop.setAttribute('placeholder', prefix + current.slice(0, j-1));
                               j--;
                               setTimeout(typeLoop, 40);
                             } else {
@@ -363,8 +514,36 @@
                         }
                         typeLoop();
                       }
-                      setupTypewriter('typewriter-search');
-                      setupTypewriter('typewriter-search-mobile');
+                      
+                      // Mobile typewriter
+                      var inputMobile = document.getElementById('typewriter-search-mobile');
+                      if (inputMobile) {
+                        var iM = 0, jM = 0, typingM = true;
+                        function typeLoopMobile() {
+                          var current = categories[iM];
+                          if (typingM) {
+                            if (jM < current.length) {
+                              inputMobile.setAttribute('placeholder', prefix + current.slice(0, jM+1));
+                              jM++;
+                              setTimeout(typeLoopMobile, 90);
+                            } else {
+                              typingM = false;
+                              setTimeout(typeLoopMobile, 1200);
+                            }
+                          } else {
+                            if (jM > 0) {
+                              inputMobile.setAttribute('placeholder', prefix + current.slice(0, jM-1));
+                              jM--;
+                              setTimeout(typeLoopMobile, 40);
+                            } else {
+                              typingM = true;
+                              iM = (iM + 1) % categories.length;
+                              setTimeout(typeLoopMobile, 400);
+                            }
+                          }
+                        }
+                        typeLoopMobile();
+                      }
                     });
                   </script>
                   {% endblock %}
@@ -809,20 +988,6 @@
                 });
             });
         });
-    </script>
-
-    <script>
-        // Banner close functionality
-        function closeBanner() {
-            const banner = document.getElementById('topBanner');
-            if (banner) {
-                banner.classList.add('closing');
-                setTimeout(() => {
-                    banner.style.display = 'none';
-                }, 300);
-            }
-        }
-
     </script>
 
      <script src="{% static 'js/jquery.min.js' %}"></script>

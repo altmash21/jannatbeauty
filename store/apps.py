@@ -7,6 +7,10 @@ class StoreConfig(AppConfig):
     name = 'store'
 
     def ready(self):
+        # Ensure OfferBanner admin is registered
+        import store.admin_offerbanner
+
+    def ready(self):
         from .signals import create_seller_group_and_permissions
 
         # Connect signal to create seller group and permissions after migration

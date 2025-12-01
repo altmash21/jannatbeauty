@@ -403,6 +403,13 @@
                 right: 12px;
             }
         }
+        
+        /* Add top margin for mobile to prevent content being cut off */
+        @media (max-width: 767px) {
+            .py-1.bg-light {
+                margin-top: 50px;
+            }
+        }
     </style>
 {% endblock %}
 
