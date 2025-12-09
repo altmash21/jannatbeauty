@@ -185,6 +185,12 @@
                                 <span>Discount on MRP</span>
                                 <span class="fw-bold text-success">-₹{{ discount|floatformat:2 }}</span>
                             </div>
+                            {% if coupon_discount and coupon_discount|floatformat:2 != '0.00' %}
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Coupon Discount</span>
+                                <span class="fw-bold text-success">-₹{{ coupon_discount|floatformat:2 }}</span>
+                            </div>
+                            {% endif %}
                         <div class="d-flex justify-content-between mb-3">
                             <span>Delivery Charge</span>
                             <span class="fw-bold">₹{{ delivery_charge|floatformat:2 }}</span>

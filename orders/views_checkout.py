@@ -22,7 +22,7 @@ from store.models import Product
 logger = logging.getLogger(__name__)
 
 # Delivery charge constant
-DELIVERY_CHARGE = 75.0
+DELIVERY_CHARGE = 40.0
 
 
 def get_site_url(request):
