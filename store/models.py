@@ -10,11 +10,9 @@ import os
 from io import BytesIO
 from django.core.files.base import ContentFile
 
-
 from django.db import models
 
 
-from django.db import models
 
 class OfferBanner(models.Model):
     text = models.CharField(max_length=255, help_text='Banner text to display at the top of the site')

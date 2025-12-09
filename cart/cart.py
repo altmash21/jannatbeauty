@@ -25,10 +25,12 @@ class Cart:
         """
         self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)
-        if not cart:
+        # Check if cart exists in session (use 'is None' instead of 'not cart' to handle empty dict)
+        if cart is None:
             # save an empty cart in the session
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
+        logger.debug(f"Cart initialized with {len(self.cart)} items: {self.cart}")
 
     def add(self, product, quantity=1, override_quantity=False):
         """
@@ -86,9 +88,27 @@ class Cart:
         Remove a product from the cart.
         """
         product_id = str(product.id)
+        logger.debug(f"Removing product {product_id} from cart")
+        logger.debug(f"Cart before removal: {self.cart}")
         if product_id in self.cart:
-            del self.cart[product_id]
-            self.save()
+            # Create a new dictionary without the product
+            new_cart = {k: v for k, v in self.cart.items() if k != product_id}
+            # Replace the cart in session with the new dictionary
+            self.session[settings.CART_SESSION_ID] = new_cart
+            self.cart = new_cart
+            
+            # If cart is now empty, delete the session key entirely
+            if not new_cart:
+                logger.debug(f"Cart is empty after removing {product_id}, deleting session key")
+                if settings.CART_SESSION_ID in self.session:
+                    del self.session[settings.CART_SESSION_ID]
+                self.cart = {}
+            
+            self.session.modified = True
+            # Force session save immediately
+            self.session.save()
+            logger.debug(f"Product {product_id} removed. Cart after removal: {self.cart}")
+            logger.debug(f"Session cart after removal: {self.session.get(settings.CART_SESSION_ID)}")
 
     def __iter__(self):
         """

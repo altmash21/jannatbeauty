@@ -176,7 +176,7 @@
                                         </svg>
                                     </button>
                                 </form>
-                                <span class="fw-bold text-primary">₹{{ item.price }}</span>
+                                <span class="fw-bold text-primary item-total" data-product-id="{{ item.product.id }}">₹{{ item.total_price|floatformat:2 }}</span>
                             </div>
                         </div>
                     </div>
@@ -220,25 +220,25 @@
                     </div>
 
                     <div class="d-flex justify-content-between mb-3">
-                        <span>Discount on MRP</span>
+                        <span>Discount on MRP {% if compare_discount_percent > 0 %}({{ compare_discount_percent|floatformat:0 }}% off){% endif %}</span>
                         <span class="fw-bold text-success">-₹{{ compare_discount|floatformat:2 }}</span>
                     </div>
                     
                     {% if coupon_discount > 0 %}
                     <div class="d-flex justify-content-between mb-3">
-                        <span>Coupon Discount</span>
+                        <span>Coupon Discount {% if coupon_discount_percent > 0 %}({{ coupon_discount_percent|floatformat:0 }}% off){% endif %}</span>
                         <span class="fw-bold text-success">-₹{{ coupon_discount|floatformat:2 }}</span>
                     </div>
                     {% endif %}
                     
                     <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                        <span>Convenience Fee</span>
-                        <span class="fw-bold text-success">₹0</span>
+                        <span>Delivery Charge</span>
+                        <span class="fw-bold">₹40</span>
                     </div>
 
                     <div class="d-flex justify-content-between mb-4">
                         <span class="text-uppercase fw-bold">Total Amount</span>
-                        <span class="text-primary fw-bold">₹{{ total|floatformat:2 }}</span>
+                        <span class="text-primary fw-bold">₹{{ total|add:40|floatformat:2 }}</span>
                     </div>
 
                     <button class="btn btn-primary btn-lg w-100 mb-3"
@@ -320,14 +320,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <span class="fw-bold">₹{{ item.total_price }}</span>
                                             </td>
                                             <td class="align-middle">
-                                                <form method="post" action="{% url 'cart:cart_remove' item.product.id %}" class="remove-item-form">
-                                                    {% csrf_token %}
-                                                    <button class="btn btn-link text-danger p-0 remove-item-btn" type="submit" data-product-id="{{ item.product.id }}">
-                                                        <svg width="20" height="20">
-                                                            <use xlink:href="#trash"></use>
-                                                        </svg>
-                                                    </button>
-                                                </form>
+                                                <button class="btn btn-link text-danger p-0 remove-item-btn" 
+                                                        type="button" 
+                                                        data-product-id="{{ item.product.id }}"
+                                                        data-remove-url="{% url 'cart:cart_remove' item.product.id %}">
+                                                    <svg width="20" height="20">
+                                                        <use xlink:href="#trash"></use>
+                                                    </svg>
+                                                </button>
                                             </td>
                                         </tr>
                                         {% empty %}
@@ -381,25 +381,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
 
                         <div class="d-flex justify-content-between mb-3">
-                            <span>Discount on MRP</span>
+                            <span>Discount on MRP {% if compare_discount_percent > 0 %}({{ compare_discount_percent|floatformat:0 }}% off){% endif %}</span>
                             <span class="fw-bold text-success">-₹{{ compare_discount|floatformat:2 }}</span>
                         </div>
                         
                         {% if coupon_discount > 0 %}
                         <div class="d-flex justify-content-between mb-3">
-                            <span>Coupon Discount</span>
+                            <span>Coupon Discount {% if coupon_discount_percent > 0 %}({{ coupon_discount_percent|floatformat:0 }}% off){% endif %}</span>
                             <span class="fw-bold text-success">-₹{{ coupon_discount|floatformat:2 }}</span>
                         </div>
                         {% endif %}
                         
                         <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                            <span>Convenience Fee</span>
-                            <span class="fw-bold text-success">₹0</span>
+                            <span>Delivery Charge</span>
+                            <span class="fw-bold">₹40</span>
                         </div>
 
                         <div class="d-flex justify-content-between mb-4">
                             <span class="text-uppercase fw-bold">Total Amount</span>
-                            <span class="text-primary fw-bold fs-5">₹{{ total|floatformat:2 }}</span>
+                            <span class="text-primary fw-bold fs-5">₹{{ total|add:40|floatformat:2 }}</span>
                         </div>
 
                         <button class="btn btn-primary btn-lg w-100 mb-3"
@@ -447,95 +447,159 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper: update all cart summary fields from JSON
     function updateCartSummary(data) {
-        // Desktop summary
-        const mrpEls = document.querySelectorAll('.cart-summary .fw-bold, .cart-summary-mobile .fw-bold');
-        document.querySelectorAll('.cart-summary .fw-bold, .cart-summary-mobile .fw-bold').forEach(function(el) {
-            if (el.closest('.d-flex') && el.previousElementSibling && el.previousElementSibling.textContent.includes('Price')) {
-                el.textContent = '₹' + (data.mrp_total !== undefined ? data.mrp_total.toFixed(2) : '0.00');
+        console.log('Updating cart summary with:', data);
+        
+        // Update MRP Total (Price)
+        document.querySelectorAll('.cart-summary .d-flex, .cart-summary-mobile .d-flex').forEach(function(div) {
+            const label = div.querySelector('span:first-child');
+            const value = div.querySelector('span:last-child');
+            if (label && value) {
+                if (label.textContent.includes('Price')) {
+                    // Update item count and price
+                    const itemCount = data.cart_count || 0;
+                    label.textContent = `Price (${itemCount} item${itemCount === 1 ? '' : 's'})`;
+                    value.textContent = '₹' + (data.mrp_total || 0).toFixed(2);
+                } else if (label.textContent.includes('Discount on MRP')) {
+                    const percent = data.compare_discount_percent || 0;
+                    label.innerHTML = 'Discount on MRP' + (percent > 0 ? ' (' + Math.round(percent) + '% off)' : '');
+                    value.textContent = '-₹' + (data.compare_discount || 0).toFixed(2);
+                } else if (label.textContent.includes('Coupon Discount')) {
+                    const percent = data.coupon_discount_percent || 0;
+                    label.innerHTML = 'Coupon Discount' + (percent > 0 ? ' (' + Math.round(percent) + '% off)' : '');
+                    value.textContent = '-₹' + (data.coupon_discount || 0).toFixed(2);
+                }
             }
         });
-        document.querySelectorAll('.cart-summary .text-success, .cart-summary-mobile .text-success').forEach(function(el) {
-            if (el.textContent.includes('-₹')) {
-                el.textContent = '-₹' + (data.discount !== undefined ? data.discount.toFixed(2) : '0.00');
+        
+        // Update or hide coupon discount row
+        const couponDiscount = data.coupon_discount || 0;
+        document.querySelectorAll('.cart-summary, .cart-summary-mobile').forEach(function(summary) {
+            const couponRow = Array.from(summary.querySelectorAll('.d-flex')).find(div => {
+                const label = div.querySelector('span:first-child');
+                return label && label.textContent.includes('Coupon Discount');
+            });
+            
+            if (couponDiscount > 0) {
+                if (!couponRow) {
+                    // Create coupon discount row if it doesn't exist
+                    const discountRow = Array.from(summary.querySelectorAll('.d-flex')).find(div => {
+                        const label = div.querySelector('span:first-child');
+                        return label && label.textContent.includes('Discount on MRP');
+                    });
+                    if (discountRow) {
+                        const newRow = document.createElement('div');
+                        newRow.className = 'd-flex justify-content-between mb-3';
+                        const percent = data.coupon_discount_percent || 0;
+                        const percentText = percent > 0 ? ' (' + Math.round(percent) + '% off)' : '';
+                        newRow.innerHTML = `<span>Coupon Discount${percentText}</span><span class="fw-bold text-success">-₹${couponDiscount.toFixed(2)}</span>`;
+                        discountRow.parentNode.insertBefore(newRow, discountRow.nextSibling);
+                    }
+                }
+            } else if (couponRow) {
+                // Remove coupon row if discount is 0
+                couponRow.remove();
             }
         });
+        
+        // Update Total Amount (add ₹40 delivery charge)
         document.querySelectorAll('.cart-summary .text-primary, .cart-summary-mobile .text-primary').forEach(function(el) {
-            el.textContent = '₹' + (data.total !== undefined ? data.total.toFixed(2) : '0.00');
-        });
-        // Update item count
-        document.querySelectorAll('.cart-summary span, .cart-summary-mobile span').forEach(function(el) {
-            if (el.textContent.match(/Price \(\d+ item/)) {
-                el.textContent = `Price (${data.cart_count} item${data.cart_count == 1 ? '' : 's'})`;
+            if (el.closest('.d-flex')) {
+                const label = el.previousElementSibling;
+                if (label && (label.textContent.includes('Total Amount') || label.textContent.includes('TOTAL AMOUNT'))) {
+                    const totalWithDelivery = (data.total || 0) + 40;
+                    el.textContent = '₹' + totalWithDelivery.toFixed(2);
+                }
             }
         });
+        
         // Update cart icon count if present
         document.querySelectorAll('.cart-count').forEach(function(el) {
-            el.textContent = data.cart_count;
+            el.textContent = data.cart_count || 0;
         });
     }
 
     // Helper: update per-item total price in the row (desktop)
     function updateItemTotal(productId, totalPrice) {
-        // Desktop
-        const row = document.querySelector(`tr [data-product-id='${productId}']`);
-        if (row) {
-            const td = row.closest('tr').querySelectorAll('td');
+        // Desktop - find the total column (4th column)
+        const desktopRow = document.querySelector(`table .remove-item-btn[data-product-id='${productId}']`);
+        if (desktopRow) {
+            const td = desktopRow.closest('tr').querySelectorAll('td');
             if (td && td.length > 3) {
-                td[3].querySelector('span').textContent = '₹' + totalPrice.toFixed(2);
+                const totalSpan = td[3].querySelector('span');
+                if (totalSpan) totalSpan.textContent = '₹' + totalPrice.toFixed(2);
             }
         }
-        // Mobile
-        const mobile = document.querySelector(`.cart-item-mobile [data-product-id='${productId}']`);
-        if (mobile) {
-            // Find the price span in the same mobile cart item
-            const priceSpan = mobile.closest('.cart-item-mobile').querySelector('.fw-bold.text-primary');
-            if (priceSpan) priceSpan.textContent = '₹' + totalPrice.toFixed(2);
+        // Mobile - find the item-total span
+        const mobileTotal = document.querySelector(`.cart-item-mobile .item-total[data-product-id='${productId}']`);
+        if (mobileTotal) {
+            mobileTotal.textContent = '₹' + totalPrice.toFixed(2);
         }
     }
 
-    // AJAX remove item (already present, just update summary after removal)
+    // AJAX remove item - NO nested forms!
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.remove-item-btn').forEach(function(btn) {
+        console.log('Attaching remove button handlers...');
+        const removeButtons = document.querySelectorAll('.remove-item-btn');
+        console.log('Found', removeButtons.length, 'remove buttons');
+        
+        removeButtons.forEach(function(btn, index) {
+            console.log('Attaching handler to button', index, btn);
+            
             btn.addEventListener('click', function(e) {
-                if (window.fetch) {
-                    e.preventDefault();
-                    const form = this.form;
-                    const url = form.getAttribute('action');
-                    let csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
-                    if (!csrfToken) {
-                        csrfToken = getCookie('csrftoken');
-                    }
-                    btn.disabled = true;
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        credentials: 'same-origin'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            let cartItem = btn.closest('.cart-item-mobile') || btn.closest('tr');
-                            if (cartItem) cartItem.remove();
-                            // Fetch new cart summary
-                            fetch('/cart/detail/json/', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-                                .then(r => r.json())
-                                .then(updateCartSummary);
-                        } else {
-                            alert(data.message || 'Failed to remove item from cart');
-                            btn.disabled = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while removing the item');
-                        btn.disabled = false;
-                    });
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Remove button clicked!');
+                
+                // Get URL from data attribute (no form needed!)
+                const url = this.getAttribute('data-remove-url') || this.form?.getAttribute('action');
+                const productId = this.getAttribute('data-product-id');
+                
+                console.log('Product ID:', productId);
+                console.log('Removing item, URL:', url);
+                
+                if (!url || url.indexOf('/cart/remove/') === -1) {
+                    console.error('Invalid URL:', url);
+                    alert('Error: Invalid remove URL');
+                    return false;
                 }
-            });
+                
+                let csrfToken = getCookie('csrftoken');
+                
+                btn.disabled = true;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = 'Removing...';
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    console.log('Remove response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error('Server returned ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Remove response data:', data);
+                    // Always reload the page to ensure consistency
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error removing item:', error);
+                    alert('Error removing item: ' + error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                });
+                
+                return false;
+            }, true);
         });
 
         // Desktop: quantity input change
@@ -563,16 +627,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        updateItemTotal(productId, data.item_total_price);
-                        fetch('/cart/detail/json/', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-                            .then(r => r.json())
-                            .then(updateCartSummary);
+                        // Check if cart is empty after update
+                        const cartCount = data.cart_count !== undefined ? data.cart_count : data.cart_total_items;
+                        if (cartCount === 0) {
+                            window.location.reload();
+                        } else {
+                            if (data.item_total_price !== null && data.item_total_price !== undefined) {
+                                updateItemTotal(productId, data.item_total_price);
+                            }
+                            updateCartSummary(data);
+                        }
                     } else {
                         alert(data.message || 'Failed to update quantity');
                     }
                     input.disabled = false;
                 })
                 .catch(error => {
+                    console.error('Error:', error);
                     alert('Error updating cart');
                     input.disabled = false;
                 });
@@ -604,16 +675,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        updateItemTotal(productId, data.item_total_price);
-                        fetch('/cart/detail/json/', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-                            .then(r => r.json())
-                            .then(updateCartSummary);
+                        // Check if cart is empty after update
+                        const cartCount = data.cart_count !== undefined ? data.cart_count : data.cart_total_items;
+                        if (cartCount === 0) {
+                            window.location.reload();
+                        } else {
+                            if (data.item_total_price !== null && data.item_total_price !== undefined) {
+                                updateItemTotal(productId, data.item_total_price);
+                            }
+                            updateCartSummary(data);
+                        }
                     } else {
                         alert(data.message || 'Failed to update quantity');
                     }
                     input.disabled = false;
                 })
                 .catch(error => {
+                    console.error('Error:', error);
                     alert('Error updating cart');
                     input.disabled = false;
                 });
