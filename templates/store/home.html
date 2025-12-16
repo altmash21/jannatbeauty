@@ -2,6 +2,10 @@
 {% load static %}
 {% block title %}Jannat Library{% endblock %}
 {% block extra_css %}
+<script>
+  // Set flag BEFORE any scripts load to prevent legacy carousel init
+  window.disableLegacyProductCarousel = true;
+</script>
 
 <style>
 
@@ -163,6 +167,85 @@
   .product-carousel .btn-link:hover {
     color: #495057;
     text-decoration: underline;
+  }
+
+  /* Product Carousel Swiper Navigation Styles */
+  .product-carousel {
+    position: relative;
+  }
+
+  .product-carousel .swiper {
+    padding: 0 50px;
+  }
+
+  /* Navigation Buttons - Desktop Only */
+  .product-carousel .swiper-button-next,
+  .product-carousel .swiper-button-prev {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: #06402B;
+    transition: all 0.3s ease;
+    display: none;
+  }
+
+  .product-carousel .swiper-button-next:after,
+  .product-carousel .swiper-button-prev:after {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .product-carousel .swiper-button-next:hover,
+  .product-carousel .swiper-button-prev:hover {
+    background: #06402B;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .product-carousel .swiper-button-next {
+    right: 0;
+  }
+
+  .product-carousel .swiper-button-prev {
+    left: 0;
+  }
+
+  /* Show arrows on desktop (1024px and above) */
+  @media (min-width: 1024px) {
+    .product-carousel .swiper-button-next,
+    .product-carousel .swiper-button-prev {
+      display: flex;
+    }
+  }
+
+  /* Pagination */
+  .product-carousel .swiper-pagination {
+    bottom: -5px !important;
+    position: relative;
+    margin-top: 20px;
+  }
+
+  .product-carousel .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    opacity: 1;
+    transition: all 0.3s ease;
+  }
+
+  .product-carousel .swiper-pagination-bullet-active {
+    background: #06402B;
+    width: 24px;
+    border-radius: 5px;
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 1023px) {
+    .product-carousel .swiper {
+      padding: 0;
+    }
   }
 
   .discount-modal-content {
@@ -659,16 +742,14 @@
           {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
       </div>
-      <div class="icon-arrow icon-arrow-left"><svg width="50" height="50" viewBox="0 0 24 24">
-          <use xlink:href="#arrow-left"></use>
-        </svg></div>
-      <div class="icon-arrow icon-arrow-right"><svg width="50" height="50" viewBox="0 0 24 24">
-          <use xlink:href="#arrow-right"></use>
-        </svg></div>
     </div>
   </section>
 
+  <!-- Swiper CSS for product carousels -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
   <section class="collection bg-light position-relative py-5">
     <div class="container">
       <div class="row">
@@ -745,13 +826,9 @@
           {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
       </div>
-      <div class="icon-arrow icon-arrow-left"><svg width="50" height="50" viewBox="0 0 24 24">
-          <use xlink:href="#arrow-left"></use>
-        </svg></div>
-      <div class="icon-arrow icon-arrow-right"><svg width="50" height="50" viewBox="0 0 24 24">
-          <use xlink:href="#arrow-right"></use>
-        </svg></div>
     </div>
   </section>
 
@@ -872,13 +949,9 @@
           {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
       </div>
-      <div class="icon-arrow icon-arrow-left"><svg width="50" height="50" viewBox="0 0 24 24">
-          <use xlink:href="#arrow-left"></use>
-        </svg></div>
-      <div class="icon-arrow icon-arrow-right"><svg width="50" height="50" viewBox="0 0 24 24">
-          <use xlink:href="#arrow-right"></use>
-        </svg></div>
     </div>
   </section>
 
@@ -1399,53 +1472,8 @@
   </script>
 
 {% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.categorySwiperInstance) {
-    window.categorySwiperInstance.destroy(true, true);
-    window.categorySwiperInstance = null;
-  }
-  window.categorySwiperInstance = new Swiper('.category-swiper', {
-    loop: true,
-    slidesPerView: 2.5,
-    spaceBetween: 16,
-    centeredSlides: false,
-    speed: 5000,
-    allowTouchMove: true,
-    grabCursor: true,
-    loopedSlides: 5,
-    freeMode: {
-      enabled: true,
-      momentum: false,
-      sticky: false
-    },
-    autoplay: {
-      delay: 1,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: false,
-      reverseDirection: false,
-      waitForTransition: false
-    },
-    breakpoints: {
-      576: {
-        slidesPerView: 3,
-        spaceBetween: 24,
-      },
-      768: {
-        slidesPerView: 4,
-        spaceBetween: 24,
-      }
-    },
-    navigation: false,
-    pagination: false,
-    on: {
-      init: function() {
-        this.autoplay.start();
-      }
-    }
-  });
-});
-</script>
+  <!-- Product carousel initialization -->
+  <script src="{% static 'js/product_carousel.js' %}"></script>
 {% endblock %}
 
 <!-- Remove Swiper arrows and pagination for this section -->

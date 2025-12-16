@@ -238,7 +238,7 @@ def home(request):
             available=True,
             approved=True,
             seller__seller_profile__approval_status='approved'
-        ).select_related('category', 'seller').order_by('-created')[:8]
+        ).select_related('category', 'seller').order_by('-created')[:20]
         cache.set('home_new_arrivals', list(new_arrivals), 60 * 15)  # Cache for 15 minutes
     
     featured_products = cache.get('home_featured_products')
@@ -248,18 +248,18 @@ def home(request):
             available=True,
             approved=True,
             seller__seller_profile__approval_status='approved'
-        ).select_related('category', 'seller').order_by('-created')[:8]
+        ).select_related('category', 'seller').order_by('-created')[:20]
         cache.set('home_featured_products', list(featured_products), 60 * 15)  # Cache for 15 minutes
     
-    best_selling_products = cache.get('home_best_selling_products')
+    best_selling_products = cache.get('home_best_selling')
     if best_selling_products is None:
         best_selling_products = Product.objects.filter(
             major_category='best_selling',
             available=True,
             approved=True,
             seller__seller_profile__approval_status='approved'
-        ).select_related('category', 'seller').order_by('-created')[:8]
-        cache.set('home_best_selling_products', list(best_selling_products), 60 * 15)  # Cache for 15 minutes
+        ).select_related('category', 'seller').order_by('-created')[:20]
+        cache.set('home_best_selling', list(best_selling_products), 60 * 15)
     
     categories = cache.get('home_categories')
     if categories is None:
